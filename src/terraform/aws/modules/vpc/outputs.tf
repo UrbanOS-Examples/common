@@ -96,14 +96,9 @@ output "public_route_table_ids" {
   value       = ["${aws_route_table.public.*.id}"]
 }
 
-output "protected_route_table_ids" {
-  description = "List of IDs of protected route tables"
-  value       = ["${aws_route_table.protected.*.id}"]
-}
-
-output "private_route_table_ids" {
-  description = "List of IDs of private route tables"
-  value       = ["${aws_route_table.private.*.id}"]
+output "internal_route_table_ids" {
+  description = "List of IDs of internal route tables"
+  value       = ["${aws_route_table.internal.*.id}"]
 }
 
 output "nat_ids" {

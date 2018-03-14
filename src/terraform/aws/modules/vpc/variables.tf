@@ -94,12 +94,7 @@ variable "vpn_gateway_id" {
   default     = ""
 }
 
-variable "propagate_private_route_tables_vgw" {
-  description = "Should be true if you want route table propagation"
-  default     = false
-}
-
-variable "propagate_protected_route_tables_vgw" {
+variable "propagate_internal_route_tables_vgw" {
   description = "Should be true if you want route table propagation"
   default     = false
 }
@@ -144,13 +139,8 @@ variable "public_route_table_tags" {
   default     = {}
 }
 
-variable "protected_route_table_tags" {
-  description = "Additional tags for the protected route tables"
-  default     = {}
-}
-
-variable "private_route_table_tags" {
-  description = "Additional tags for the private route tables"
+variable "internal_route_table_tags" {
+  description = "Additional tags for the internal route tables"
   default     = {}
 }
 

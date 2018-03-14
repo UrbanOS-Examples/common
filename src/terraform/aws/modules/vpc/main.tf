@@ -1,10 +1,11 @@
 # I used terraform-aws-vpc as a starting point and I made the following modifications:
 # defined a new type of subnets: protected_subnets that are like private subnets and alse have ACL's
 # removed RDS, ElasticCache and RedShift
-# only define two routing tables: Public and Private
+# only define one routing table for Public and on Internal Route table per Availability Zone
 # This approach is based on the following articles:
 # https://medium.com/aws-activate-startup-blog/practical-vpc-design-8412e1a18dcc
 # https://docs.aws.amazon.com/quickstart/latest/vpc/architecture.html
+
 terraform {
   required_version = ">= 0.10.3" # introduction of Local Values configuration language feature
 }
@@ -79,29 +80,17 @@ resource "aws_route" "public_internet_gateway" {
 }
 
 #################
-# Private and protected routes - need to create one for each AZ. Do I really need to create a private and a public
+# Internal route table to be used by Private or Protected Subnets - we are going to set one per Availability Zone.
+# The reason for that is that in production we want to have one NAT per Availability Zonepropa and this will result in
+# each route table pointing to the NAT in its own Availability Zone
 #################
 
-resource "aws_route_table" "protected" {
+resource "aws_route_table" "internal" {
   count = "${var.create_vpc && length(var.protected_subnets) > 0 ? length(var.azs) : 0}"
 
   vpc_id = "${aws_vpc.this.id}"
 
-  tags = "${merge(var.tags, var.protected_route_table_tags, map("Name", format("%s-protected-%s", var.name ,element(var.azs, count.index))))}"
-
-  lifecycle {
-    # When attaching VPN gateways it is common to define aws_vpn_gateway_route_propagation
-    # resources that manipulate the attributes of the routing table (typically for the private subnets)
-    ignore_changes = ["propagating_vgws"]
-  }
-}
-
-resource "aws_route_table" "private" {
-  count = "${var.create_vpc && length(var.private_subnets) > 0 ? length(var.azs)  : 0}"
-
-  vpc_id = "${aws_vpc.this.id}"
-
-  tags = "${merge(var.tags, var.private_route_table_tags, map("Name", format("%s-private-%s", var.name, element(var.azs, count.index))))}"
+  tags = "${merge(var.tags, var.internal_route_table_tags, map("Name", format("%s-internal-%s", var.name ,element(var.azs, count.index))))}"
 
   lifecycle {
     # When attaching VPN gateways it is common to define aws_vpn_gateway_route_propagation
@@ -184,18 +173,10 @@ resource "aws_nat_gateway" "this" {
   depends_on = ["aws_internet_gateway.this"]
 }
 
-resource "aws_route" "private_nat_gateway" {
-  count = "${var.create_vpc && var.enable_nat_gateway ? length(var.private_subnets) : 0}"
+resource "aws_route" "internal_nat_gateway" {
+  count = "${var.create_vpc && var.enable_nat_gateway ? length(var.azs) : 0}"
 
-  route_table_id         = "${element(aws_route_table.private.*.id, count.index)}"
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = "${element(aws_nat_gateway.this.*.id, count.index)}"
-}
-
-resource "aws_route" "protected_nat_gateway" {
-  count = "${var.create_vpc && var.enable_nat_gateway ? length(var.protected_subnets) : 0}"
-
-  route_table_id         = "${element(aws_route_table.protected.*.id,count.index)}"
+  route_table_id         = "${element(aws_route_table.internal.*.id, count.index)}"
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = "${element(aws_nat_gateway.this.*.id, count.index)}"
 }
@@ -216,18 +197,11 @@ resource "aws_vpc_endpoint" "s3" {
   service_name = "${data.aws_vpc_endpoint_service.s3.service_name}"
 }
 
-resource "aws_vpc_endpoint_route_table_association" "private_s3" {
-  count = "${var.create_vpc && var.enable_s3_endpoint ? length(var.private_subnets) : 0}"
+resource "aws_vpc_endpoint_route_table_association" "internal_s3" {
+  count = "${var.create_vpc && var.enable_s3_endpoint ? length(var.azs) : 0}"
 
   vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
-  route_table_id  = "${element(aws_route_table.private.*.id, count.index)}"
-}
-
-resource "aws_vpc_endpoint_route_table_association" "protected_s3" {
-  count = "${var.create_vpc && var.enable_s3_endpoint ? length(var.protected_subnets) : 0}"
-
-  vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
-  route_table_id  = "${element(aws_route_table.protected.*.id,count.index)}"
+  route_table_id  = "${element(aws_route_table.internal.*.id, count.index)}"
 }
 
 resource "aws_vpc_endpoint_route_table_association" "public_s3" {
@@ -253,18 +227,11 @@ resource "aws_vpc_endpoint" "dynamodb" {
   service_name = "${data.aws_vpc_endpoint_service.dynamodb.service_name}"
 }
 
-resource "aws_vpc_endpoint_route_table_association" "private_dynamodb" {
-  count = "${var.create_vpc && var.enable_dynamodb_endpoint ? length(var.private_subnets) : 0}"
+resource "aws_vpc_endpoint_route_table_association" "internal_dynamodb" {
+  count = "${var.create_vpc && var.enable_dynamodb_endpoint ? length(var.azs) : 0}"
 
   vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb.id}"
-  route_table_id  = "${element(aws_route_table.private.*.id, count.index)}"
-}
-
-resource "aws_vpc_endpoint_route_table_association" "protected_dynamodb" {
-  count = "${var.create_vpc && var.enable_dynamodb_endpoint ? length(var.protected_subnets) : 0}"
-
-  vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb.id}"
-  route_table_id  = "${element(aws_route_table.protected.*.id,count.index)}"
+  route_table_id  = "${element(aws_route_table.internal.*.id, count.index)}"
 }
 
 resource "aws_vpc_endpoint_route_table_association" "public_dynamodb" {
@@ -275,20 +242,20 @@ resource "aws_vpc_endpoint_route_table_association" "public_dynamodb" {
 }
 
 ##########################
-# Route table association
+# Route table  - subnet association
 ##########################
 resource "aws_route_table_association" "private" {
   count = "${var.create_vpc && length(var.private_subnets) > 0 ? length(var.private_subnets) : 0}"
 
   subnet_id      = "${element(aws_subnet.private.*.id, count.index)}"
-  route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
+  route_table_id = "${element(aws_route_table.internal.*.id, count.index)}"
 }
 
 resource "aws_route_table_association" "protected" {
   count = "${var.create_vpc && length(var.protected_subnets) > 0 ? length(var.protected_subnets) : 0}"
 
   subnet_id      = "${element(aws_subnet.protected.*.id, count.index)}"
-  route_table_id = "${element(aws_route_table.protected.*.id, count.index)}"
+  route_table_id = "${element(aws_route_table.internal.*.id, count.index)}"
 }
 
 resource "aws_route_table_association" "public" {
@@ -323,17 +290,10 @@ resource "aws_vpn_gateway_route_propagation" "public" {
   vpn_gateway_id = "${element(concat(aws_vpn_gateway.this.*.id, aws_vpn_gateway_attachment.this.*.vpn_gateway_id), count.index)}"
 }
 
-resource "aws_vpn_gateway_route_propagation" "protected" {
-  count = "${var.create_vpc && var.propagate_protected_route_tables_vgw && (var.enable_vpn_gateway  || var.vpn_gateway_id != "") ? 1 : 0}"
+resource "aws_vpn_gateway_route_propagation" "internal" {
+  count = "${var.create_vpc && var.propagate_internal_route_tables_vgw && (var.enable_vpn_gateway  || var.vpn_gateway_id != "") ? length(var.azs) : 0}"
 
-  route_table_id = "${element(aws_route_table.protected.*.id, count.index)}"
-  vpn_gateway_id = "${element(concat(aws_vpn_gateway.this.*.id, aws_vpn_gateway_attachment.this.*.vpn_gateway_id), count.index)}"
-}
-
-resource "aws_vpn_gateway_route_propagation" "private" {
-  count = "${var.create_vpc && var.propagate_private_route_tables_vgw && (var.enable_vpn_gateway || var.vpn_gateway_id != "") ? length(var.private_subnets) : 0}"
-
-  route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
+  route_table_id = "${element(aws_route_table.internal.*.id, count.index)}"
   vpn_gateway_id = "${element(concat(aws_vpn_gateway.this.*.id, aws_vpn_gateway_attachment.this.*.vpn_gateway_id), count.index)}"
 }
 
