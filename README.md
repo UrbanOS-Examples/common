@@ -3,7 +3,7 @@
 At this point it contains Terraform code for setting up a VPC along with subnets, NAT gateways and so on.
 
 ### VPC Setup
-This repository contains Terraform code to setup a VPC in a consistent manner across environments. This repository will be monitored by the Continuous Delivery Pipeline and it will apply the changes automatically. Until the Delivery Pipeline is deployed, a VPC can be setup manually by executing the following commands:
+This repository contains Terraform code to setup VPC's consistently across environments. This repository will be monitored by the Continuous Delivery Pipeline and it will apply the changes automatically. Until the Delivery Pipeline is deployed, a VPC can be setup manually by executing the following commands:
 
 ```
 cd src\terraform\aws\vpc
