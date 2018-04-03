@@ -41,12 +41,12 @@ variable "private_subnets" {
 
 variable "protected_subnets" {
   description = "CIDR blocks for Protected Subnets"
-  default     = ["us-east-2a", "us-east-2b", "us-east-2c"]
+  default     = ["10.0.48.0/21", "10.0.112.0/21", "10.0.176.0/21"]
 }
 
 variable "public_subnets" {
   description = "CIDR blocks for Public Subnets"
-  default     = ["us-east-2a", "us-east-2b", "us-east-2c"]
+  default     = ["10.0.32.0/20", "10.0.96.0/20", "10.0.160.0/20"]
 }
 
 variable "enable_nat_gateway" {

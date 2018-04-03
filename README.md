@@ -7,7 +7,7 @@ This repository contains Terraform code to setup VPC's consistently across envir
 
 ```
 cd src\terraform\aws\vpc
-terraform environment select ${ENVIRONMENT_NAME}
+terraform workspace select ${ENVIRONMENT_NAME}
 #to see what changes will be applied
 terraform plan -var-file=variables/${ENVIRONMENT_NAME}.tfvars
 #to apply the changes
@@ -26,7 +26,7 @@ The Terraform code creates the following resources in AWS:
 
 Terraform needs to keep track of its state in order to provision the environment. The following article provides details why State is important  https://www.terraform.io/docs/state/purpose.html
 
-Smart Columbus Operating System consists of multiple components and some of these components need to need to be reused across projects. For example a Microservice will be rebuilt from scratch every time, but Kafka or a VPC need to be reused across projects. In fact destroying Kafka or the VPC and recreating it every time a micro-service is deployed will have very bad consequences.
+Smart Columbus Operating System consists of multiple components and some of these components need to be reused across projects. For example a Microservice will be rebuilt from scratch every time, but Kafka or a VPC need to be reused across projects. In fact destroying Kafka or the VPC and recreating it every time a micro-service is deployed will have very bad consequences.
 
 In order to create composable and maintainable Terraform state we need to consider the following aspects:
 * simple way of only changing what is specific to a given environment. For example when deploying a micro-service we want a small instance in Staging and a large in Production. Everything else is the same.
