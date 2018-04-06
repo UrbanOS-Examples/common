@@ -48,7 +48,7 @@ The first problem can be solved by extracting the differences between environmen
 
 The second problem can be solved by using Terraform remote state. If a component needs data from another component, it needs to declare the dependency as a remote state.
 
-In addition in order to persist the state and share it across environments, projects and developers we need to use a remote backend. Initially we are going to use S3 as a remote backend. All environments will use the same bucket and will a structure similar with the following:
+In addition in order to persist the state and share it across environments, projects and developers we need to use a remote backend. Initially we are going to use S3 as a remote backend. All environments will use the same bucket and will have a structure similar with the following:
 
 * Terraform state
   * VPC
