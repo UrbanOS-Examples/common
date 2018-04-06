@@ -7,11 +7,23 @@ This repository contains Terraform code to setup VPC's consistently across envir
 
 ```
 cd src\terraform\aws\vpc
-terraform workspace select ${ENVIRONMENT_NAME}
+# if this is the first time running Terraform initialize it first
+terraform init
+terraform workspace select ENVIRONMENT_NAME
 #to see what changes will be applied
-terraform plan -var-file=variables/${ENVIRONMENT_NAME}.tfvars
+terraform plan -var-file=variables/ENVIRONMENT_NAME.tfvars
 #to apply the changes
-terraform apply -var-file=variables/${ENVIRONMENT_NAME}.tfvars
+terraform apply -var-file=variables/ENVIRONMENT_NAME.tfvars
+```
+
+To simplify these commands, there is a wrapper script in tf.sh that takes a valid workspace name as the first parameter followed by whatever parameters need to be passed to Terraform itself. Using this script the above commands become:
+
+```
+cd src\terraform\aws\vpc
+# if this is the first time running Terraform initialize it first
+terraform init
+../../../../tf.sh ENVIRONMENT_NAME plan
+../../../../tf.sh ENVIRONMENT_NAME apply
 ```
 
 The Terraform code creates the following resources in AWS:
@@ -36,12 +48,13 @@ The first problem can be solved by extracting the differences between environmen
 
 The second problem can be solved by using Terraform remote state. If a component needs data from another component, it needs to declare the dependency as a remote state.
 
-In addition in order to persist the state and share it across environments, projects and developers we need to use a remote backend. Initially we are going to use S3 as a remote backend. All environments will use the same bucket and will have the following structure:
+In addition in order to persist the state and share it across environments, projects and developers we need to use a remote backend. Initially we are going to use S3 as a remote backend. All environments will use the same bucket and will a structure similar with the following:
 
 * Terraform state
   * VPC
     * Management
     * Development
+    * Sandbox
     * Staging
     * Production
   * CI/CD Pipeline
@@ -54,5 +67,3 @@ In addition in order to persist the state and share it across environments, proj
     * Development
     * Staging
     * Production
-
-**Note: that the AWS bucket should be encrypted and should enable versioning so we can roll back if something bad happens**
