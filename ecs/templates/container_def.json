@@ -1,0 +1,24 @@
+[
+  {
+    "cpu": ${cpu_units},
+    "environment": [{
+      "name": "SECRET",
+      "value": "KEY"
+    }],
+    "portMappings": [
+        {
+            "containerPort": 8000,
+            "hostPort": 8000
+        },
+        {
+            "containerPort": 8081,
+            "hostPort": 8081
+        }
+    ],
+    "essential": true,
+    "image": "${docker_image}",
+    "memory": ${mem_units},
+    "memoryReservation": ${mem_res},
+    "name": "${task_def_name}"
+  }
+]
