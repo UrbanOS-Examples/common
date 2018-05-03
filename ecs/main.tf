@@ -39,6 +39,8 @@ data "template_file" "user_data" {
 
   vars {
     cluster_name = "${aws_ecs_cluster.cluster.name}"
+    mount_point = "/efs"
+    efs_file_system_dns_name = "${aws_efs_file_system.ecs.dns_name}"
   }
 }
 
