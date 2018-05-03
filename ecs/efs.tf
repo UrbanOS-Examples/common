@@ -24,10 +24,10 @@ resource "aws_efs_mount_target" "b" {
   ]
 }
 
-#resource "aws_efs_mount_target" "c" {
-#  file_system_id = "${aws_efs_file_system.ecs.id}"
-#  subnet_id      = "${var.subnet_ids[2]}"
-#  security_groups = [
-#     "${aws_security_group.ecs_sg.id}"
-#  ]
-#}
+resource "aws_efs_mount_target" "c" {
+  file_system_id = "${aws_efs_file_system.ecs.id}"
+  subnet_id      = "${var.subnet_ids[2]}"
+  security_groups = [
+     "${aws_security_group.ecs_sg.id}"
+  ]
+}
