@@ -103,3 +103,7 @@ variable "efs_encrypted" {
   description = "Is EFS encrypted?  true/false"
   type = "string"
 }
+
+variable "launch_control_public_ip" {
+  description = "True/false for defining EC2 public ip address"
+}

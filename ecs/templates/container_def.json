@@ -7,13 +7,15 @@
     }],
     "portMappings": [
         {
-            "containerPort": 8000,
-            "hostPort": 8000
-        },
-        {
             "containerPort": 8081,
             "hostPort": 8081
         }
+    ],
+    "mountPoints": [
+            {
+              "sourceVolume": "nexus-data",
+              "containerPath": "/nexus-data"
+            }
     ],
     "essential": true,
     "image": "${docker_image}",

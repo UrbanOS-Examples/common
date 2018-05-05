@@ -94,7 +94,7 @@ resource "aws_launch_configuration" "ecs_conf" {
   iam_instance_profile        = "${aws_iam_instance_profile.cluster.name}"
   instance_type               = "${var.type}"
   key_name                    = "${var.key_name}"
-  associate_public_ip_address = false
+  associate_public_ip_address = "${var.launch_control_public_ip}"
   security_groups             = ["${aws_security_group.ecs_sg.id}"]
 
   lifecycle {
@@ -210,6 +210,10 @@ resource "aws_ecs_task_definition" "ecs" {
   family = "nexus_task"
   network_mode = "host"
   container_definitions = "${data.template_file.container_definitions.rendered}"
+#  volume  {
+#    name      = "nexus-data"
+#    host_path = "/efs/nexus-data"
+#  }
 }
 
 # Datasource task definition for ecs
