@@ -40,8 +40,9 @@ data "template_file" "user_data" {
   vars {
     cluster_name = "${aws_ecs_cluster.cluster.name}"
     mount_point = "/efs"
-    efs_file_system_dns_name = "${aws_efs_file_system.ecs.dns_name}"
-    efs_file_system_id = "${aws_efs_file_system.ecs.id}"
+    efs_file_system_dns_name = "${var.efs_dns_name}"
+    efs_file_system_id = "${var.efs_id}"
+    docker_image = "${var.ecs_task_def_docker_image}"
   }
 }
 
@@ -211,10 +212,10 @@ resource "aws_ecs_task_definition" "ecs" {
   family = "nexus_task"
   network_mode = "host"
   container_definitions = "${data.template_file.container_definitions.rendered}"
-#  volume  {
-#    name      = "nexus-data"
-#    host_path = "/efs/nexus-data"
-#  }
+  volume  {
+    name      = "nexus-data"
+    host_path = "/efs/nexus-data"
+  }
 }
 
 # Datasource task definition for ecs

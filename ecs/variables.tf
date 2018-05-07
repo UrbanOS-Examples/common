@@ -87,23 +87,14 @@ variable "ecs_service_tasks_desired_count" {
   description = "Desired number of tasks running for the service"
 }
 
-variable "efs_name" {
-  description = "EFS name"
-}
-
-variable "efs_token" {
-  description = "EFS Token, whatever that is...."
-}
-
-variable "efs_mode" {
-  description = "xfer mode:  generalPurpose OR maxIO"
-}
-
-variable "efs_encrypted" {
-  description = "Is EFS encrypted?  true/false"
-  type = "string"
-}
-
 variable "launch_control_public_ip" {
   description = "True/false for defining EC2 public ip address"
+}
+
+variable "efs_dns_name" {
+  description = "EFS DNS Daame"
+}
+
+variable "efs_id" {
+  description = "EFS ID"
 }

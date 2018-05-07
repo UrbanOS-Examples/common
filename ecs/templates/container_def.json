@@ -11,6 +11,12 @@
             "hostPort": 8081
         }
     ],
+    "mountPoints": [
+            {
+              "sourceVolume": "nexus-data",
+              "containerPath": "/nexus-data"
+            }
+    ],
     "essential": true,
     "image": "${docker_image}",
     "memory": ${mem_units},
