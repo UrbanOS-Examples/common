@@ -40,7 +40,7 @@ variable "azs" {
 
 variable "enable_dns_hostnames" {
   description = "Should be true to enable DNS hostnames in the VPC"
-  default     = false
+  default     = true
 }
 
 variable "enable_dns_support" {
@@ -210,4 +210,8 @@ variable "default_vpc_enable_classiclink" {
 variable "default_vpc_tags" {
   description = "Additional tags for the Default VPC"
   default     = {}
+}
+
+variable "efs_id"{
+  description  = "EFS ID"
 }
