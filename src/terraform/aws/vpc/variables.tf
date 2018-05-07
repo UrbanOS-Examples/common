@@ -68,3 +68,8 @@ variable "enable_dynamodb_endpoint" {
   description = "Should be true if you want to provision a DynamoDB endpoint to the VPC"
   default     = true
 }
+
+variable "enable_dns_hostnames" {
+  description = "Should be true to enable DNS hostnames in the VPC"
+  default     = true
+}

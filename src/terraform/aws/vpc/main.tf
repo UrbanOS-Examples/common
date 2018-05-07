@@ -46,6 +46,8 @@ module "vpc" {
   enable_s3_endpoint       = "${var.enable_s3_endpoint}"
   enable_dynamodb_endpoint = "${var.enable_dynamodb_endpoint}"
 
+  enable_dns_hostnames = "${var.enable_dns_hostnames}"
+
   tags = {
     Owner       = "${var.name}"
     Environment = "${var.environment}"
