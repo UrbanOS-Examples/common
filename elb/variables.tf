@@ -64,3 +64,8 @@ variable "expose_to_public_internet" {
   description = "Whether or not the ELB is publicly accessible (\"yes\" or \"no\")."
   default = "no"
 }
+
+variable "idle_timeout" {
+  description = "Idle Timeout is the number of seconds a connection can be idle before the load balancer closes the connection."
+  default = "120"
+}

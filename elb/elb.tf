@@ -7,7 +7,7 @@ resource "aws_elb" "service" {
   internal = "${var.expose_to_public_internet == "yes" ? false : true}"
 
   cross_zone_load_balancing = true
-  idle_timeout = 60
+  idle_timeout = "${var.idle_timeout}"
   connection_draining = true
   connection_draining_timeout = 60
 
