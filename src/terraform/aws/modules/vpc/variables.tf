@@ -211,7 +211,3 @@ variable "default_vpc_tags" {
   description = "Additional tags for the Default VPC"
   default     = {}
 }
-
-variable "efs_id"{
-  description  = "EFS ID"
-}

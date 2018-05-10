@@ -13,18 +13,6 @@ terraform {
  }
 }
 
-data "terraform_remote_state" "efs" {
-  backend   = "s3"
-  workspace = "${terraform.workspace}"
-
-  config {
-    bucket   = "scos-terraform-state"
-    key      = "efs"
-    region   = "us-east-2"
-    role_arn = "arn:aws:iam::784801362222:role/UpdateTerraform"
-  }
-}
-
 module "vpc" {
   source = "../modules/vpc"
 
@@ -59,7 +47,6 @@ module "vpc" {
   enable_dynamodb_endpoint = "${var.enable_dynamodb_endpoint}"
 
   enable_dns_hostnames = "${var.enable_dns_hostnames}"
-  efs_id =  "${data.terraform_remote_state.efs.efs_id}"
 
   tags = {
     Owner       = "${var.name}"
