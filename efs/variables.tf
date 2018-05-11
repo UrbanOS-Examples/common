@@ -16,8 +16,3 @@ variable "efs_encrypted" {
   description = "Is EFS encrypted?  true/false"
   type = "string"
 }
-
-variable "prevent_destroy" {
-  description = "The switch to override prevent destroy"
-  default = "true"
-}
