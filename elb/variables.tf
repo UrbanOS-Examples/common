@@ -67,5 +67,5 @@ variable "expose_to_public_internet" {
 
 variable "idle_timeout" {
   description = "Idle Timeout is the number of seconds a connection can be idle before the load balancer closes the connection."
-  default = "120"
+  default = "180"
 }
