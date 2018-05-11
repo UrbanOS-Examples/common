@@ -1,6 +1,6 @@
 # Security group EFS access
 resource "aws_security_group" "this" {
-  name = "${var.name}-EFS-Security Group"
+  name = "${var.sg_name}-EFS-Security Group"
   description = "Access to ports EFS (2049)"
   vpc_id = "${var.vpc_id}"
 
@@ -28,7 +28,7 @@ resource "aws_security_group" "this" {
     description = "Open to all outgoing traffic"
   }
 
-  tags = "${merge(var.mount_target_tags, map("Name", "${var.name} EFS"))}"
+  tags = "${merge(var.mount_target_tags, map("Name", "${var.sg_name} EFS"))}"
 }
 
 #Terraform Does not support an array for "subnet_id" by now create 3 targets should be used instead.

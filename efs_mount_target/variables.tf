@@ -1,4 +1,4 @@
-variable "name" {
+variable "sg_name" {
   description = "Name of the EFS"
 }
 

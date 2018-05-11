@@ -9,6 +9,6 @@ resource "aws_efs_file_system" "this" {
     Name = "${terraform.workspace}-${var.efs_name}"
   }
    lifecycle {
-    prevent_destroy = false
+    prevent_destroy = "true"
   }
 }
