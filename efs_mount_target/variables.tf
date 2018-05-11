@@ -9,7 +9,6 @@ variable "vpc_id" {
 variable "mount_target_tags" {
   description  = "Mount target tags"
   type = "map"
-  default = {}
 }
 
 variable "subnets" {
