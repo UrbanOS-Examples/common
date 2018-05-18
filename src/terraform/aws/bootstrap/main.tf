@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "terraform-state" {
-  bucket = "scos-alm-terraform-state"
+  bucket = "${var.bucket_name}"
   acl    = "private"
 
   versioning {
@@ -25,7 +25,7 @@ resource "aws_s3_bucket" "terraform-state" {
 }
 
 resource "aws_dynamodb_table" "dynamodb-terraform-state-lock" {
-  name           = "terraform_lock"
+  name           = "${var.lock_table_name}"
   hash_key       = "LockID"
   read_capacity  = 20
   write_capacity = 20
