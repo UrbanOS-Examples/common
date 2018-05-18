@@ -9,8 +9,6 @@ terraform {
     region         = "us-east-2"
     dynamodb_table = "terraform_lock"
     encrypt        = "true"
-
-    # role_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
   }
 }
 
