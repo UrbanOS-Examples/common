@@ -10,6 +10,10 @@ resource "aws_s3_bucket" "terraform-state" {
     enabled = true
   }
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
@@ -33,6 +37,10 @@ resource "aws_dynamodb_table" "dynamodb-terraform-state-lock" {
   attribute {
     name = "LockID"
     type = "S"
+  }
+
+  lifecycle {
+    prevent_destroy = true
   }
 
   tags {
