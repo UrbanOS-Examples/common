@@ -4,13 +4,12 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-   bucket = "scos-terraform-state"
-   key    = "vpc"
-   region = "us-east-2"
-   dynamodb_table="terraform_lock"
-   encrypt = "true"
-   role_arn = "arn:aws:iam::784801362222:role/UpdateTerraform"
- }
+    bucket         = "scos-alm-terraform-state"
+    key            = "vpc"
+    region         = "us-east-2"
+    dynamodb_table = "terraform_lock"
+    encrypt        = "true"
+  }
 }
 
 module "vpc" {
