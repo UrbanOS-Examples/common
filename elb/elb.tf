@@ -31,7 +31,7 @@ resource "aws_elb" "service" {
     unhealthy_threshold = 3
     timeout = 15
     target = "${var.health_check_target}"
-    interval = 60
+    interval = 120
   }
 
   tags {
