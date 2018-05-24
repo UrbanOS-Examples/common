@@ -33,7 +33,6 @@ variable "azs" {
   default     = ["us-east-2a", "us-east-2b", "us-east-2c"]
 }
 
-
 variable "private_subnets" {
   description = "CIDR blocks for Private Subnets"
   default     = ["10.0.0.0/19", "10.0.64.0/19", "10.0.128.0/19"]
@@ -72,4 +71,14 @@ variable "enable_dynamodb_endpoint" {
 variable "enable_dns_hostnames" {
   description = "Should be true to enable DNS hostnames in the VPC"
   default     = true
+}
+
+# OpenVPN
+variable "openvpn_admin_username" {
+  description = "Username for the OpenVPN Access Server administrative user"
+  default     = "openvpn"
+}
+
+variable "openvpn_admin_password_secret_arn" {
+  description = "AWS SecretsManager ARN for the OpenVPN admin password"
 }
