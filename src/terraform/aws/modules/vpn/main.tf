@@ -1,3 +1,16 @@
+data "template_file" "openvpn_init" {
+  template = "${file("${path.module}/templates/openvpn_init.tpl")}"
+
+  vars {
+    admin_user      = "${var.admin_user}"
+    admin_password  = "${var.admin_password}"
+    local_auth      = "${var.local_auth}"
+    reroute_dns     = "${var.reroute_dns}"
+    reroute_gw      = "${var.reroute_gw}"
+    public_hostname = "${aws_eip.openvpn_eip.public_ip}"
+  }
+}
+
 resource "aws_instance" "openvpn_instance" {
   ami                    = "ami-6d163708"
   instance_type          = "t2.micro"
@@ -12,31 +25,7 @@ resource "aws_instance" "openvpn_instance" {
     prevent_destroy = "true"
   }
 
-  user_data = <<USERDATA
-#!/bin/bash
-
-cat <<EOF >> /etc/network/interfaces
-auto eth1
-iface eth1 inet dhcp
-EOF
-
-ifup eth1
-
-# Swap ports so that web traffic listens on 443 to eliminate port needed in URL
-sed -i 's/"cs\.https\.port"\: "943",/"cs\.https\.port"\: "443",/' /usr/local/openvpn_as/etc/config.json
-sed -i 's/"vpn\.server\.daemon\.tcp\.port"\: "443",/"vpn\.server\.daemon\.tcp\.port"\: "943",/' /usr/local/openvpn_as/etc/config.json
-
-# OpenVPN reads the userdata for key value pairs for automatic self configuration
-# These are the known (undocumented) variables that the OpenVPN AS consumes
-admin_user=${var.admin_user}
-admin_pw=${var.admin_password}
-# License key cannot be reused, so it should not be set automatically
-license=
-local_auth=${var.local_auth}
-reroute_dns=${var.reroute_dns}
-reroute_gw=${var.reroute_gw}
-public_hostname=${aws_eip.openvpn_eip.public_ip}
-USERDATA
+  user_data = "${data.template_file.openvpn_init.rendered}"
 
   tags {
     Name = "OpenVPN"
