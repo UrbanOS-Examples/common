@@ -56,9 +56,9 @@ module "vpc" {
   enable_dynamodb_endpoint = "${var.enable_dynamodb_endpoint}"
   enable_dns_hostnames     = "${var.enable_dns_hostnames}"
   tags = {
-    Owner       = "${var.name}"
+    Owner       = "${var.owner}"
     Environment = "${var.environment}"
-    Name        = "${var.owner}"
+    Name        = "${var.name}"
   }
 }
 
