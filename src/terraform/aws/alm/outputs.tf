@@ -25,3 +25,9 @@ output "nat_public_ips" {
   description = "List of public Elastic IPs created for AWS NAT Gateway"
   value       = ["${module.vpc.nat_public_ips}"]
 }
+
+# VPN
+output "vpn_public_ip" {
+  description = "Public facing IP address for the ALM VPN"
+  value       = "${module.vpn.elastic_ip}"
+}
