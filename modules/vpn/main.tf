@@ -29,6 +29,7 @@ resource "aws_instance" "openvpn_instance" {
 
   tags {
     Name = "OpenVPN"
+    Workspace = "${terraform.workspace}"
   }
 
   depends_on = ["aws_eip.openvpn_eip", "aws_security_group.openvpn"]
