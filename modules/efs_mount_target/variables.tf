@@ -11,9 +11,8 @@ variable "mount_target_tags" {
   type = "map"
 }
 
-variable "subnets" {
+variable "subnet" {
   description  = "Subnets where the target will be mounted"
-  type = "list"
 }
 
 variable "efs_id" {

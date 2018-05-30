@@ -10,7 +10,6 @@ variable "owner" {
 
 variable "vpc_name" {
   description = "The name of the VPC"
-  default     = ""
 }
 
 variable "vpc_single_nat_gateway" {

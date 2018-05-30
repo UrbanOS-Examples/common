@@ -33,8 +33,8 @@ resource "aws_security_group" "this" {
 
 #Terraform Does not support an array for "subnet_id" by now create 3 targets should be used instead.
 resource "aws_efs_mount_target" "this" {
-  count = "${length(var.subnets)}"
+  count = "1"
   file_system_id = "${var.efs_id}"
-  subnet_id      = "${element(var.subnets, count.index)}"
+  subnet_id      = "${var.subnet}"
   security_groups  = ["${aws_security_group.this.id}"]
 }
