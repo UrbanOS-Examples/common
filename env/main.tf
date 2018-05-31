@@ -44,11 +44,49 @@ module "vpc" {
 }
 
 resource "aws_route53_zone" "private" {
-	name          = "${var.private_dns_zone_name}"
-	vpc_id        = "${module.vpc.vpc_id}"
-	force_destroy = true
+  name          = "${var.private_dns_zone_name}"
+  vpc_id        = "${module.vpc.vpc_id}"
+  force_destroy = true
 
-	tags = {
-		Environment = "${var.environment}"
-	}
+  tags = {
+    Environment = "${var.environment}"
+  }
+}
+
+module "kubernetes" {
+  source  = "scholzj/kubernetes/aws"
+  version = "1.3.3"
+
+  cluster_name = "jd-cluster-name" # FIXME
+  aws_region   = "${var.region}"
+
+  hosted_zone         = "${aws_route53_zone.private.name}"
+  hosted_zone_private = true
+
+  master_subnet_id  = "${module.vpc.public_subnets[0]}"
+  worker_subnet_ids = "${module.vpc.public_subnets}"
+
+  min_worker_count = 2
+  max_worker_count = 3
+
+  addons = [
+    "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/storage-class.yaml",
+    "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/heapster.yaml",
+    "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/dashboard.yaml",
+    "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/external-dns.yaml",
+    "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/autoscaler.yaml"
+  ]
+
+  tags = {
+    Environmnet = "${var.environment}"
+		DNSZone = "${aws_route53_zone.private.zone_id}"
+  }
+
+  tags2 = [
+    {
+      key = "Application"
+      value = "AWS-Kubernetes"
+      propagate_at_launch = true
+    }
+  ]
 }
