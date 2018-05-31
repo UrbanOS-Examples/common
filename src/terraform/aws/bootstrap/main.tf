@@ -1,5 +1,6 @@
 provider "aws" {
-  region = "${var.region}"
+  region  = "${var.region}"
+  profile = "${var.profile}"
 }
 
 resource "aws_s3_bucket" "terraform-state" {
@@ -24,7 +25,7 @@ resource "aws_s3_bucket" "terraform-state" {
 
   tags {
     type        = "devops"
-    Environment = "Application Lifecycle Management"
+    Environment = "${var.environment}"
   }
 }
 
