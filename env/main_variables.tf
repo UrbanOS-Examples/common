@@ -67,3 +67,6 @@ variable "vpc_enable_dns_hostnames" {
   default     = true
 }
 
+variable "private_dns_zone_name" {
+	description = "Name of private DNS Route53 zone"
+}
