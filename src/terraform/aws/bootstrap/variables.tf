@@ -3,6 +3,16 @@ variable "region" {
   default     = "us-east-2"
 }
 
+variable "profile" {
+  description = "AWS Profile"
+  default     = "default"
+}
+
+variable "environment" {
+  description = "Environment being bootstrapped"
+  default     = "Application Lifecycle Management"
+}
+
 variable "bucket_name" {
   description = "AWS S3 bucket name for Terraform state"
   default     = "scos-alm-terraform-state"
