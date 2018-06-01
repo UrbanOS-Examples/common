@@ -43,6 +43,28 @@ module "vpc" {
   }
 }
 
+resource "aws_vpc_peering_connetion" "env_to_alm" {
+	vpc_id = "${module.vpc.vpc_id}"
+	peer_vpc_id = "${data.<something>.vpc.vpc_id}"
+	peer_owner_id = "${var.other_subaccount_id}"
+	peer_region = "${var.region}"
+  auto_accept = "false"
+
+	tags {
+		Side = "Requester"
+  }
+}
+
+resource "aws_vpc_peering_connection_accepter" "alm" {
+	provider = "aws.alm"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
+	auto_accept = true
+
+	tags {
+		Side = "Accepter"
+	}
+}
+
 resource "aws_route53_zone" "private" {
   name          = "${var.private_dns_zone_name}"
   vpc_id        = "${module.vpc.vpc_id}"
