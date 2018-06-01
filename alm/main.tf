@@ -5,7 +5,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket         = "scos-alm-terraform-state"
-    key            = "vpc"
+    key            = "alm"
     region         = "us-east-2"
     dynamodb_table = "terraform_lock"
     encrypt        = true
