@@ -3,6 +3,14 @@ variable "region" {
   default     = "us-east-2"
 }
 
+variable "credentials_profile" {
+  description = "The AWS credentials profile to use"
+}
+
+variable "accepter_credentials_profile" {
+  description = "The AWS credentials profile to use for accepting peering requests"
+}
+
 variable "owner" {
   description = "User creating this VPC. It should be done through jenkins"
   default     = "jenkins"
@@ -68,5 +76,13 @@ variable "vpc_enable_dns_hostnames" {
 }
 
 variable "private_dns_zone_name" {
-	description = "Name of private DNS Route53 zone"
+  description = "Name of private DNS Route53 zone"
+}
+
+variable "alm_account_id" {
+  description = "Id if the account to peer to"
+}
+
+variable "kubernetes_cluster_name" {
+  description = "Name of the Kubernetes Cluster"
 }

@@ -1,4 +1,4 @@
 **/terraform.*
 **/.terraform
 *.swp
-**/plan
+**/*.plan

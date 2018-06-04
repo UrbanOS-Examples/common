@@ -1,10 +1,19 @@
 provider "aws" {
   region = "${var.region}"
+
+  profile = "${var.credentials_profile}"
+}
+
+provider "aws" {
+  alias  = "alm"
+  region = "${var.region}"
+
+  profile = "${var.accepter_credentials_profile}"
 }
 
 terraform {
   backend "s3" {
-    bucket         = "scos-alm-terraform-state"
+    bucket         = "scos-sandbox-terraform-state"
     key            = "operating-system"
     region         = "us-east-2"
     dynamodb_table = "terraform_lock"
@@ -13,7 +22,7 @@ terraform {
 }
 
 resource "aws_key_pair" "cloud_key" {
-  key_name   = "${terraform.workspace}_cloud_key"
+  key_name   = "${terraform.workspace}_env_cloud_key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRAvH6k7iEeRDz9SQtkH1o8KiUaed/e2hmzTUjA8bhmeWVLPsgCMKIUKR0jdPlvdZ0AmMLXswobsXj08dPgWxUZxoAWIqKCjd969KckydUpBtcb+X2Q+tpOcugBOQSY1H8hgNrdcRKEaUllTfvseJ9pBOYU7j9VuZ608HQhfZw7+aS8wi9o/BJwejtpWdlo6gkxXoIRqDX/ioYg+W6Tc7yoUzAEANwZAy3/3GKWDrh+9jnzR6mEEN48Nuee49wWfP5G0T/v4+Gvux5zioHb3rcmmR9YTkFOiv1poInhXlPdc7Q38yj+z6E+hACNN3rK80YjU0ByaSPltPjqm9ZYmPX"
 }
 
@@ -43,26 +52,37 @@ module "vpc" {
   }
 }
 
-resource "aws_vpc_peering_connetion" "env_to_alm" {
-	vpc_id = "${module.vpc.vpc_id}"
-	peer_vpc_id = "${data.<something>.vpc.vpc_id}"
-	peer_owner_id = "${var.other_subaccount_id}"
-	peer_region = "${var.region}"
-  auto_accept = "false"
+data "terraform_remote_state" "vpc" {
+  backend   = "s3"
+  workspace = "${terraform.workspace}"
 
-	tags {
-		Side = "Requester"
+  config {
+    bucket = "scos-sandbox-terraform-state"
+    key    = "alm"
+    region = "us-east-2"
+  }
+}
+
+resource "aws_vpc_peering_connection" "env_to_alm" {
+  vpc_id        = "${module.vpc.vpc_id}"
+  peer_vpc_id   = "${data.terraform_remote_state.vpc.vpc_id}"
+  peer_owner_id = "${var.alm_account_id}"
+  peer_region   = "${var.region}"
+  auto_accept   = "false"
+
+  tags {
+    Side = "Requester"
   }
 }
 
 resource "aws_vpc_peering_connection_accepter" "alm" {
-	provider = "aws.alm"
+  provider                  = "aws.alm"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
-	auto_accept = true
+  auto_accept               = true
 
-	tags {
-		Side = "Accepter"
-	}
+  tags {
+    Side = "Accepter"
+  }
 }
 
 resource "aws_route53_zone" "private" {
@@ -79,14 +99,14 @@ module "kubernetes" {
   source  = "scholzj/kubernetes/aws"
   version = "1.3.3"
 
-  cluster_name = "jd-cluster-name" # FIXME
+  cluster_name = "${var.kubernetes_cluster_name}"
   aws_region   = "${var.region}"
 
   hosted_zone         = "${aws_route53_zone.private.name}"
   hosted_zone_private = true
 
-  master_subnet_id  = "${module.vpc.public_subnets[0]}"
-  worker_subnet_ids = "${module.vpc.public_subnets}"
+  master_subnet_id  = "${module.vpc.private_subnets[0]}"
+  worker_subnet_ids = "${module.vpc.private_subnets}"
 
   min_worker_count = 2
   max_worker_count = 3
@@ -96,19 +116,19 @@ module "kubernetes" {
     "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/heapster.yaml",
     "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/dashboard.yaml",
     "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/external-dns.yaml",
-    "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/autoscaler.yaml"
+    "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/autoscaler.yaml",
   ]
 
   tags = {
     Environmnet = "${var.environment}"
-		DNSZone = "${aws_route53_zone.private.zone_id}"
+    DNSZone     = "${aws_route53_zone.private.zone_id}"
   }
 
   tags2 = [
     {
-      key = "Application"
-      value = "AWS-Kubernetes"
+      key                 = "Application"
+      value               = "AWS-Kubernetes"
       propagate_at_launch = true
-    }
+    },
   ]
 }
