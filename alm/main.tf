@@ -1,10 +1,13 @@
 provider "aws" {
   region = "${var.region}"
+
+  shared_credentials_file = "~/.aws/credentials"
+  profile                 = "${var.credentials_profile}"
 }
 
 terraform {
   backend "s3" {
-    bucket         = "scos-alm-terraform-state"
+    bucket         = "scos-sandbox-terraform-state"
     key            = "alm"
     region         = "us-east-2"
     dynamodb_table = "terraform_lock"

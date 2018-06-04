@@ -3,6 +3,10 @@ variable "region" {
   default     = "us-east-2"
 }
 
+variable "credentials_profile" {
+  description = "The AWS credentials profile to use for this execution"
+}
+
 variable "owner" {
   description = "User creating this VPC. It should be done through jenkins"
   default     = "jenkins"
