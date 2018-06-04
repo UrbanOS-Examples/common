@@ -3,6 +3,10 @@ variable "region" {
   default     = "us-east-2"
 }
 
+variable "credentials_profile" {
+  description = "The AWS credentials profile to use"
+}
+
 variable "bucket_name" {
   description = "AWS S3 bucket name for Terraform state"
   default     = "scos-alm-terraform-state"

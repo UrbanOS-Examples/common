@@ -1,5 +1,8 @@
 provider "aws" {
   region = "${var.region}"
+
+  shared_credentials_file = "~/.aws/credentials"
+  profile                 = "${var.credentials_profile}"
 }
 
 resource "aws_s3_bucket" "terraform-state" {
