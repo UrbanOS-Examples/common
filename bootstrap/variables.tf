@@ -7,6 +7,11 @@ variable "credentials_profile" {
   description = "The AWS credentials profile to use"
 }
 
+variable "environment" {
+  description = "Environment being bootstrapped"
+  default     = "Application Lifecycle Management"
+}
+
 variable "bucket_name" {
   description = "AWS S3 bucket name for Terraform state"
   default     = "scos-alm-terraform-state"

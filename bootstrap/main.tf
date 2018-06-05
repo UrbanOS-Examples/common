@@ -26,7 +26,7 @@ resource "aws_s3_bucket" "terraform-state" {
 
   tags {
     type        = "devops"
-    Environment = "Application Lifecycle Management"
+    Environment = "${var.environment}"
   }
 }
 
