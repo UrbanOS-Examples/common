@@ -1,9 +1,4 @@
 # ------------- EFS -----------------------------
-variable "region" {
-  description = "AWS region"
-  default = "us-east-2"
-}
-
 variable "efs_name" {
   description = "EFS name"
   default = "nexus"

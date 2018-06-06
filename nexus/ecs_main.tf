@@ -1,40 +1,31 @@
-provider "aws" {
-  region = "${var.region}"
+data "template_file" "task_definition" {
+  template = "${file("${path.module}/templates/task-definition.json.tpl")}"
+
+  vars {
+    name = "${var.service_name}"
+    image = "${var.service_image}"
+    cpu = "${var.cpu}"
+    memory = "${var.memory}"
+    memoryReservation = "${var.memory_reservation}"
+    command = "${jsonencode(var.service_command)}"
+    port = "${var.service_port}"
+    region = "${var.region}"
+    log_group = "${module.service.log_group}"
+    directory_name="${var.directory_name}"
+
+  }
 }
 
-terraform {
-  backend "s3" {
-   bucket = "scos-alm-terraform-state"
-   key    = "nexus"
-   region = "us-east-2"
-   dynamodb_table="terraform_lock"
-   encrypt = "true"
-   role_arn = "arn:aws:iam::199837183662:role/UpdateTerraform"
- }
-}
+data "template_file" "instance_user_data" {
+  template = "${file("${path.module}/templates/instance-user-data.sh")}"
 
-#refer to existing VPC
-data "terraform_remote_state" "vpc" {
- backend     = "s3"
- workspace = "${terraform.workspace}"
-
- config {
-   bucket = "scos-alm-terraform-state"
-   key    = "vpc"
-   region = "us-east-2"
-   role_arn = "arn:aws:iam::199837183662:role/UpdateTerraform"
- }
-}
-
-data "terraform_remote_state" "efs" {
-  backend   = "s3"
-  workspace = "${terraform.workspace}"
-
-  config {
-    bucket   = "scos-alm-terraform-state"
-    key      = "nexus_efs"
-    region   = "us-east-2"
-    role_arn = "arn:aws:iam::199837183662:role/UpdateTerraform"
+  vars {
+    cluster_name = "${module.cluster.cluster_name}"
+    mount_point = "/efs"
+    directory_name="${var.directory_name}"
+    efs_file_system_dns_name = "${module.efs.dns_name}"
+    efs_file_system_id = "${module.efs.efs_id}"
+    docker_image = "${var.service_image}"
   }
 }
 
@@ -67,7 +58,7 @@ module "ecs_load_balancer" {
   #to issue these we need to set up a certificate manager. To avaoid nother
   #wild goose chase AWS style I simply compied the module and changed the protocol to HTTP
 
-  source = "../../modules/elb"
+  source = "../modules/elb"
   version = "0.1.10"
 
   region = "${var.region}"

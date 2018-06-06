@@ -1,8 +1,3 @@
-variable "region" {
-  description = "AWS Region"
-  default     = "us-east-2"
-}
-
 variable "component" {
   description = "The component this cluster will contain"
   default = "nexus"
