@@ -1,0 +1,6 @@
+Important notes when dealing with the ecs-scalable-cluster custom package
+
+- Sometimes the iam role policy doesn't get deleted properly. There is no way to delete it from the AWS web admin console.  You must use the awscli command line tool. (REF:  https://github.com/hashicorp/terraform/issues/3749) Run the following command to list:
+   aws iam list-instance-profiles
+Run the following to delete:
+   aws iam delete-instance-profile --instance-profile-name nexus-profile
