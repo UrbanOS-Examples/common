@@ -18,7 +18,7 @@ data "terraform_remote_state" "vpc" {
 
  config {
    bucket = "scos-sandbox-terraform-state"
-   key    = "vpc"
+   key    = "alm"
    region = "us-east-2"
  }
 }
