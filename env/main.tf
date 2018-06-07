@@ -45,13 +45,6 @@ module "vpc" {
   }
 }
 
-# resource "aws_vpc_endpoint_route_table_association" "public" {
-#   count = "${var.create_vpc && var.enable_s3_endpoint ? length(var.azs) : 0}"
-
-#   vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
-#   route_table_id  = "${element(aws_route_table.internal.*.id, count.index)}"
-# }
-
 resource "aws_route53_zone" "private" {
   name          = "${var.private_dns_zone_name}"
   vpc_id        = "${module.vpc.vpc_id}"
