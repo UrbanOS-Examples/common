@@ -4,13 +4,6 @@ provider "aws" {
   profile = "${var.credentials_profile}"
 }
 
-provider "aws" {
-  alias  = "alm"
-  region = "${var.region}"
-
-  profile = "${var.accepter_credentials_profile}"
-}
-
 terraform {
   backend "s3" {
     bucket         = "scos-sandbox-terraform-state"
@@ -52,38 +45,12 @@ module "vpc" {
   }
 }
 
-data "terraform_remote_state" "vpc" {
-  backend   = "s3"
-  workspace = "${terraform.workspace}"
+# resource "aws_vpc_endpoint_route_table_association" "public" {
+#   count = "${var.create_vpc && var.enable_s3_endpoint ? length(var.azs) : 0}"
 
-  config {
-    bucket = "scos-sandbox-terraform-state"
-    key    = "alm"
-    region = "us-east-2"
-  }
-}
-
-resource "aws_vpc_peering_connection" "env_to_alm" {
-  vpc_id        = "${module.vpc.vpc_id}"
-  peer_vpc_id   = "${data.terraform_remote_state.vpc.vpc_id}"
-  peer_owner_id = "${var.alm_account_id}"
-  peer_region   = "${var.region}"
-  auto_accept   = "false"
-
-  tags {
-    Side = "Requester"
-  }
-}
-
-resource "aws_vpc_peering_connection_accepter" "alm" {
-  provider                  = "aws.alm"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
-  auto_accept               = true
-
-  tags {
-    Side = "Accepter"
-  }
-}
+#   vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
+#   route_table_id  = "${element(aws_route_table.internal.*.id, count.index)}"
+# }
 
 resource "aws_route53_zone" "private" {
   name          = "${var.private_dns_zone_name}"
