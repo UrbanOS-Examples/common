@@ -57,7 +57,7 @@ resource "aws_route53_zone" "private" {
 
 module "kubernetes" {
   # source  = "github.com/SmartColumbusOS/terraform-aws-kubernetes"
-  source = "../../terraform-aws-kubernetes"
+  source = "github.com/SmartColumbusOS/terraform-aws-kubernetes"
 
   cluster_name        = "${var.kubernetes_cluster_name}"
   aws_region          = "${var.region}"
