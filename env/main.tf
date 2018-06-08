@@ -56,20 +56,18 @@ resource "aws_route53_zone" "private" {
 }
 
 module "kubernetes" {
-  source  = "scholzj/kubernetes/aws"
-  version = "1.3.3"
+  # source  = "github.com/SmartColumbusOS/terraform-aws-kubernetes"
+  source = "../../terraform-aws-kubernetes"
 
-  cluster_name = "${var.kubernetes_cluster_name}"
-  aws_region   = "${var.region}"
-
+  cluster_name        = "${var.kubernetes_cluster_name}"
+  aws_region          = "${var.region}"
+  aws_profile         = "${var.credentials_profile}"
   hosted_zone         = "${aws_route53_zone.private.name}"
   hosted_zone_private = true
-
-  master_subnet_id  = "${module.vpc.private_subnets[0]}"
-  worker_subnet_ids = "${module.vpc.private_subnets}"
-
-  min_worker_count = 2
-  max_worker_count = 3
+  master_subnet_id    = "${module.vpc.private_subnets[0]}"
+  worker_subnet_ids   = "${module.vpc.private_subnets}"
+  min_worker_count    = "${var.min_worker_count}"
+  max_worker_count    = "${var.max_worker_count}"
 
   addons = [
     "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/storage-class.yaml",

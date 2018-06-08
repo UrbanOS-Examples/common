@@ -20,3 +20,8 @@ output "nat_public_ips" {
   description = "List of public Elastic IPs created for AWS NAT Gateway"
   value       = ["${module.vpc.nat_public_ips}"]
 }
+
+output "kubernetes_master_private_ip" {
+  description = "The private IP of the kubernetes master"
+  value       = "${module.kubernetes.private_ip}"
+}

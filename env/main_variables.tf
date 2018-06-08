@@ -7,10 +7,6 @@ variable "credentials_profile" {
   description = "The AWS credentials profile to use"
 }
 
-variable "accepter_credentials_profile" {
-  description = "The AWS credentials profile to use for accepting peering requests"
-}
-
 variable "owner" {
   description = "User creating this VPC. It should be done through jenkins"
   default     = "jenkins"
@@ -79,10 +75,16 @@ variable "private_dns_zone_name" {
   description = "Name of private DNS Route53 zone"
 }
 
-variable "alm_account_id" {
-  description = "Id if the account to peer to"
-}
-
 variable "kubernetes_cluster_name" {
   description = "Name of the Kubernetes Cluster"
+}
+
+variable "min_worker_count" {
+  description = "Minimum kubernetes workers"
+  default     = 5
+}
+
+variable "max_worker_count" {
+  description = "Maximum kubernetes worker"
+  default     = 5
 }

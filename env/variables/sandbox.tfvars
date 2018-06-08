@@ -12,6 +12,8 @@ private_dns_zone_name = "sandbox.smartcolumbus.com"
 
 alm_account_id = "068920858268"
 
+alm_workspace = "sandbox"
+
 vpc_cidr = "10.100.0.0/16"
 
 vpc_private_subnets = ["10.100.0.0/19"]

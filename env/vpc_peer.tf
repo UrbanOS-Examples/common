@@ -7,10 +7,10 @@ provider "aws" {
 
 data "terraform_remote_state" "vpc" {
   backend   = "s3"
-  workspace = "${terraform.workspace}"
+  workspace = "${var.alm_workspace}"
 
   config {
-    bucket = "scos-sandbox-terraform-state"
+    bucket = "${var.alm_state_bucket}"
     key    = "alm"
     region = "us-east-2"
   }
@@ -39,33 +39,29 @@ resource "aws_vpc_peering_connection_accepter" "alm" {
 }
 
 resource "aws_route" "public_peer_env_to_alm" {
-  count = "${length(data.terraform_remote_state.vpc.public_route_table_ids)}"
-
-  route_table_id            = "${element(module.vpc.public_route_table_ids, count.index)}"
+  route_table_id            = "${element(module.vpc.public_route_table_ids, 0)}"
   destination_cidr_block    = "${data.terraform_remote_state.vpc.vpc_cidr_block}"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
 }
 
 resource "aws_route" "public_peer_alm_to_env" {
-  count = "${length(module.vpc.public_route_table_ids)}"
+  provider = "aws.alm"
 
-  route_table_id            = "${element(data.terraform_remote_state.vpc.public_route_table_ids, count.index)}"
+  route_table_id            = "${element(data.terraform_remote_state.vpc.public_route_table_ids, 0)}"
   destination_cidr_block    = "${module.vpc.vpc_cidr_block}"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
 }
 
 resource "aws_route" "private_peer_env_to_alm" {
-  count = "${length(data.terraform_remote_state.vpc.private_route_table_ids)}"
-
-  route_table_id            = "${element(module.vpc.private_route_table_ids, count.index)}"
+  route_table_id            = "${element(module.vpc.private_route_table_ids, 0)}"
   destination_cidr_block    = "${data.terraform_remote_state.vpc.vpc_cidr_block}"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
 }
 
 resource "aws_route" "private_peer_alm_to_env" {
-  count = "${length(module.vpc.private_route_table_ids)}"
+  provider = "aws.alm"
 
-  route_table_id            = "${element(data.terraform_remote_state.vpc.private_route_table_ids, count.index)}"
+  route_table_id            = "${element(data.terraform_remote_state.vpc.private_route_table_ids, 0)}"
   destination_cidr_block    = "${module.vpc.vpc_cidr_block}"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
 }
