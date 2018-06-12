@@ -1,3 +1,13 @@
+# I am using the default subnet for now but the problem is that all subnets are public. Need to revisit this
+environment = "sandbox"
+#vpc_id = "vpc-de4f01b6"
+#public_subnet_ids = ["subnet-6c374e04", "subnet-5916a123", "subnet-36a5bd7b"]
+#private_subnet_ids = ["subnet-6c374e04", "subnet-5916a123", "subnet-36a5bd7b"]
+
+vpc_id = "vpc-0b505c82e5aa08cb3"
+public_subnet_ids = ["subnet-01c8230961c9598e3", "subnet-000a174a504a0208e", "subnet-0699fccb7c7dd91ef"]
+private_subnet_ids = ["subnet-0dc37f26b358b1c41", "subnet-087a4bc429e7ee828", "subnet-0bee853043eba945b"]
+
 credentials_profile = "sandbox"
 
 accepter_credentials_profile = "sandbox"
@@ -26,6 +36,7 @@ kubernetes_cluster_name = "sandbox-kube"
 
 # Joomla
 deployment_identifier = "sandbox"
+db_instance_address  = "joomla.cj574n7uvzxv.us-east-2.rds.amazonaws.com"
 
 ## Cluster variables
 cluster_instance_ssh_public_key_path = "~/.ssh/id_rsa.pub"
