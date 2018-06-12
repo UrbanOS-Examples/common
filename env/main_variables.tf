@@ -3,8 +3,8 @@ variable "region" {
   default     = "us-east-2"
 }
 
-variable "credentials_profile" {
-  description = "The AWS credentials profile to use"
+variable "role_arn" {
+  description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
 }
 
 variable "owner" {
@@ -88,3 +88,4 @@ variable "max_worker_count" {
   description = "Maximum kubernetes worker"
   default     = 5
 }
+
