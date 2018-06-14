@@ -11,6 +11,15 @@ The following is a series of shell snippets for running terraform scripts in the
 
 On first use of a set of terraform scripts, terraform must first be initialized so that plugins and modules can be fetched, and the S3 backend can be configured.  The Terraform scripts are configured to reference the `sandbox` profile by default, but Terraform does not recognize the AWS profile configuration on initialization.  Once Terraform is initialized, the `AWS_PROFILE` environment variable becomes redundant
 
+In order to create a `sandbox` profile, you must create a user in sandbox with administor privileges and add it to the `~/.aws/credentials` file.
+You don't have to have this user to use the aws cli, but terraform seems to have trouble assuming roles.
+
+```
+[sandbox]
+aws_access_key_id = <id>
+aws_secret_access_key = <key>
+```
+
 ```bash
 export AWS_PROFILE=sandbox
 terraform init
