@@ -2,3 +2,4 @@
 **/.terraform
 *.swp
 **/*.plan
+.DS_Store
