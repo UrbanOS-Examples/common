@@ -62,7 +62,7 @@ module "kubernetes" {
   aws_region          = "${var.region}"
 #  aws_profile         = "${var.credentials_profile}"
   hosted_zone         = "${aws_route53_zone.private.name}"
-  hosted_zone_private = false
+  hosted_zone_private = true
   master_subnet_id    = "${module.vpc.private_subnets[0]}"
   worker_subnet_ids   = "${module.vpc.private_subnets}"
   min_worker_count    = "${var.min_worker_count}"
