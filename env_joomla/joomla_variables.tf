@@ -15,12 +15,12 @@ variable "vpc_id" {
   description = "VPC Id"
 }
 
-variable "public_subnet_ids"{
+variable "public_subnet_ids" {
   description = "Public subnet ids"
   type  = "list"
 }
 
-variable "private_subnet_ids"{
+variable "private_subnet_ids" {
   description = "Private subnet ids"
   type  = "list"
 }

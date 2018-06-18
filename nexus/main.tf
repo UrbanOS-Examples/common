@@ -97,12 +97,7 @@ module "cluster" {
 }
 
 module "ecs_load_balancer" {
-  #infrablocks load balancer uses HTTPS which in turn requires a certificate.
-  #to issue these we need to set up a certificate manager. To avaoid nother
-  #wild goose chase AWS style I simply compied the module and changed the protocol to HTTP
-
-  source = "../modules/elb"
-  version = "0.1.10"
+  source = "github.com/SmartColumbusOS/terraform-aws-ecs-load-balancer"
 
   region = "${var.region}"
   vpc_id = "${data.terraform_remote_state.vpc.vpc_id}"

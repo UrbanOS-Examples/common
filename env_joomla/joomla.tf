@@ -20,7 +20,7 @@ data "template_file" "instance_user_data" {
   vars {
     cluster_name = "${module.joomla_cluster.cluster_name}"
     mount_point = "/efs"
-    directory_name="${var.directory_name}"
+    directory_name = "${var.directory_name}"
     efs_file_system_dns_name = "${module.joomla_efs.dns_name}"
     efs_file_system_id = "${module.joomla_efs.efs_id}"
     docker_image = "${var.service_image}"
@@ -39,19 +39,19 @@ data "template_file" "task_definition" {
     region = "${var.region}"
     log_group = "${module.joomla_service.log_group}"
     elb_name = "${module.joomla_ecs_load_balancer.name}"
-    directory_name="${var.directory_name}"
+    directory_name = "${var.directory_name}"
     db_host = "${var.db_instance_address}"
-    db_user="${var.db_user}"
-    db_password="${var.db_password}"
-    db_name="${var.db_name}"
+    db_user = "${var.db_user}"
+    db_password = "${var.db_password}"
+    db_name = "${var.db_name}"
   }
 }
 
 module "joomla_efs" {
-	source        = "../modules/efs"
+	source = "../modules/efs"
 
-	efs_name      = "${var.efs_name}"
-	efs_mode      = "${var.efs_mode}"
+	efs_name = "${var.efs_name}"
+	efs_mode = "${var.efs_mode}"
 	efs_encrypted = "${var.efs_encrypted}"
 }
 
@@ -62,7 +62,7 @@ module "joomla_mount_targets" {
 	subnet  = "${var.private_subnet_ids[0]}"
 	efs_id  = "${module.joomla_efs.efs_id}"
 	mount_target_tags = {
-		"name"        = "joomla",
+		"name" = "joomla",
     "environment" = "${var.environment}"
   }
 }
@@ -91,12 +91,7 @@ module "joomla_cluster" {
 }
 
 module "joomla_ecs_load_balancer" {
-  #infrablocks load balancer uses HTTPS which in turn requires a certificate.
-  #to issue these we need to set up a certificate manager. To avaoid nother
-  #wild goose chase AWS style I simply compied the module and changed the protocol to HTTP
-
-  source = "../modules/elb"
-  version = "0.1.10"
+  source = "github.com/SmartColumbusOS/terraform-aws-ecs-load-balancer"
 
   region = "${var.region}"
   vpc_id = "${var.vpc_id}"
@@ -136,7 +131,7 @@ module "joomla_service" {
   service_name = "${var.service_name}"
   service_image = "${var.service_image}"
   service_port = "${var.service_port}"
-  service_task_container_definitions="${data.template_file.task_definition.rendered}"
+  service_task_container_definitions = "${data.template_file.task_definition.rendered}"
 
   service_desired_count = "1"
   service_deployment_maximum_percent = "100"
