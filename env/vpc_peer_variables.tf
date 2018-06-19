@@ -16,5 +16,5 @@ variable "alm_workspace" {
 }
 
 variable "accepter_credentials_profile" {
-    description = "The AWS credentials profile to use for accepting peering"
+  description = "The AWS credentials profile to use for accepting peering"
 }

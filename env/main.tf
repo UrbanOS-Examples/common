@@ -60,7 +60,6 @@ module "kubernetes" {
   source  = "github.com/SmartColumbusOS/terraform-aws-kubernetes"
   cluster_name        = "${var.kubernetes_cluster_name}"
   aws_region          = "${var.region}"
-#  aws_profile         = "${var.credentials_profile}"
   hosted_zone         = "${aws_route53_zone.private.name}"
   hosted_zone_private = true
   master_subnet_id    = "${module.vpc.private_subnets[0]}"
