@@ -1,10 +1,10 @@
-environment = "dev"
+environment = "test"
 
-vpc_name = "dev"
+vpc_name = "test"
 
-private_dns_zone_name = "dev.smartcolumbusos.com"
+private_dns_zone_name = "test.smartcolumbus.com"
 
-role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
+role_arn = "arn:aws:iam::647770347641:role/jenkins_role"
 
 kubernetes_cluster_name = "streaming-kube"
 

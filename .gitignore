@@ -3,3 +3,5 @@
 *.swp
 **/*.plan
 .DS_Store
+plan.txt
+plan.bin
