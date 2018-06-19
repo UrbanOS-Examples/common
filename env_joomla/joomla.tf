@@ -73,7 +73,7 @@ module "joomla_cluster" {
 
   region = "${var.region}"
   vpc_id = "${var.vpc_id}"
-  subnet_ids = "${join(",",var.public_subnet_ids)}"
+  subnet_ids = "${join(",",var.private_subnet_ids)}"
 
   component = "${var.component}"
   deployment_identifier = "${var.deployment_identifier}"
