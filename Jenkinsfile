@@ -2,8 +2,8 @@ node('master') {
     ansiColor('xterm') {
         stage('Checkout') {
             checkout scm
-            echo 'Checkout from GIT'
         }
+
         stage('Plan') {
             echo 'Write out plan into Jenkins build directory for this job'
             dir('env') {
@@ -16,7 +16,7 @@ node('master') {
                 sh('terraform plan -var-file=variables/dev.tfvars -out ../output/plan.bin  | tee -a ../output/plan.txt')
             }
         }
-        archiveArtifacts artifacts: 'output/plan.txt, output/plan.bin', allowEmptyArchive: true
+
         stage('Execute') {
             echo "Execute terraform"
             dir('env') {
@@ -27,15 +27,15 @@ node('master') {
                 sh('terraform apply ../output/plan.bin                   | tee -a ../output/apply.txt')
             }
         }
-	stage('Copy Kubernetes config') {
-	    dir('env') {
-        kubernetes_master_ip = sh(
-          script: 'terraform output kubernetes_master_private_ip',
-          returnStdout: true
-        ).trim()
-        build job: 'kubeconfig', parameters: [string(name: 'K8_MASTER_IP', value: "${kubernetes_master_ip}")], quietPeriod: 15
+	    stage('Copy Kubernetes config') {
+            dir('env') {
+                kubernetes_master_ip = sh(
+                    script: 'terraform output kubernetes_master_private_ip',
+                    returnStdout: true
+                ).trim()
+                build job: 'kubeconfig', parameters: [string(name: 'K8_MASTER_IP', value: "${kubernetes_master_ip}")], quietPeriod: 15
+	        }
 	    }
-	}
         archiveArtifacts artifacts: 'output/destroy.txt, output/apply.txt', allowEmptyArchive: true
     }
 }
