@@ -57,16 +57,18 @@ resource "aws_route53_zone" "private" {
 }
 
 module "kubernetes" {
-  source  = "github.com/SmartColumbusOS/terraform-aws-kubernetes"
+  source              = "github.com/SmartColumbusOS/terraform-aws-kubernetes"
   cluster_name        = "${var.kubernetes_cluster_name}"
   aws_region          = "${var.region}"
   hosted_zone         = "${aws_route53_zone.private.name}"
+  hosted_zone_id      = "${aws_route53_zone.private.zone_id}"
   hosted_zone_private = true
   master_subnet_id    = "${module.vpc.private_subnets[0]}"
   worker_subnet_ids   = "${module.vpc.private_subnets}"
   min_worker_count    = "${var.min_worker_count}"
   max_worker_count    = "${var.max_worker_count}"
   ssh_public_key      = "./k8_rsa.pub"
+
   addons = [
     "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/storage-class.yaml",
     "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/heapster.yaml",
