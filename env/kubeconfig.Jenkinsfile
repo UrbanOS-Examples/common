@@ -10,7 +10,7 @@ node('master') {
             withCredentials([sshUserPrivateKey(credentialsId: "k8s-no-pass", keyFileVariable: 'keyfile')]) {
                 sh("mkdir -p ~/.kube/")
                 sh("""scp -o StrictHostKeyChecking=no -i $keyfile centos@$K8_MASTER_IP:~/kubeconfig ~/.kube/config""")
-                sh("kubectl get all")
+                sh("kubectl get nodes")
             }
         }
     }
