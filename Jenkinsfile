@@ -29,14 +29,15 @@ node('master') {
                 sh('terraform apply ../output/plan.bin                   | tee -a ../output/apply.txt')
             }
         }
-	    stage('Copy Kubernetes config') {
+
+        stage('Copy Kubernetes config') {
             dir('env') {
                 kubernetes_master_ip = sh(
                     script: 'terraform output kubernetes_master_private_ip',
                     returnStdout: true
                 ).trim()
                 build job: 'kubeconfig', parameters: [string(name: 'K8_MASTER_IP', value: "${kubernetes_master_ip}")], quietPeriod: 15
-	        }
-	    }
+            }
+        }
     }
 }
