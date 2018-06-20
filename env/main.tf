@@ -1,5 +1,6 @@
 provider "aws" {
-  region     = "${var.region}"
+  region = "${var.region}"
+
   assume_role {
     role_arn = "${var.role_arn}"
   }
@@ -40,9 +41,10 @@ module "vpc" {
   enable_dns_hostnames     = "${var.vpc_enable_dns_hostnames}"
 
   tags = {
-    Owner       = "${var.owner}"
-    Environment = "${var.environment}"
-    Name        = "${var.vpc_name}"
+    Owner                                  = "${var.owner}"
+    Environment                            = "${var.environment}"
+    Name                                   = "${var.vpc_name}"
+    "kubernetes.io/cluster/streaming-kube" = "owned"
   }
 }
 
