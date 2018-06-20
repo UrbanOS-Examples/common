@@ -17,6 +17,8 @@ node('master') {
             }
         }
 
+        archiveArtifacts artifacts: 'output/plan.txt', allowEmptyArchive: false
+
         stage('Execute') {
             echo "Execute terraform"
             dir('env') {
@@ -36,6 +38,5 @@ node('master') {
                 build job: 'kubeconfig', parameters: [string(name: 'K8_MASTER_IP', value: "${kubernetes_master_ip}")], quietPeriod: 15
 	        }
 	    }
-        archiveArtifacts artifacts: 'output/destroy.txt, output/apply.txt', allowEmptyArchive: true
     }
 }
