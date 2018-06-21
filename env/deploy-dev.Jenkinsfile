@@ -12,6 +12,7 @@ node('master') {
         }
         stage('Deploy UI') {
             build job: 'deploy-cota-streaming-ui'
+            build job: 'deploy-proxy-cluster'
         }
     }
 }
