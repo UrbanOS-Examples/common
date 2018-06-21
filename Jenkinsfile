@@ -36,6 +36,7 @@ node('master') {
                     script: 'terraform output kubernetes_master_private_ip',
                     returnStdout: true
                 ).trim()
+                sh("echo Kubernetes Master IP: ${kubernetes_master_ip}")
                 build job: 'kubeconfig', parameters: [string(name: 'K8_MASTER_IP', value: "${kubernetes_master_ip}")], quietPeriod: 15
             }
         }
