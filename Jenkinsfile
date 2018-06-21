@@ -1,4 +1,6 @@
 node('master') {
+    properties([disableConcurrentBuilds()])
+
     ansiColor('xterm') {
         stage('Checkout') {
             checkout scm
