@@ -38,9 +38,22 @@ node('master') {
                     script: 'terraform output kubernetes_master_private_ip',
                     returnStdout: true
                 ).trim()
-                sh("echo Kubernetes Master IP: ${kubernetes_master_ip}")
-                build job: 'kubeconfig', parameters: [string(name: 'K8_MASTER_IP', value: kubernetes_master_ip)]
+
+                withCredentials([sshUserPrivateKey(credentialsId: "k8s-no-pass", keyFileVariable: 'keyfile')]) {
+                    sh("mkdir -p ~/.kube/")
+                    sh("echo '====> WAITING FOR KUBERNETES TO START... <===='")
+                    retry(24) {
+                        sleep(10)
+                        copyKubeConfig(kubernetes_master_ip)
+                    }
+                }
+
+                sh("kubectl get nodes")
             }
         }
     }
+}
+
+def copyKubeConfig(kubernetes_master_ip) {
+    sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig ~/.kube/config""")
 }
