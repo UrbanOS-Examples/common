@@ -1,0 +1,8 @@
+#!/bin/bash
+env=prod
+
+clear
+rm -rf .terraform
+terraform init -backend-config=bucket=scos-alm-terraform-state && terraform workspace new $env
+terraform workspace select $env && terraform plan -var-file=variables/$env.tfvars -out=plan.bin | tee plan.txt
+
