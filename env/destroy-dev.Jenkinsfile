@@ -15,7 +15,7 @@ node('master') {
 
         stage('Apply destruction') {
             dir('env') {
-                sh('kubectl delete all --all | exit 0')
+                sh('kubectl delete all --all || true')
                 sh('terraform apply plan.bin')
             }
         }
