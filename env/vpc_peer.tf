@@ -1,6 +1,7 @@
 provider "aws" {
-  alias       = "alm"
-  region      = "${var.region}"
+  alias  = "alm"
+  region = "${var.region}"
+
   assume_role {
     role_arn = "${var.alm_role_arn}"
   }
@@ -66,4 +67,3 @@ resource "aws_route" "private_peer_alm_to_env" {
   destination_cidr_block    = "${module.vpc.vpc_cidr_block}"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
 }
-
