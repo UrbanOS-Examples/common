@@ -22,7 +22,9 @@ node('master') {
                     sh("../scripts/zero_elb_count.sh")
                 }
 
-                sh('terraform apply plan.bin')
+                retry(1) {
+                    sh('terraform apply plan.bin')
+                }
             }
         }
 
