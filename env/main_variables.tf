@@ -89,3 +89,7 @@ variable "max_worker_count" {
   default     = 5
 }
 
+variable "kube_key" {
+  description = "The SSH key to use for kubernetes hosts"
+  default     = "./k8_rsa.pub"
+}

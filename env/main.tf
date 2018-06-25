@@ -69,7 +69,7 @@ module "kubernetes" {
   worker_subnet_ids   = "${module.vpc.private_subnets}"
   min_worker_count    = "${var.min_worker_count}"
   max_worker_count    = "${var.max_worker_count}"
-  ssh_public_key      = "./k8_rsa.pub"
+  ssh_public_key      = "${var.kube_key}"
 
   addons = [
     "https://raw.githubusercontent.com/scholzj/terraform-aws-kubernetes/master/addons/storage-class.yaml",

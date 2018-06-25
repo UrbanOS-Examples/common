@@ -14,7 +14,7 @@ alm_account_id = "068920858268"
 
 alm_workspace = "sandbox"
 
-vpc_azs = ["us-east-2a","us-east-2b","us-east-2c"]
+vpc_azs = ["us-east-2a", "us-east-2b", "us-east-2c"]
 
 vpc_cidr = "10.100.0.0/16"
 
@@ -23,3 +23,9 @@ vpc_private_subnets = ["10.100.0.0/19", "10.100.64.0/19", "10.100.128.0/19"]
 vpc_public_subnets = ["10.100.32.0/20", "10.100.96.0/20", "10.100.160.0/20"]
 
 kubernetes_cluster_name = "sandbox-kube"
+
+role_arn = "arn:aws:iam::068920858268:role/admin_role"
+
+alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
+
+kube_key = "~/.ssh/id_rsa.pub"
