@@ -4,18 +4,13 @@ node('master') {
             checkout scm
         }
 
-        stage('Plan destruction') {
+        stage('Destroy') {
             dir('env') {
                 sh('terraform init --backend-config=bucket=scos-alm-terraform-state')
-                sh('terraform workspace new dev | exit 0')
+                sh('terraform workspace new dev || true')
                 sh('terraform workspace select dev')
-                sh('terraform plan -destroy -no-color -var-file=variables/dev.tfvars -out plan.bin | tee -a plan.txt')
-            }
-        }
 
-        stage('Apply destruction') {
-            dir('env') {
-                timeout(120) {
+                timeout(5) {
                     sh('kubectl delete all --all || true')
                 }
 
@@ -25,11 +20,9 @@ node('master') {
                 }
 
                 retry(2) {
-                    sh('terraform apply plan.bin')
+                    sh('terraform destroy -auto-approve -no-color -var-file=variables/dev.tfvars')
                 }
             }
         }
-
-        archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
     }
 }
