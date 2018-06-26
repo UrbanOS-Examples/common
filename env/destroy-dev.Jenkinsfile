@@ -15,14 +15,16 @@ node('master') {
 
         stage('Apply destruction') {
             dir('env') {
-                sh('kubectl delete all --all || true')
+                timeout(120) {
+                    sh('kubectl delete all --all || true')
+                }
 
                 retry(30) {
                     sleep(10)
                     sh("../scripts/zero_elb_count.sh")
                 }
 
-                retry(1) {
+                retry(2) {
                     sh('terraform apply plan.bin')
                 }
             }
