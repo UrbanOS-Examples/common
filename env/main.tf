@@ -49,7 +49,7 @@ module "vpc" {
 }
 
 resource "aws_route53_zone" "private" {
-  name          = "${var.private_dns_zone_name}"
+  name          = "${var.dns_zone_name}"
   vpc_id        = "${module.vpc.vpc_id}"
   force_destroy = true
 
@@ -91,4 +91,46 @@ module "kubernetes" {
       propagate_at_launch = true
     },
   ]
+}
+
+resource "aws_elb" "jupyter_elb" {
+  name = "jupyter-elb"
+
+  internal        = true
+  subnets         = ["${module.vpc.private_subnets}"]
+  security_groups = ["${module.kubernetes.kubeconfig_security_group}"]
+
+  listener {
+    instance_port     = 30001
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "TCP:30001"
+    interval            = 30
+  }
+}
+
+resource "aws_autoscaling_attachment" "jupyter_k8s_attachment" {
+  autoscaling_group_name = "${module.kubernetes.autoscaling_group_name}"
+  elb                    = "${aws_elb.jupyter_elb.id}"
+}
+
+resource "aws_route53_record" "jupyterhub_dns" {
+  zone_id = "${var.public_dns_zone_id}"
+  name    = "jupyter.${var.dns_zone_name}"
+  type    = "A"
+
+  count = 1
+
+  alias {
+    name                   = "${aws_elb.jupyter_elb.dns_name}"
+    zone_id                = "${aws_elb.jupyter_elb.zone_id}"
+    evaluate_target_health = false
+  }
 }
