@@ -1,16 +1,16 @@
-role_arn = "arn:aws:iam::068920858268:role/admin_role"
+role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
-alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
+alm_role_arn = "arn:aws:iam::199837183662:role/jenkins_role"
 
-vpc_id = "vpc-0b505c82e5aa08cb3"
+vpc_id = "vpc-6a775a02"
 
-alm_vpc_id = "vpc-05144c7c5fd3f5663"
+alm_vpc_id = "vpc-006960d9c11f2cc91"
 
-public_subnet_ids = ["subnet-0dc37f26b358b1c41", "subnet-027d7f27cae6eb299", "subnet-086560ce6ec942354"]
+public_subnet_ids = ["subnet-3e0e5856", "subnet-efbf3395", "subnet-708b7c3c"]
 
-private_subnet_ids = ["subnet-0c84b0d4ad02de5fe", "subnet-0dc37f26b358b1c41", "subnet-0dc37f26b358b1c41"]
+private_subnet_ids = ["subnet-880056e0", "subnet-5db93527", "subnet-d8887f94"]
 
-alm_account_id = "068920858268"
+alm_account_id = "199837183662"
 
 db_instance_class = "db.t2.micro"
 

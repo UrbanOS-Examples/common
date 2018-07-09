@@ -3,8 +3,6 @@
     "Statement": [
         {
             "Action": [
-                "ecs:*",
-                "elasticloadbalancing:Describe*",
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:BatchGetImage",
                 "ecr:GetDownloadUrlForLayer",
