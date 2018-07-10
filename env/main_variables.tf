@@ -93,3 +93,8 @@ variable "kube_key" {
   description = "The SSH key to use for kubernetes hosts"
   default     = "./k8_rsa.pub"
 }
+
+variable "key_pair_public_key" {
+  description = "The public key used to create a key pair"
+  default     = ""
+}
