@@ -31,9 +31,11 @@ variable "domain_name" {
 }
 variable "public_zone_id" {
   description = "The ID of the public Route 53 zone."
+  default = ""
 }
 variable "private_zone_id" {
   description = "The ID of the private Route 53 zone."
+  default = ""
 }
 
 variable "health_check_target" {
