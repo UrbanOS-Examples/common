@@ -55,8 +55,16 @@ node('master') {
 
         stage('Deploy Tiller') {
             dir('env') {
-                sh("kubectl --namespace kube-system create serviceaccount tiller")
-                sh("kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller")
+                sh("""
+                    if [ $(kubectl get serviceaccount --namespace kube-system | grep -wc tiller) -eq 0 ]; then
+                        kubectl --namespace kube-system create serviceaccount tiller
+                    fi
+                """)
+                sh("""
+                    if [ $(kubectl get clusterrolebinding --namespace kube-system | grep -wc tiller) -eq 0 ]; then
+                        kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+                    fi
+                """)
             }
         }
     }
