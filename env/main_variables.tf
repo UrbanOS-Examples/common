@@ -72,7 +72,7 @@ variable "vpc_enable_dns_hostnames" {
 }
 
 variable "dns_zone_name" {
-  description = "Name of private DNS Route53 zone"
+  description = "Name of public and private DNS Route53 zone"
 }
 
 variable "kubernetes_cluster_name" {
