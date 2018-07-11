@@ -71,8 +71,8 @@ variable "vpc_enable_dns_hostnames" {
   default     = true
 }
 
-variable "private_dns_zone_name" {
-  description = "Name of private DNS Route53 zone"
+variable "dns_zone_name" {
+  description = "Name of public and private DNS Route53 zone"
 }
 
 variable "kubernetes_cluster_name" {
@@ -92,4 +92,8 @@ variable "max_worker_count" {
 variable "kube_key" {
   description = "The SSH key to use for kubernetes hosts"
   default     = "./k8_rsa.pub"
+}
+
+variable "public_dns_zone_id" {
+  description = "Public DNS Zone Id.  This goes away after the public zone is terraformed."
 }
