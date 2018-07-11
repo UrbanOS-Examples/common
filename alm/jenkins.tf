@@ -1,5 +1,5 @@
 data "template_file" "instance_user_data" {
-  template = "${file(var.cluster_instance_user_data_template)}"
+  template = "${file("templates/jenkins_instance_userdata.sh.tpl")}"
 
   vars {
     cluster_name             = "${module.jenkins_cluster.cluster_name}"
@@ -12,12 +12,12 @@ data "template_file" "instance_user_data" {
 }
 
 data "template_file" "task_definition" {
-  template = "${file(var.service_task_container_definitions)}"
+  template = "${file("templates/task_definition.json.tpl")}"
 
   vars {
     name           = "${var.service_name}"
     image          = "${var.docker_registry}/${var.service_image}"
-    memory         = "${var.memory}"
+    memory         = "1024"
     command        = "${jsonencode(var.service_command)}"
     port           = "${var.service_port}"
     region         = "${var.region}"
@@ -32,7 +32,7 @@ module "jenkins_efs" {
 
   efs_name      = "${var.efs_name}"
   efs_mode      = "${var.efs_mode}"
-  efs_encrypted = "${var.efs_encrypted}"
+  efs_encrypted = true
 }
 
 module "jenkins_mount_targets" {
@@ -57,13 +57,13 @@ module "jenkins_cluster" {
   subnet_ids = "${join(",",module.vpc.private_subnets)}"
 
   component             = "${var.component}"
-  deployment_identifier = "${var.deployment_identifier}"
+  deployment_identifier = "${var.environment}"
 
   cluster_name                         = "${terraform.workspace}_${var.cluster_name}"
   cluster_instance_ssh_public_key_path = "${var.cluster_instance_ssh_public_key_path}"
   cluster_instance_type                = "${var.cluster_instance_type}"
   cluster_instance_user_data_template  = "${data.template_file.instance_user_data.rendered}"
-  cluster_instance_iam_policy_contents = "${file(var.cluster_instance_iam_policy_contents)}"
+  cluster_instance_iam_policy_contents = "${file("files/instance_policy.json")}"
 
   cluster_minimum_size     = "${var.cluster_minimum_size}"
   cluster_maximum_size     = "${var.cluster_maximum_size}"
@@ -79,24 +79,22 @@ module "jenkins_ecs_load_balancer" {
   subnet_ids = "${module.vpc.private_subnets}"
 
   component             = "${var.component}"
-  deployment_identifier = "${var.deployment_identifier}"
+  deployment_identifier = "${var.environment}"
 
   service_name            = "${terraform.workspace}_${var.service_name}"
   service_port            = "${var.service_port}"
   service_certificate_arn = ""
 
   domain_name     = "${var.domain_name}"
-  public_zone_id  = "${var.public_zone_id}"
-  private_zone_id = "${var.private_zone_id}"
 
   health_check_target = "HTTP:8080/login"
 
-  allow_cidrs = "${var.allow_lb_cidrs}"
+  allow_cidrs = "${var.allowed_cidrs}"
 
-  include_public_dns_record  = "${var.include_public_dns_record}"
-  include_private_dns_record = "${var.include_private_dns_record}"
+  include_public_dns_record  = "no"
+  include_private_dns_record = "no"
 
-  expose_to_public_internet = "${var.expose_to_public_internet}"
+  expose_to_public_internet = "no"
 }
 
 module "jenkins_service" {
@@ -107,7 +105,7 @@ module "jenkins_service" {
   vpc_id = "${module.vpc.vpc_id}"
 
   component             = "${var.component}"
-  deployment_identifier = "${var.deployment_identifier}"
+  deployment_identifier = "${var.environment}"
 
   service_name                       = "${var.service_name}"
   service_image                      = "${var.docker_registry}/${var.service_image}"
@@ -118,7 +116,7 @@ module "jenkins_service" {
   service_deployment_maximum_percent         = "100"
   service_deployment_minimum_healthy_percent = "50"
 
-  attach_to_load_balancer = "${var.attach_to_load_balancer}"
+  attach_to_load_balancer = "yes"
   service_elb_name        = "${module.jenkins_ecs_load_balancer.name}"
 
   service_volumes = [
@@ -155,16 +153,6 @@ variable "cluster_instance_type" {
   default     = "t2.medium"
 }
 
-variable "cluster_instance_user_data_template" {
-  description = "The contents of a template for container instance user data"
-  default     = ""
-}
-
-variable "cluster_instance_iam_policy_contents" {
-  description = "AWS Region"
-  default     = "us-east-2"
-}
-
 variable "cluster_minimum_size" {
   description = "The minimum size of the ECS cluster"
   default     = 1
@@ -180,46 +168,13 @@ variable "cluster_desired_capacity" {
   default     = 3
 }
 
-variable "allowed_cidrs" {
-  description = "The CIDRs allowed access to containers"
-  type        = "list"
-  default     = ["10.0.0.0/8"]
-}
-
 variable "domain_name" {
   description = "The domain name of the supplied Route 53 zones."
 }
 
 variable "service_port" {
   description = "The port on which the service containers are listening"
-}
-
-variable "public_zone_id" {
-  description = "The ID of the public Route 53 zone"
-}
-
-variable "private_zone_id" {
-  description = "The ID of the private Route 53 zone"
-}
-
-variable "allow_lb_cidrs" {
-  description = "A list of CIDRs from which the ELB is reachable"
-  type        = "list"
-}
-
-variable "include_public_dns_record" {
-  description = "Whether or not to create a public DNS record"
-  default     = "no"
-}
-
-variable "include_private_dns_record" {
-  description = "Whether or not to create a private DNS record"
-  default     = "yes"
-}
-
-variable "expose_to_public_internet" {
-  description = "Whether or not the ELB is publicly accessible"
-  default     = "no"
+  default     = 8080
 }
 
 variable "service_name" {
@@ -230,16 +185,6 @@ variable "service_name" {
 variable "service_image" {
   description = "The docker image (including version) to deploy"
   default     = "scos/jenkins-master:latest"
-}
-
-variable "service_task_container_definitions" {
-  description = "A template for the container definitions in the task"
-  default     = ""
-}
-
-variable "attach_to_load_balancer" {
-  description = "Whether or not this service should attach to a load balancer"
-  default     = "yes"
 }
 
 variable "service_elb_name" {
@@ -253,12 +198,9 @@ variable "service_command" {
   default     = []
 }
 
-variable "memory" {
-  description = "Memory"
-}
-
 variable "directory_name" {
   description = "Directory where data is saved"
+  default     = "jenkins_home"
 }
 
 variable "efs_name" {
@@ -271,19 +213,9 @@ variable "efs_mode" {
   default     = "generalPurpose"
 }
 
-variable "efs_encrypted" {
-  description = "Is EFS encrypted?  true/false"
-  type        = "string"
-  default     = true
-}
-
 variable "jenkins_relay_user_data_template" {
   description = "Location of the userdata template for the jenkins relay"
   default     = "templates/jenkins_relay_userdata.sh.tpl"
-}
-
-variable "jenkins_relay_github_secret" {
-  description = "Secret token for jenkins api access"
 }
 
 variable "jenkins_relay_docker_image" {

@@ -14,7 +14,7 @@ terraform {
 }
 
 data "aws_secretsmanager_secret_version" "openvpn_admin_password" {
-  secret_id = "${var.openvpn_admin_password_secret_arn}"
+  secret_id = "arn:aws:secretsmanager:us-east-2:199837183662:secret:openvpn_admin_password-beMNOa"
 }
 
 resource "aws_key_pair" "cloud_key" {
@@ -38,17 +38,14 @@ variable "owner" {
 
 variable "environment" {
   description = "VPC environment. It can be sandbox, dev, staging or production"
-  default     = ""
-}
-
-variable "openvpn_admin_password_secret_arn" {
-  description = "AWS SecretsManager ARN for the OpenVPN admin password"
-}
-
-variable "deployment_identifier" {
-  description = "An identifier for this instantiation"
 }
 
 variable "cluster_instance_ssh_public_key_path" {
   description = "AWS The path to the public key to use for the container instances"
+}
+
+variable "allowed_cidrs" {
+  description = "The CIDRs allowed access to containers"
+  type        = "list"
+  default     = ["0.0.0.0/0"]
 }

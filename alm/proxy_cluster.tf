@@ -4,7 +4,7 @@ module "proxy_cluster" {
   region                               = "${var.region}"
   vpc_id                               = "${module.vpc.vpc_id}"
   subnet_ids                           = "${module.vpc.private_subnets}"
-  deployment_identifier                = "${var.deployment_identifier}"
+  deployment_identifier                = "${var.environment}"
   cluster_instance_ssh_public_key_path = "${var.cluster_instance_ssh_public_key_path}"
   allowed_cidrs                        = "${var.allowed_cidrs}"
   ui_host                              = "${var.cota_ui_host}"

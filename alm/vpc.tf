@@ -10,7 +10,7 @@ module "vpc" {
   public_subnets  = "${var.vpc_public_subnets}"
 
   enable_nat_gateway = "${var.vpc_enable_nat_gateway}"
-  single_nat_gateway = "${var.vpc_single_nat_gateway}"
+  single_nat_gateway = true
 
   enable_vpn_gateway       = "${var.vpc_enable_vpn_gateway}"
   enable_s3_endpoint       = "${var.vpc_enable_s3_endpoint}"
