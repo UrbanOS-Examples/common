@@ -31,3 +31,5 @@ alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
 kube_key = "~/.ssh/id_rsa.pub"
 
 public_dns_zone_id = "Z8ERD8071HP70"
+
+alm_vpc_id = "vpc-05144c7c5fd3f5663"
