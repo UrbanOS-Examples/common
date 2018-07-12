@@ -141,16 +141,11 @@ resource "aws_route53_record" "jupyterhub_dns" {
   }
 }
 
-data "aws_vpc" "alm_vpc" {
-  provider = "aws.alm"
-  id       = "${var.alm_vpc_id}"
-}
-
 resource "aws_security_group_rule" "allow_inbound_traffic_from_alm" {
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "-1"
-  cidr_blocks       = ["${data.aws_vpc.alm_vpc.cidr_block}"]
+  cidr_blocks       = ["${data.terraform_remote_state.vpc.vpc_cidr_block}"]
   security_group_id = "${module.kubernetes.kubeconfig_security_group}"
 }
