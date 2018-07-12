@@ -12,9 +12,10 @@ data "terraform_remote_state" "vpc" {
   workspace = "${var.alm_workspace}"
 
   config {
-    bucket = "${var.alm_state_bucket}"
-    key    = "alm"
-    region = "us-east-2"
+    bucket     = "${var.alm_state_bucket}"
+    key        = "alm"
+    region     = "us-east-2"
+    role_arn   = "${var.alm_role_arn}"
   }
 }
 
