@@ -97,3 +97,7 @@ variable "kube_key" {
 variable "public_dns_zone_id" {
   description = "Public DNS Zone Id.  This goes away after the public zone is terraformed."
 }
+
+variable "key_pair_public_key" {
+  description = "The public key used to create a key pair"
+}
