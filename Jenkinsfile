@@ -10,7 +10,7 @@ node('master') {
             echo 'Write out plan into Jenkins build directory for this job'
             dir('env') {
                 sh('rm -rf .terraform output | exit 0')
-                sh('terraform init -backend-config="bucket=scos-alm-terraform-state"')
+                sh('terraform init -backend-config="bucket=scos-alm-terraform-state" -backend-config="role_arn=arn:aws:iam::199837183662:role/jenkins_role" -backend-config="dynamodb_table=terraform_lock"')
                 sh('terraform workspace new dev || exit 0')
                 sh('terraform workspace select dev')
                 sh('echo name: $JOB_NAME - build number: $BUILD_NUMBER | tee ../output/plan.txt')
