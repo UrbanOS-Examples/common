@@ -101,3 +101,7 @@ variable "public_dns_zone_id" {
 variable "key_pair_public_key" {
   description = "The public key used to create a key pair"
 }
+
+variable "alm_vpc_id" {
+  description = "VCP Id of the Application LifeCycle Management network"
+}

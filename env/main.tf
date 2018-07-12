@@ -93,25 +93,31 @@ module "kubernetes" {
   ]
 }
 
+locals {
+  jupyter_port = 30001
+}
+
 resource "aws_elb" "jupyter_elb" {
   name = "jupyter-elb"
 
-  internal        = true
+  internal = true
+
   subnets         = ["${module.vpc.private_subnets}"]
   security_groups = ["${module.kubernetes.kubeconfig_security_group}"]
 
   listener {
-    instance_port     = 30001
-    instance_protocol = "http"
+    instance_port = "${local.jupyter_port}"
+
+    instance_protocol = "HTTP"
     lb_port           = 80
-    lb_protocol       = "http"
+    lb_protocol       = "HTTP"
   }
 
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 3
-    target              = "TCP:30001"
+    target              = "TCP:${local.jupyter_port}"
     interval            = 30
   }
 }
@@ -133,4 +139,18 @@ resource "aws_route53_record" "jupyterhub_dns" {
     zone_id                = "${aws_elb.jupyter_elb.zone_id}"
     evaluate_target_health = false
   }
+}
+
+data "aws_vpc" "alm_vpc" {
+  provider = "aws.alm"
+  id       = "${var.alm_vpc_id}"
+}
+
+resource "aws_security_group_rule" "allow_inbound_traffic_from_alm" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "-1"
+  cidr_blocks       = ["${data.aws_vpc.alm_vpc.cidr_block}"]
+  security_group_id = "${module.kubernetes.kubeconfig_security_group}"
 }
