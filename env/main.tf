@@ -19,7 +19,7 @@ terraform {
 
 resource "aws_key_pair" "cloud_key" {
   key_name   = "${terraform.workspace}_env_cloud_key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRAvH6k7iEeRDz9SQtkH1o8KiUaed/e2hmzTUjA8bhmeWVLPsgCMKIUKR0jdPlvdZ0AmMLXswobsXj08dPgWxUZxoAWIqKCjd969KckydUpBtcb+X2Q+tpOcugBOQSY1H8hgNrdcRKEaUllTfvseJ9pBOYU7j9VuZ608HQhfZw7+aS8wi9o/BJwejtpWdlo6gkxXoIRqDX/ioYg+W6Tc7yoUzAEANwZAy3/3GKWDrh+9jnzR6mEEN48Nuee49wWfP5G0T/v4+Gvux5zioHb3rcmmR9YTkFOiv1poInhXlPdc7Q38yj+z6E+hACNN3rK80YjU0ByaSPltPjqm9ZYmPX"
+  public_key = "${var.key_pair_public_key}"
 }
 
 variable "region" {
@@ -31,7 +31,73 @@ variable "role_arn" {
   description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
 }
 
+resource "aws_route53_zone" "private" {
+  vpc_id        = "${module.vpc.vpc_id}"
+  force_destroy = true
+
+  tags = {
+    Environment = "${var.environment}"
+  }
+}
+
 variable "environment" {
   description = "VPC environment. It can be sandbox, dev, staging or production"
   default     = ""
+}
+
+locals {
+  jupyter_port = 30001
+}
+
+resource "aws_elb" "jupyter_elb" {
+  name = "jupyter-elb"
+
+  internal = true
+
+  subnets         = ["${module.vpc.private_subnets}"]
+  security_groups = ["${module.kubernetes.kubeconfig_security_group}"]
+
+  listener {
+    instance_port = "${local.jupyter_port}"
+
+    instance_protocol = "HTTP"
+    lb_port           = 80
+    lb_protocol       = "HTTP"
+  }
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "TCP:${local.jupyter_port}"
+    interval            = 30
+  }
+}
+
+resource "aws_autoscaling_attachment" "jupyter_k8s_attachment" {
+  autoscaling_group_name = "${module.kubernetes.autoscaling_group_name}"
+  elb                    = "${aws_elb.jupyter_elb.id}"
+}
+
+resource "aws_route53_record" "jupyterhub_dns" {
+  zone_id = "${var.public_dns_zone_id}"
+  name    = "jupyter.${var.dns_zone_name}"
+  type    = "A"
+
+  count = 1
+
+  alias {
+    name                   = "${aws_elb.jupyter_elb.dns_name}"
+    zone_id                = "${aws_elb.jupyter_elb.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_security_group_rule" "allow_inbound_traffic_from_alm" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "-1"
+  cidr_blocks       = ["${data.terraform_remote_state.vpc.vpc_cidr_block}"]
+  security_group_id = "${module.kubernetes.kubeconfig_security_group}"
 }

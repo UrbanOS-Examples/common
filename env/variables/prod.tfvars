@@ -2,7 +2,7 @@ environment = "prod"
 
 vpc_name = "prod"
 
-private_dns_zone_name = "smartcolumbus.com"
+dns_zone_name = "smartcolumbus.com"
 
 role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
 

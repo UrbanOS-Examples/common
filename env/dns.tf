@@ -1,5 +1,5 @@
 resource "aws_route53_zone" "private" {
-  name          = "${var.private_dns_zone_name}"
+  name          = "${var.dns_zone_name}"
   vpc_id        = "${module.vpc.vpc_id}"
   force_destroy = true
 
@@ -8,6 +8,6 @@ resource "aws_route53_zone" "private" {
   }
 }
 
-variable "private_dns_zone_name" {
+variable "dns_zone_name" {
   description = "Name of private DNS Route53 zone"
 }
