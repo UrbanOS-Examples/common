@@ -12,9 +12,10 @@ data "terraform_remote_state" "vpc" {
   workspace = "${var.alm_workspace}"
 
   config {
-    bucket = "${var.alm_state_bucket}"
-    key    = "alm"
-    region = "us-east-2"
+    bucket     = "${var.alm_state_bucket}"
+    key        = "alm"
+    region     = "us-east-2"
+    role_arn   = "${var.alm_role_arn}"
   }
 }
 
@@ -66,4 +67,25 @@ resource "aws_route" "private_peer_alm_to_env" {
   route_table_id            = "${element(data.terraform_remote_state.vpc.private_route_table_ids, 0)}"
   destination_cidr_block    = "${module.vpc.vpc_cidr_block}"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
+}
+
+variable "alm_role_arn" {
+  description = "The ARN for the assume role for ALM access"
+}
+
+variable "alm_account_id" {
+  description = "Id if the account to peer to"
+}
+
+variable "alm_state_bucket" {
+  description = "S3 Bucket which contains the ALM terraform state"
+  default     = "scos-sandbox-terraform-state"
+}
+
+variable "alm_workspace" {
+  description = "Workspace for the ALM state"
+}
+
+variable "accepter_credentials_profile" {
+  description = "The AWS credentials profile to use for accepting peering"
 }
