@@ -31,15 +31,6 @@ variable "role_arn" {
   description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
 }
 
-resource "aws_route53_zone" "private" {
-  vpc_id        = "${module.vpc.vpc_id}"
-  force_destroy = true
-
-  tags = {
-    Environment = "${var.environment}"
-  }
-}
-
 variable "environment" {
   description = "VPC environment. It can be sandbox, dev, staging or production"
   default     = ""
@@ -100,4 +91,8 @@ resource "aws_security_group_rule" "allow_inbound_traffic_from_alm" {
   protocol          = "-1"
   cidr_blocks       = ["${data.terraform_remote_state.vpc.vpc_cidr_block}"]
   security_group_id = "${module.kubernetes.kubeconfig_security_group}"
+}
+
+variable "public_dns_zone_id" {
+  description = "Public DNS zone ID"
 }
