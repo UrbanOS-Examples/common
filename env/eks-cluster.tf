@@ -22,3 +22,8 @@ module "eks-cluster" {
     Environment = "${var.environment}"
   }
 }
+
+output "eks-cluster-kubeconfig" {
+  description = "Working kubeconfig to talk to the eks cluster."
+  value       = "${module.eks-cluster.kubeconfig}"
+}
