@@ -69,6 +69,11 @@ resource "aws_route" "private_peer_alm_to_env" {
   vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
 }
 
+variable "alm_region" {
+  description = "AWS Region of ALM Environment"
+  default     = "us-east-2"
+}
+
 variable "alm_role_arn" {
   description = "The ARN for the assume role for ALM access"
 }
