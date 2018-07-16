@@ -10,6 +10,8 @@ environment = "sandbox"
 
 dns_zone_name = "sandbox.smartcolumbus.com"
 
+root_dns_name = "smartcolumbusos.com"
+
 alm_account_id = "068920858268"
 
 alm_workspace = "sandbox"
@@ -31,4 +33,3 @@ alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
 kube_key = "~/.ssh/id_rsa.pub"
 
 public_dns_zone_id = "Z8ERD8071HP70"
-

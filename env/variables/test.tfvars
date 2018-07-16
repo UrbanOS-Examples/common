@@ -4,6 +4,8 @@ vpc_name = "test"
 
 dns_zone_name = "test.smartcolumbus.com"
 
+root_dns_name = "smartcolumbusos.com"
+
 role_arn = "arn:aws:iam::647770347641:role/jenkins_role"
 
 kubernetes_cluster_name = "streaming-kube"
@@ -22,7 +24,7 @@ vpc_single_nat_gateway = true
 
 vpc_cidr = "10.100.0.0/16"
 
-vpc_azs= ["us-east-2a","us-east-2b","us-east-2c"]
+vpc_azs = ["us-east-2a", "us-east-2b", "us-east-2c"]
 
 vpc_private_subnets = ["10.100.0.0/19", "10.100.64.0/19", "10.100.128.0/19"]
 
