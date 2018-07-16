@@ -12,9 +12,9 @@ module "eks-cluster" {
 
   worker_groups       = [ {
     name                    = "Workers"
-    asg_desired_capacity    = "4"
+    asg_desired_capacity    = "3"
     asg_min_size            = "1"
-    asg_max_size            = "4"
+    asg_max_size            = "6"
     instance_type           = "t2.medium"
   } ]
 
