@@ -27,6 +27,11 @@ variable "region" {
   default     = "us-east-2"
 }
 
+variable "alm_region" {
+  description = "AWS Region of ALM Environment"
+  default     = "us-east-2"
+}
+
 variable "role_arn" {
   description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
 }

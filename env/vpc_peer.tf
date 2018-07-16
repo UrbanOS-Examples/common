@@ -1,6 +1,6 @@
 provider "aws" {
   alias  = "alm"
-  region = "${var.region}"
+  region = "${var.alm_region}"
 
   assume_role {
     role_arn = "${var.alm_role_arn}"
@@ -23,7 +23,7 @@ resource "aws_vpc_peering_connection" "env_to_alm" {
   vpc_id        = "${module.vpc.vpc_id}"
   peer_vpc_id   = "${data.terraform_remote_state.vpc.vpc_id}"
   peer_owner_id = "${var.alm_account_id}"
-  peer_region   = "${var.region}"
+  peer_region   = "${var.alm_region}"
   auto_accept   = "false"
 
   tags {
