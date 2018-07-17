@@ -36,7 +36,7 @@ variable "vpc_cidr" {
 
 variable "vpc_azs" {
   description = "A list of availability zones in the region"
-  default     = ["us-east-2a"]
+  default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
 }
 
 variable "vpc_private_subnets" {
