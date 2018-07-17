@@ -1,6 +1,7 @@
 node('master') {
     ansiColor('xterm') {
         stage('Checkout') {
+            deleteDir()
             checkout scm
         }
 
