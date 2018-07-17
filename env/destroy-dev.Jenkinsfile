@@ -19,9 +19,17 @@ node('master') {
         stage('Destroy infrastructure') {
             dir('env') {
                 initTerraform()
-                sh('terraform destroy -var-file=variables/dev.tfvars -auto-approve')
+                destroyEnv()
             }
         }
+    }
+}
+
+def destroyEnv() {
+    try {
+        sh('terraform destroy -var-file=variables/dev.tfvars -auto-approve')
+    } catch(all) {
+        sh('../scripts/delete_vpc.sh')
     }
 }
 
