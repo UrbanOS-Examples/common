@@ -8,8 +8,6 @@ vpc_name = "sandbox-dev"
 
 vpc_single_nat_gateway = true
 
-environment = "sandbox"
-
 dns_zone_name = "sandbox.smartcolumbus.com"
 
 alm_account_id = "068920858268"

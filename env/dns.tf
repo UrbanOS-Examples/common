@@ -4,7 +4,7 @@ resource "aws_route53_zone" "private" {
   force_destroy = true
 
   tags = {
-    Environment = "${var.environment}"
+    Environment = "${terraform.workspace}"
   }
 }
 

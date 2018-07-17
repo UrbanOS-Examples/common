@@ -18,7 +18,7 @@ module "eks-cluster" {
   }]
 
   tags = {
-    Environment = "${workspace}"
+    Environment = "${terraform.workspace}"
   }
 }
 

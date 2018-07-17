@@ -20,7 +20,7 @@ module "kubernetes" {
   ]
 
   tags = {
-    Environmnet = "${workspace}"
+    Environmnet = "${terraform.workspace}"
     DNSZone     = "${aws_route53_zone.private.zone_id}"
   }
 

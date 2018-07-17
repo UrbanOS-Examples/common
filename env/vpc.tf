@@ -19,7 +19,7 @@ module "vpc" {
 
   tags = {
     Owner                                                  = "${var.owner}"
-    Environment                                            = "${workspace}"
+    Environment                                            = "${terraform.workspace}"
     Name                                                   = "${var.vpc_name}"
     "kubernetes.io/cluster/${var.kubernetes_cluster_name}" = "shared"
   }
