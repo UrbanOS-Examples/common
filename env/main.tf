@@ -81,12 +81,7 @@ locals {
 
 variable "region" {
   description = "AWS Region"
-  default     = "us-east-2"
-}
-
-variable "environment" {
-  description = "VPC environment. It can be sandbox, dev, staging or production"
-  default     = ""
+  default     = "us-east-1"
 }
 
 variable "public_dns_zone_id" {
