@@ -12,10 +12,10 @@ data "terraform_remote_state" "vpc" {
   workspace = "${var.alm_workspace}"
 
   config {
-    bucket   = "${terraform.backend.config.bucket}"
-    key      = "operating-system"
-    region   = "${terraform.backend.config.region}"
-    role_arn = "${terraform.backend.config.role_arn}"
+    bucket   = "${var.alm_state_bucket_name}"
+    key      = "alm"
+    region   = "us-east-2"
+    role_arn = "${var.alm_role_arn}"
   }
 }
 
@@ -76,6 +76,10 @@ variable "alm_region" {
 
 variable "alm_role_arn" {
   description = "The ARN for the assume role for ALM access"
+}
+
+variable "alm_state_bucket_name" {
+  description = "The name of the S3 state bucket for ALM"
 }
 
 variable "alm_account_id" {
