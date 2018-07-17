@@ -1,7 +1,3 @@
-region = "us-east-1"
-
-environment = "dev"
-
 vpc_name = "dev"
 
 dns_zone_name = "dev.smartcolumbusos.com"
@@ -17,8 +13,6 @@ alm_account_id = "199837183662"
 alm_role_arn = "arn:aws:iam::199837183662:role/jenkins_role"
 
 accepter_credentials_profile = "jenkins"
-
-alm_state_bucket = "scos-alm-terraform-state"
 
 alm_workspace = "alm"
 

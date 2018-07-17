@@ -41,7 +41,7 @@ resource "aws_route53_zone" "public_hosted_zone" {
   force_destroy = true
 
   tags = {
-    Environment = "${var.environment}"
+    Environment = "${terraform.workspace}"
   }
 }
 

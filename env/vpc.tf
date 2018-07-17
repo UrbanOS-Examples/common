@@ -18,9 +18,9 @@ module "vpc" {
   enable_dns_hostnames     = "${var.vpc_enable_dns_hostnames}"
 
   tags = {
-    Owner                  = "${var.owner}"
-    Environment            = "${var.environment}"
-    Name                   = "${var.vpc_name}"
+    Owner                                                  = "${var.owner}"
+    Environment                                            = "${terraform.workspace}"
+    Name                                                   = "${var.vpc_name}"
     "kubernetes.io/cluster/${var.kubernetes_cluster_name}" = "shared"
   }
 }
@@ -107,4 +107,3 @@ output "nat_public_ips" {
 variable "key_pair_public_key" {
   description = "The public key used to create a key pair"
 }
-

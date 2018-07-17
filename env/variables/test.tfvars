@@ -1,5 +1,3 @@
-environment = "test"
-
 vpc_name = "test"
 
 dns_zone_name = "test.smartcolumbus.com"
@@ -14,9 +12,9 @@ alm_account_id = "199837183662"
 
 alm_role_arn = "arn:aws:iam::199837183662:role/jenkins_role"
 
-accepter_credentials_profile = "jenkins"
+alm_state_bucket_name = "scos-alm-terraform-state"
 
-alm_state_bucket = "scos-alm-terraform-state"
+accepter_credentials_profile = "jenkins"
 
 alm_workspace = "alm"
 
@@ -24,7 +22,11 @@ vpc_single_nat_gateway = true
 
 vpc_cidr = "10.100.0.0/16"
 
+<<<<<<< HEAD
 vpc_azs = ["us-east-2a", "us-east-2b", "us-east-2c"]
+=======
+vpc_azs = ["us-east-1a", "us-east-1b", "us-east-1d"]
+>>>>>>> origin/master
 
 vpc_private_subnets = ["10.100.0.0/19", "10.100.64.0/19", "10.100.128.0/19"]
 
