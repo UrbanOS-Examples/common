@@ -1,6 +1,6 @@
 provider "aws" {
   alias  = "alm"
-  region = "${var.region}"
+  region = "${var.alm_region}"
 
   assume_role {
     role_arn = "${var.alm_role_arn}"
@@ -23,7 +23,7 @@ resource "aws_vpc_peering_connection" "env_to_alm" {
   vpc_id        = "${module.vpc.vpc_id}"
   peer_vpc_id   = "${data.terraform_remote_state.vpc.vpc_id}"
   peer_owner_id = "${var.alm_account_id}"
-  peer_region   = "${var.region}"
+  peer_region   = "${var.alm_region}"
   auto_accept   = "false"
 
   tags {
@@ -67,6 +67,11 @@ resource "aws_route" "private_peer_alm_to_env" {
   route_table_id            = "${element(data.terraform_remote_state.vpc.private_route_table_ids, 0)}"
   destination_cidr_block    = "${module.vpc.vpc_cidr_block}"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.env_to_alm.id}"
+}
+
+variable "alm_region" {
+  description = "AWS Region of ALM Environment"
+  default     = "us-east-2"
 }
 
 variable "alm_role_arn" {
