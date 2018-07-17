@@ -5,22 +5,36 @@ node('master') {
             checkout scm
         }
 
-        stage('Plan destruction') {
-            dir('env') {
-                sh('terraform init -backend-config="bucket=scos-alm-terraform-state" -backend-config="role_arn=arn:aws:iam::199837183662:role/jenkins_role" -backend-config="dynamodb_table=terraform_lock"')
-                sh('terraform workspace new dev | exit 0')
-                sh('terraform workspace select dev')
-                sh('terraform plan -destroy -no-color -var-file=variables/dev.tfvars -out plan.bin | tee -a plan.txt')
+        stage('Destroy services') {
+            timeout(5) {
+                sh('kubectl delete all --all || true')
+            }
+
+            retry(30) {
+                sleep(10)
+                sh('scripts/zero_elb_count.sh')
             }
         }
 
-        stage('Apply destruction') {
+        stage('Destroy infrastructure') {
             dir('env') {
-                sh('kubectl delete all --all | exit 0')
-                sh('terraform apply plan.bin')
+                initTerraform()
+                sh('terraform destroy -var-file=variables/dev.tfvars -auto-approve')
             }
         }
+    }
+}
 
-        archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
+def initTerraform() {
+    sh('terraform init -backend-config="bucket=scos-alm-terraform-state" -backend-config="role_arn=arn:aws:iam::199837183662:role/jenkins_role" -backend-config="dynamodb_table=terraform_lock"')
+    tfSwitchWorkspace()
+}
+
+def tfSwitchWorkspace() {
+    try {
+        sh('terraform workspace select dev')
+    } catch(all) {
+        sh('terraform workspace create dev')
+        sh('terraform workspace select dev')
     }
 }
