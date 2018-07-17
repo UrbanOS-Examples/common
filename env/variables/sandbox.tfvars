@@ -1,5 +1,3 @@
-region = "us-east-1"
-
 credentials_profile = "sandbox"
 
 accepter_credentials_profile = "sandbox"
@@ -15,8 +13,6 @@ alm_account_id = "068920858268"
 alm_workspace = "sandbox"
 
 alm_state_bucket_name = "scos-sandbox-terraform-state"
-
-vpc_azs = ["us-east-1a", "us-east-1b", "us-east-1d"]
 
 vpc_cidr = "10.100.0.0/16"
 
