@@ -12,10 +12,10 @@ data "terraform_remote_state" "vpc" {
   workspace = "${var.alm_workspace}"
 
   config {
-    bucket     = "${var.alm_state_bucket}"
-    key        = "alm"
-    region     = "us-east-2"
-    role_arn   = "${var.alm_role_arn}"
+    bucket   = "${var.alm_state_bucket_name}"
+    key      = "alm"
+    region   = "us-east-2"
+    role_arn = "${var.alm_role_arn}"
   }
 }
 
@@ -78,13 +78,12 @@ variable "alm_role_arn" {
   description = "The ARN for the assume role for ALM access"
 }
 
-variable "alm_account_id" {
-  description = "Id if the account to peer to"
+variable "alm_state_bucket_name" {
+  description = "The name of the S3 state bucket for ALM"
 }
 
-variable "alm_state_bucket" {
-  description = "S3 Bucket which contains the ALM terraform state"
-  default     = "scos-sandbox-terraform-state"
+variable "alm_account_id" {
+  description = "Id if the account to peer to"
 }
 
 variable "alm_workspace" {

@@ -8,13 +8,13 @@ vpc_name = "sandbox-dev"
 
 vpc_single_nat_gateway = true
 
-environment = "sandbox"
-
 dns_zone_name = "sandbox.smartcolumbus.com"
 
 alm_account_id = "068920858268"
 
 alm_workspace = "sandbox"
+
+alm_state_bucket_name = "scos-sandbox-terraform-state"
 
 vpc_azs = ["us-east-1a", "us-east-1b", "us-east-1d"]
 

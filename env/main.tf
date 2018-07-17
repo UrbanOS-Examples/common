@@ -22,24 +22,6 @@ resource "aws_key_pair" "cloud_key" {
   public_key = "${var.key_pair_public_key}"
 }
 
-variable "region" {
-  description = "AWS Region"
-  default     = "us-east-2"
-}
-
-variable "role_arn" {
-  description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
-}
-
-variable "environment" {
-  description = "VPC environment. It can be sandbox, dev, staging or production"
-  default     = ""
-}
-
-locals {
-  jupyter_port = 30001
-}
-
 resource "aws_elb" "jupyter_elb" {
   name = "jupyter-elb"
 
@@ -93,6 +75,24 @@ resource "aws_security_group_rule" "allow_inbound_traffic_from_alm" {
   security_group_id = "${module.kubernetes.kubeconfig_security_group}"
 }
 
+locals {
+  jupyter_port = 30001
+}
+
+variable "region" {
+  description = "AWS Region"
+  default     = "us-east-1"
+}
+
 variable "public_dns_zone_id" {
   description = "Public DNS zone ID"
+}
+
+variable "role_arn" {
+  description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
+}
+
+output "key_pair_name" {
+  description = "Name of the keypair to use for env deployments"
+  value       = "${aws_key_pair.cloud_key.key_name}"
 }
