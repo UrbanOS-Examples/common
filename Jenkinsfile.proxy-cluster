@@ -1,12 +1,15 @@
 node('master') {
     ansiColor('xterm') {
         stage('Checkout') {
+            deleteDir()
             checkout scm
         }
 
         stage('Deploy') {
             dir('alm') {
-                sh('../scripts/deploy_proxy_cluster.sh')
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_jenkins_user', variable: 'AWS_ACCESS_KEY_ID']]) {
+                    sh('../scripts/deploy_proxy_cluster.sh')
+                }
             }
         }
     }
