@@ -11,7 +11,11 @@ variable "public_hosted_zone_id" {
 }
 
 variable "count" {
-  description = ""
+  description = "1 or 0, indicating whether the resource will be created or not"
+}
+
+variable "key" {
+  description = "Path to the state file inside the bucket"
 }
 
 data "terraform_remote_state" "env_remote_state" {
@@ -20,7 +24,7 @@ data "terraform_remote_state" "env_remote_state" {
 
   config {
     bucket   = "${var.remote_bucket_name}"
-    key      = "operating-system"
+    key      = "${var.key}"
     region   = "us-east-2"
     role_arn = "arn:aws:iam::068920858268:role/admin_role"
     encrypt  = true

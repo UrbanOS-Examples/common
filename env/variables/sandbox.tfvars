@@ -8,8 +8,6 @@ vpc_name = "sandbox-dev"
 
 vpc_single_nat_gateway = true
 
-dns_zone_name = "sandbox.smartcolumbus.com"
-
 root_dns_name = "smartcolumbusos.com"
 
 alm_account_id = "068920858268"
@@ -33,5 +31,3 @@ role_arn = "arn:aws:iam::068920858268:role/admin_role"
 alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
 kube_key = "~/.ssh/id_rsa.pub"
-
-public_dns_zone_id = "Z8ERD8071HP70"

@@ -23,7 +23,7 @@ resource "aws_key_pair" "cloud_key" {
 }
 
 resource "aws_elb" "jupyter_elb" {
-  name = "jupyter-elb"
+  name = "jupyter-elb-${terraform.workspace}"
 
   internal = true
 
@@ -52,26 +52,12 @@ resource "aws_autoscaling_attachment" "jupyter_k8s_attachment" {
   elb                    = "${aws_elb.jupyter_elb.id}"
 }
 
-# resource "aws_route53_record" "jupyterhub_dns" {
-#   zone_id = "${var.public_dns_zone_id}"
-#   name    = "jupyter.${var.dns_zone_name}"
-#   type    = "A"
-
-#   count = 1
-
-#   alias {
-#     name                   = "${aws_elb.jupyter_elb.dns_name}"
-#     zone_id                = "${aws_elb.jupyter_elb.zone_id}"
-#     evaluate_target_health = false
-#   }
-# }
-
 resource "aws_security_group_rule" "allow_inbound_traffic_from_alm" {
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "-1"
-  cidr_blocks       = ["${data.terraform_remote_state.vpc.vpc_cidr_block}"]
+  cidr_blocks       = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
   security_group_id = "${module.kubernetes.kubeconfig_security_group}"
 }
 

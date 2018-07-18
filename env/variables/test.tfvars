@@ -1,7 +1,5 @@
 vpc_name = "test"
 
-dns_zone_name = "test.smartcolumbus.com"
-
 root_dns_name = "smartcolumbusos.com"
 
 role_arn = "arn:aws:iam::647770347641:role/jenkins_role"

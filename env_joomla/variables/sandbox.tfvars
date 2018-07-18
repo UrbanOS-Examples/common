@@ -1,7 +1,9 @@
 environment = "sandbox"
 
 vpc_id = "vpc-0b505c82e5aa08cb3"
+
 public_subnet_ids = ["subnet-01c8230961c9598e3", "subnet-000a174a504a0208e", "subnet-0699fccb7c7dd91ef"]
+
 private_subnet_ids = ["subnet-0dc37f26b358b1c41", "subnet-087a4bc429e7ee828", "subnet-0bee853043eba945b"]
 
 credentials_profile = "sandbox"
@@ -12,13 +14,11 @@ vpc_single_nat_gateway = true
 
 environment = "sandbox"
 
-private_dns_zone_name = "sandbox.smartcolumbus.com"
-
 alm_account_id = "068920858268"
 
 alm_workspace = "sandbox"
 
-vpc_azs = ["us-east-2a","us-east-2b","us-east-2c"]
+vpc_azs = ["us-east-2a", "us-east-2b", "us-east-2c"]
 
 vpc_cidr = "10.100.0.0/16"
 
@@ -30,7 +30,8 @@ kubernetes_cluster_name = "sandbox-kube"
 
 # Joomla
 deployment_identifier = "sandbox"
-db_instance_address  = "joomla.cj574n7uvzxv.us-east-2.rds.amazonaws.com"
+
+db_instance_address = "joomla.cj574n7uvzxv.us-east-2.rds.amazonaws.com"
 
 ## Cluster variables
 cluster_instance_ssh_public_key_path = "~/.ssh/id_rsa.pub"
@@ -65,7 +66,6 @@ include_public_dns_record = "no"
 include_private_dns_record = "no"
 
 expose_to_public_internet = "no"
-
 
 ## Service variables
 service_image = "joomla"
