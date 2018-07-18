@@ -1,39 +1,6 @@
-provider "aws" {
-  region = "${var.region}"
-
-  assume_role {
-    role_arn = "${var.role_arn}"
-  }
-}
-
-terraform {
-  backend "s3" {
-    bucket         = "scos-sandbox-terraform-state"
-    key            = "operating-system"
-    region         = "us-east-2"
-    role_arn       = "arn:aws:iam::068920858268:role/admin_role"
-    dynamodb_table = "terraform_lock_sandbox"
-    encrypt        = true
-  }
-}
-
-variable "region" {
-  description = "AWS Region"
-  default     = "us-east-2"
-}
-
-variable "role_arn" {
-  description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
-  default     = "arn:aws:iam::068920858268:role/admin_role"
-}
-
-variable "environment" {
-  description = "VPC environment. It can be sandbox, dev, staging or production"
-}
-
 locals {
-  is_prod   = "${var.environment == "prod" ? 1  : 0}"
-  zone_name = "${local.is_prod ? var.root_dns_name : format("%s.%s", var.environment, var.root_dns_name)}"
+  is_prod   = "${terraform.workspace == "prod" ? 1  : 0}"
+  zone_name = "${local.is_prod ? var.root_dns_name : format("%s.%s", terraform.workspace, var.root_dns_name)}"
 }
 
 resource "aws_route53_zone" "public_hosted_zone" {
@@ -45,73 +12,66 @@ resource "aws_route53_zone" "public_hosted_zone" {
   }
 }
 
-data "terraform_remote_state" "sandbox-operating-system" {
-  backend   = "s3"
-  workspace = "sandbox"
+resource "aws_route53_zone" "private" {
+  name   = "${terraform.workspace}.internal.k8s"
+  vpc_id = "${module.vpc.vpc_id}"
+}
 
-  config {
-    bucket   = "scos-sandbox-terraform-state"
-    key      = "operating-system"
-    region   = "us-east-2"
-    role_arn = "arn:aws:iam::068920858268:role/admin_role"
-    encrypt  = true
+module "dev_dns" {
+  source                = "./modules/remote_dns/"
+  remote_workspace      = "dev"
+  remote_bucket_name    = "${var.alm_state_bucket_name}"
+  public_hosted_zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
+  count                 = "${local.is_prod}"
+}
+
+module "staging_dns" {
+  source                = "./modules/remote_dns/"
+  remote_workspace      = "staging"
+  remote_bucket_name    = "${var.alm_state_bucket_name}"
+  public_hosted_zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
+  count                 = "${local.is_prod}"
+}
+
+module "alm_dns" {
+  source                = "./modules/remote_dns/"
+  remote_workspace      = "alm"
+  remote_bucket_name    = "${var.alm_state_bucket_name}"
+  public_hosted_zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
+  count                 = "${local.is_prod}"
+}
+
+resource "aws_route53_record" "jupyterhub_dns" {
+  zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
+  name    = "jupyter"
+  type    = "A"
+
+  count = 1
+
+  alias {
+    name                   = "${aws_elb.jupyter_elb.dns_name}"
+    zone_id                = "${aws_elb.jupyter_elb.zone_id}"
+    evaluate_target_health = false
   }
 }
 
-resource "aws_route53_record" "sandbox" {
-  zone_id    = "${aws_route53_zone.public_hosted_zone.zone_id}"
-  name       = "sandbox"
-  type       = "NS"
-  records    = ["${data.terraform_remote_state.sandbox-operating-system.name_servers}"]
-  ttl        = 300
-  count      = "${local.is_prod}"
-  depends_on = ["aws_route53_zone.public_hosted_zone"]
-}
+resource "aws_route53_record" "alm_jupyterhub_dns" {
+  provider = "aws.alm"
+  zone_id  = "${data.terraform_remote_state.vpc.private_zone_id}"
+  name     = "jupyter"
+  type     = "A"
 
-data "terraform_remote_state" "dev-operating-system" {
-  backend   = "s3"
-  workspace = "dev"
+  count = 1
 
-  config {
-    bucket   = "scos-sandbox-terraform-state"
-    key      = "operating-system"
-    region   = "us-east-2"
-    role_arn = "arn:aws:iam::068920858268:role/admin_role"
-    encrypt  = true
+  alias {
+    name                   = "${aws_elb.jupyter_elb.dns_name}"
+    zone_id                = "${aws_elb.jupyter_elb.zone_id}"
+    evaluate_target_health = false
   }
 }
 
-resource "aws_route53_record" "dev" {
-  zone_id    = "${aws_route53_zone.public_hosted_zone.zone_id}"
-  name       = "dev"
-  type       = "NS"
-  records    = ["${data.terraform_remote_state.dev-operating-system.name_servers}"]
-  ttl        = 300
-  count      = "${local.is_prod}"
-  depends_on = ["aws_route53_zone.public_hosted_zone"]
-}
-
-data "terraform_remote_state" "staging-operating-system" {
-  backend   = "s3"
-  workspace = "staging"
-
-  config {
-    bucket   = "scos-sandbox-terraform-state"
-    key      = "operating-system"
-    region   = "us-east-2"
-    role_arn = "arn:aws:iam::068920858268:role/admin_role"
-    encrypt  = true
-  }
-}
-
-resource "aws_route53_record" "staging" {
-  zone_id    = "${aws_route53_zone.public_hosted_zone.zone_id}"
-  name       = "staging"
-  type       = "NS"
-  records    = ["${data.terraform_remote_state.staging-operating-system.name_servers}"]
-  ttl        = 300
-  count      = "${local.is_prod}"
-  depends_on = ["aws_route53_zone.public_hosted_zone"]
+variable "root_dns_name" {
+  description = "Name of root domain (ex. example.com)"
 }
 
 output "name_servers" {
