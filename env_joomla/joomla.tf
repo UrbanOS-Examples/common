@@ -51,7 +51,11 @@ resource "aws_db_instance" "joomladb" {
   password             = "${var.db_password}"
   parameter_group_name = "default.mysql5.6"
 
-  vpc_security_group_ids = ["${aws_security_group.scos_servers.id}"]
+  vpc_security_group_ids  = ["${aws_security_group.scos_servers.id}"]
+  backup_window           = "05:16-05:46"                             // UTC. Must not overlap with maintenance_window.
+  backup_retention_period = "7"                                       //days
+  maintenance_window      = "tue:09:55-tue:10:25"                     //UTC
+  multi_az                = "true"
 
   // this is used to put the db into the correct vpc
   // https://www.terraform.io/docs/providers/aws/r/db_instance.html#db_subnet_group_name
