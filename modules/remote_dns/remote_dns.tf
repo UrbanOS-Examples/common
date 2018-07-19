@@ -6,6 +6,14 @@ variable "remote_bucket_name" {
   description = "Bucket name that the remote state is stored on"
 }
 
+variable "remote_region" {
+  description = "Region to get terraform state from."
+}
+
+variable "remote_role_arn" {
+  description = "Role arn to assume to retrieve terraform state."
+}
+
 variable "public_hosted_zone_id" {
   description = "Zone id of the public hosted zone"
 }
@@ -25,8 +33,8 @@ data "terraform_remote_state" "env_remote_state" {
   config {
     bucket   = "${var.remote_bucket_name}"
     key      = "${var.key}"
-    region   = "us-east-2"
-    role_arn = "arn:aws:iam::068920858268:role/admin_role"
+    region   = "${var.remote_region}"
+    role_arn = "${var.remote_role_arn}"
     encrypt  = true
   }
 }
