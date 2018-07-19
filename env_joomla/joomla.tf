@@ -134,7 +134,7 @@ resource "aws_iam_instance_profile" "joomla_profile" {
 }
 
 resource "aws_instance" "joomla" {
-  ami                    = "ami-922914f7"
+  ami                    = "ami-0ad99772"
   instance_type          = "${var.cluster_instance_type}"
   vpc_security_group_ids = ["${aws_security_group.scos_servers.id}"]
 

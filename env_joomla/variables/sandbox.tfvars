@@ -6,9 +6,9 @@ vpc_id = "vpc-0b841000919415950"
 
 alm_vpc_id = "vpc-06d96f4ab8606fa67"
 
-public_subnet_ids = ["subnet-0dc37f26b358b1c41", "subnet-027d7f27cae6eb299", "subnet-086560ce6ec942354"]
+public_subnet_ids = ["subnet-075943770bae4a854", "subnet-0adfd11674572d7bc", "subnet-04abd83f0115e8853"]
 
-private_subnet_ids = ["subnet-0c84b0d4ad02de5fe", "subnet-0dc37f26b358b1c41", "subnet-0dc37f26b358b1c41"]
+private_subnet_ids = ["subnet-0d5639b261ad50647", "subnet-04cf10f9157da8759", "subnet-00df605faef60dc15"]
 
 alm_account_id = "068920858268"
 
