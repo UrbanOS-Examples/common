@@ -26,13 +26,25 @@ terraform {
   }
 }
 
+data "terraform_remote_state" "vpc" {
+  backend   = "s3"
+  workspace = "${terraform.workspace}"
+
+  config {
+    bucket   = "${var.alm_state_bucket_name}"
+    key      = "operating-system"
+    region   = "${var.alm_region}"
+    role_arn = "${var.alm_role_arn}"
+  }
+}
+
 locals {
   db_name = "joomla"
 }
 
 resource "aws_db_subnet_group" "joomladb" {
   name       = "joomladb"
-  subnet_ids = ["${var.private_subnet_ids}"]
+  subnet_ids = ["${data.terraform_remote_state.vpc.private_subnets}"]
 
   tags {
     Name = "joomla"
@@ -142,7 +154,7 @@ resource "aws_instance" "joomla" {
   instance_type          = "${var.cluster_instance_type}"
   vpc_security_group_ids = ["${aws_security_group.scos_servers.id}"]
 
-  subnet_id = "${var.private_subnet_ids[0]}"
+  subnet_id = "${data.terraform_remote_state.vpc.private_subnets[0]}"
   key_name  = "${aws_key_pair.joomla.key_name}"
 
   user_data            = "${file("files/joomla_startup.sh")}"

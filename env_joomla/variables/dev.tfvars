@@ -6,10 +6,6 @@ vpc_id = "vpc-6a775a02"
 
 alm_vpc_id = "vpc-006960d9c11f2cc91"
 
-public_subnet_ids = ["subnet-3e0e5856", "subnet-efbf3395", "subnet-708b7c3c"]
-
-private_subnet_ids = ["subnet-880056e0", "subnet-5db93527", "subnet-d8887f94"]
-
 alm_account_id = "199837183662"
 
 db_instance_class = "db.t2.micro"
@@ -21,3 +17,5 @@ joomla_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRAvH6k7iEeRDz9SQtkH1
 cluster_instance_type = "t2.small"
 
 memory = 512
+
+alm_state_bucket_name = "scos-alm-terraform-state"
