@@ -64,7 +64,7 @@ node('master') {
                 withCredentials([string(credentialsId: 'joolmadb-dev', variable: 'db_password')]) {
                    planTerraform("-var db_password=$db_password")
                 }
-                executeTerraform('joomla')
+                executeTerraform()
             }
         }
     }
