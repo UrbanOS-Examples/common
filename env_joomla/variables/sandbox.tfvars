@@ -2,9 +2,9 @@ role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
 alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
-vpc_id = "vpc-0b505c82e5aa08cb3"
+vpc_id = "vpc-0b841000919415950"
 
-alm_vpc_id = "vpc-05144c7c5fd3f5663"
+alm_vpc_id = "vpc-06d96f4ab8606fa67"
 
 public_subnet_ids = ["subnet-0dc37f26b358b1c41", "subnet-027d7f27cae6eb299", "subnet-086560ce6ec942354"]
 

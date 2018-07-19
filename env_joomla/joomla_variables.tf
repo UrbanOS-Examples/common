@@ -1,5 +1,10 @@
 variable "region" {
   description = "AWS Region"
+  default     = "us-west-2"
+}
+
+variable "alm_region" {
+  description = "AWS Region"
   default     = "us-east-2"
 }
 

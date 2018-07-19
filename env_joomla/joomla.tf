@@ -8,7 +8,7 @@ provider "aws" {
 
 provider "aws" {
   alias  = "alm"
-  region = "${var.region}"
+  region = "${var.alm_region}"
 
   assume_role {
     role_arn = "${var.alm_role_arn}"
@@ -20,7 +20,8 @@ terraform {
     bucket         = "scos-sandbox-terraform-state"
     key            = "joomla"
     region         = "us-east-2"
-    dynamodb_table = "terraform_lock"
+    role_arn       = "arn:aws:iam::068920858268:role/admin_role"
+    dynamodb_table = "terraform_lock_sandbox"
     encrypt        = true
   }
 }
