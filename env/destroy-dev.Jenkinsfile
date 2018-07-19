@@ -18,31 +18,32 @@ node('master') {
 
         stage('Destroy infrastructure') {
             dir('env') {
-                initTerraform()
-                destroyEnv()
+                def environment = "dev"
+                initTerraform(environment)
+                destroyEnv(environment)
             }
         }
     }
 }
 
-def destroyEnv() {
-    try {
-        sh('terraform destroy -var-file=variables/dev.tfvars -auto-approve')
-    } catch(all) {
-        sh('../scripts/delete_vpc.sh')
+def destroyEnv(environment) {
+    def vpc_id = sh(script: "terraform output vpc_id")
+    sh("terraform destroy -var-file=variables/${environment}.tfvars -auto-approve")
+    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_jenkins_user', variable: 'AWS_ACCESS_KEY_ID']]) {
+        sh("../scripts/delete_vpc.sh ${environment} ${vpc_id}")
     }
 }
 
-def initTerraform() {
-    sh('terraform init -backend-config="bucket=scos-alm-terraform-state" -backend-config="role_arn=arn:aws:iam::199837183662:role/jenkins_role" -backend-config="dynamodb_table=terraform_lock"')
-    tfSwitchWorkspace()
+def initTerraform(environment) {
+    sh("terraform init -backend-config=backends/${environment}.conf")
+    tfSwitchWorkspace(environment)
 }
 
-def tfSwitchWorkspace() {
+def tfSwitchWorkspace(environment) {
     try {
-        sh('terraform workspace select dev')
+        sh("terraform workspace select ${environment}")
     } catch(all) {
-        sh('terraform workspace create dev')
-        sh('terraform workspace select dev')
+        sh("terraform workspace create ${environment}")
+        sh("terraform workspace select ${environment}")
     }
 }

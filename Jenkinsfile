@@ -10,10 +10,11 @@ node('master') {
         stage('Plan') {
             echo 'Write out plan into Jenkins build directory for this job'
             dir('env') {
-                sh('terraform init -backend-config="bucket=scos-alm-terraform-state" -backend-config="role_arn=arn:aws:iam::199837183662:role/jenkins_role" -backend-config="dynamodb_table=terraform_lock"')
-                sh('terraform workspace new dev || exit 0')
-                sh('terraform workspace select dev')
-                sh('set -o pipefail; terraform plan -var-file=variables/dev.tfvars -out plan.bin  | tee -a plan.txt')
+                def environment="dev"
+                sh("terraform init -backend-config=backends/${environment}.conf")
+                sh("terraform workspace new ${environment} || true")
+                sh("terraform workspace select ${environment}")
+                sh("set -o pipefail; terraform plan -var-file=variables/${environment}.tfvars -out plan.bin | tee -a plan.txt")
             }
         }
 
