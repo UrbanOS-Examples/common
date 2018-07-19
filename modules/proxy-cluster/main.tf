@@ -45,8 +45,8 @@ module "proxy_ecs_cluster" {
   cluster_instance_iam_policy_contents = "${file("${path.module}/files/instance_policy.json")}"
 
   # in order to update running containers, we need at least 2 instances
-  cluster_minimum_size     = "3"
-  cluster_maximum_size     = "3"
-  cluster_desired_capacity = "3"
+  cluster_minimum_size     = "2"
+  cluster_maximum_size     = "2"
+  cluster_desired_capacity = "2"
   allowed_cidrs            = "${var.allowed_cidrs}"
 }
