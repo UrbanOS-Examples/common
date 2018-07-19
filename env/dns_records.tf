@@ -8,8 +8,7 @@ resource "aws_route53_record" "jupyterhub_dns" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
   name    = "jupyter"
   type    = "A"
-
-  count = 1
+  count   = 1
 
   alias {
     name                   = "${aws_elb.jupyter_elb.dns_name}"
