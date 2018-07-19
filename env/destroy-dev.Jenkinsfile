@@ -1,4 +1,5 @@
 node('master') {
+    def environment = "dev"
     ansiColor('xterm') {
         stage('Checkout') {
             deleteDir()
@@ -6,19 +7,18 @@ node('master') {
         }
 
         stage('Destroy services') {
-            timeout(5) {
+            timeout(15) {
                 sh('kubectl delete all --all || true')
             }
 
             retry(30) {
                 sleep(10)
-                sh('scripts/zero_elb_count.sh')
+                sh("scripts/zero_elb_count.sh ${environment}")
             }
         }
 
         stage('Destroy infrastructure') {
             dir('env') {
-                def environment = "dev"
                 initTerraform(environment)
                 destroyEnv(environment)
             }
