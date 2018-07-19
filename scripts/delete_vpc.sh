@@ -3,6 +3,13 @@
 environment=$1
 vpc_id=$2
 
+function help {
+    echo "Usage: $1 ENVIRONMENT VPC_ID"
+}
+
+if [ ! $environment ]; then help; exit 1; fi
+if [ ! $vpc_id ]; then help; exit 1; fi
+
 role_arn=$(grep role_arn backends/${environment}.conf | awk '{ print $3; }' | sed -e 's/^"//' -e 's/"$//')
 region=$(grep region backends/${environment}.conf | awk '{ print $3; }' | sed -e 's/^"//' -e 's/"$//')
 
