@@ -28,7 +28,7 @@ function get_elb_number {
   echo $elb_json | jq '.LoadBalancerDescriptions | length'
 }
 
-retval=(($(get_elb_number) == 0))
+retval=$(( $(get_elb_number) == 0 ))
 
 rm -f ${awsconfig}
 
