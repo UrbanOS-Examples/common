@@ -14,7 +14,7 @@ node('master') {
 
                 retry(30) {
                     sleep(10)
-                    sh("scripts/zero_elb_count.sh ${environment}")
+                    sh("../scripts/zero_elb_count.sh ${environment}")
                 }
             }
         }
