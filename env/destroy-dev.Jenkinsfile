@@ -14,7 +14,9 @@ node('master') {
 
                 retry(30) {
                     sleep(10)
-                    sh("../scripts/zero_elb_count.sh ${environment}")
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_jenkins_user', variable: 'AWS_ACCESS_KEY_ID']]) {
+                        sh("../scripts/zero_elb_count.sh ${environment}")
+                    }
                 }
             }
         }
