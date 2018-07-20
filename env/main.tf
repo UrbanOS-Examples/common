@@ -29,9 +29,9 @@ resource "aws_elb" "jupyter_elb" {
   listener {
     instance_port = "${local.jupyter_port}"
 
-    instance_protocol = "HTTP"
+    instance_protocol = "TCP"
     lb_port           = 80
-    lb_protocol       = "HTTP"
+    lb_protocol       = "TCP"
   }
 
   health_check {
