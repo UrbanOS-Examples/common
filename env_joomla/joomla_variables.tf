@@ -8,10 +8,6 @@ variable "alm_region" {
   default     = "us-east-2"
 }
 
-variable "alm_state_bucket_name" {
-  description = "The name of the S3 state bucket for ALM"
-}
-
 variable "role_arn" {
   description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
 }
@@ -26,6 +22,16 @@ variable "vpc_id" {
 
 variable "alm_vpc_id" {
   description = "VCP Id of the Application LifeCycle Management network"
+}
+
+variable "public_subnet_ids" {
+  description = "Public subnet ids"
+  type        = "list"
+}
+
+variable "private_subnet_ids" {
+  description = "Private subnet ids"
+  type        = "list"
 }
 
 variable "alm_account_id" {
