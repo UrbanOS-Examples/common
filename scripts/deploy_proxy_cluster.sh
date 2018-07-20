@@ -3,7 +3,7 @@ load_balancer() {
     echo $(kubectl describe service ${1} | grep Ingress | awk '{print $3}')
 }
 
-terraform init -backend-config="bucket=scos-alm-terraform-state" -backend-config="role_arn=arn:aws:iam::199837183662:role/jenkins_role" -backend-config="dynamodb_table=terraform_lock"
+terraform init -backend-config=backends/alm.conf
 terraform workspace select alm
 
 terraform plan -target=aws_ecs_service.cota-proxy \
