@@ -7,13 +7,15 @@ node('master') {
         }
 
         stage('Destroy services') {
-            timeout(15) {
-                sh('kubectl delete all --all || true')
-            }
+            dir('env') {
+                timeout(15) {
+                    sh('kubectl delete all --all || true')
+                }
 
-            retry(30) {
-                sleep(10)
-                sh("scripts/zero_elb_count.sh ${environment}")
+                retry(30) {
+                    sleep(10)
+                    sh("scripts/zero_elb_count.sh ${environment}")
+                }
             }
         }
 
