@@ -2,6 +2,8 @@ vpc_name = "dev"
 
 root_dns_name = "smartcolumbusos.com"
 
+region = "us-west-2"
+
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
 kubernetes_cluster_name = "streaming-kube"

@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 
 environment=$1
+vpc_id=$2
 
 function help {
-    echo "Usage: $1 ENVIRONMENT"
+    echo "Usage: $1 ENVIRONMENT VPC_ID"
 }
 
 if [ ! $environment ]; then help; exit 1; fi
+if [ ! $vpc_id ]; then help; exit 1; fi
 
-role_arn=$(grep role_arn backends/${environment}.conf | awk '{ print $3; }' | sed -e 's/^"//' -e 's/"$//')
-region=$(grep region backends/${environment}.conf | awk '{ print $3; }' | sed -e 's/^"//' -e 's/"$//')
+role_arn=$(grep role_arn variables/${environment}.tfvars | awk '{ print $3; }' | sed -e 's/^"//' -e 's/"$//')
+region=$(grep region variables/${environment}.tfvars | awk '{ print $3; }' | sed -e 's/^"//' -e 's/"$//')
 
 awsconfig=$(mktemp)
 
@@ -24,8 +26,7 @@ EOF
 export AWS_CONFIG_FILE=${awsconfig}
 
 function get_elb_number {
-  local elb_json=$(aws elb describe-load-balancers)
-  echo $elb_json | jq '.LoadBalancerDescriptions | length'
+    echo $(aws elb describe-load-balancers | jq '[.LoadBalancerDescriptions[] | select(.VPCId == "'"${vpc_id}"'")] | length')
 }
 
 numlb=$(get_elb_number)

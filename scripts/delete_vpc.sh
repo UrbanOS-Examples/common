@@ -10,8 +10,8 @@ function help {
 if [ ! $environment ]; then help; exit 1; fi
 if [ ! $vpc_id ]; then help; exit 1; fi
 
-role_arn=$(grep role_arn backends/${environment}.conf | awk '{ print $3; }' | sed -e 's/^"//' -e 's/"$//')
-region=$(grep region backends/${environment}.conf | awk '{ print $3; }' | sed -e 's/^"//' -e 's/"$//')
+role_arn=$(grep role_arn variables/${environment}.tfvars | awk '{ print $3; }' | sed -e 's/^"//' -e 's/"$//')
+region=$(grep region variables/${environment}.tfvars | awk '{ print $3; }' | sed -e 's/^"//' -e 's/"$//')
 
 awsconfig=$(mktemp)
 
@@ -29,4 +29,4 @@ aws ec2 delete-vpc --vpc-id $vpc_id
 
 rm -f ${awsconfig}
 
-true # Stopgap. Never fail the build.
+exit 0
