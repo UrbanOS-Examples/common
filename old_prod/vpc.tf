@@ -11,6 +11,20 @@ data "aws_subnet" "subnet" {
   availability_zone = "${var.vpc_regions[count.index]}"
 }
 
+data "aws_security_group" "scos_servers" {
+  name   = "SCOS Servers"
+  vpc_id = "${data.aws_vpc.default.id}"
+}
+
+resource "aws_db_subnet_group" "default" {
+  name       = "main"
+  subnet_ids = ["${data.aws_subnet.subnet.*.id}"]
+
+  tags {
+    Name = "Default Subnet Group"
+  }
+}
+
 variable "vpc_name" {
   description = "Name of the VPC to search for when importing the VPC data source"
   default     = "Prod-VPC"
