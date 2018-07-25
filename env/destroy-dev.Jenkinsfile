@@ -7,13 +7,10 @@ node('master') {
         }
 
         stage('Destroy services') {
-            timeout(15) {
-                sh('kubectl delete all --all || true')
-            }
-
-            retry(30) {
-                sleep(10)
-                sh("scripts/zero_elb_count.sh ${environment}")
+            dir('env') {
+                timeout(15) {
+                    sh('kubectl delete all --all || true')
+                }
             }
         }
 
@@ -28,9 +25,12 @@ node('master') {
 
 def destroyEnv(environment) {
     def vpc_id = sh(script: "terraform output vpc_id", returnStdout: true)
-    echo "Destroying environment attached to VPC ${vpc_id}"
-    sh("terraform destroy -var-file=variables/${environment}.tfvars -auto-approve")
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_jenkins_user', variable: 'AWS_ACCESS_KEY_ID']]) {
+        retry(30) {
+            sh("../scripts/zero_elb_count.sh ${environment} ${vpc_id}")
+        }
+        echo "Destroying environment attached to VPC ${vpc_id}"
+        sh("terraform destroy -var-file=variables/${environment}.tfvars -auto-approve")
         sh("../scripts/delete_vpc.sh ${environment} ${vpc_id}")
     }
 }

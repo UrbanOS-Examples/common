@@ -17,6 +17,23 @@ resource "aws_route53_record" "jupyterhub_dns" {
   }
 }
 
+/*
+This DNS record is here for compatibility with the manually managed zones
+until we can migrate them over
+*/
+resource "aws_route53_record" "jupyterhub_dns_compatibility" {
+  zone_id = "${var.public_dns_zone_id}"
+  name    = "jupyter"
+  type    = "A"
+  count   = 1
+
+  alias {
+    name                   = "${aws_elb.jupyter_elb.dns_name}"
+    zone_id                = "${aws_elb.jupyter_elb.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
 resource "aws_route53_record" "alm_jupyterhub_dns" {
   provider = "aws.alm"
   zone_id  = "${data.terraform_remote_state.alm_remote_state.private_zone_id}"

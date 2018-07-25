@@ -22,6 +22,8 @@ vpc_public_subnets = ["10.100.32.0/20", "10.100.96.0/20", "10.100.160.0/20"]
 
 kubernetes_cluster_name = "sandbox-kube"
 
+region = "us-west-2"
+
 role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
 alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
