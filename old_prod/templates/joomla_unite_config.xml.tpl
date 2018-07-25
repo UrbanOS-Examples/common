@@ -17,7 +17,7 @@
     <emailSysop>0</emailSysop>
     <name>Smart Columbus OS</name>
     <email>smartcolumbusos@columbus.gov</email>
-    <absolutepath>/var/www/html</absolutepath>
+    <absolutepath>${JOOMLA_PATH}</absolutepath>
     <homeurl>${JOOMLA_SITE_URL}</homeurl>
     <livesite>${JOOMLA_SITE_URL}</livesite>
   </siteInfo>
