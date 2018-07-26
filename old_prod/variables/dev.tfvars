@@ -4,6 +4,8 @@ joomla_backup_ami = "ami-11a3a16e"
 
 joomla_backup_file_name = "site-www.smartcolumbusos.com-20180722-200002edt.zip"
 
+joomla_db_identifier = "dev-joomla"
+
 joomla_instance_ebs_optimized = false
 
 joomla_instance_profile = ""

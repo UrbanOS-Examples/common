@@ -97,7 +97,7 @@ resource "aws_lb_target_group_attachment" "joomla" {
 }
 
 resource "aws_db_instance" "joomla_db" {
-  identifier             = "${terraform.workspace}-joomla"
+  identifier             = "${var.joomla_db_identifier}"
   instance_class         = "db.t2.large"
   vpc_security_group_ids = ["${data.aws_security_group.scos_servers.id}"]
   db_subnet_group_name   = "${aws_db_subnet_group.default.name}"
@@ -132,16 +132,16 @@ variable "joomla_instance_type" {
 
 variable "joomla_backup_ami" {
   description = "AMI to restore Joomla from"
-
-  default = "ami-95d4c6ef"
 }
 
 variable "joomla_lb_target_arn" {
   description = "ARN of the Joomla load balancer target group"
+  default     = "arn:aws:elasticloadbalancing:us-east-1:374013108165:targetgroup/ProdVPC-Joomla/41d7ff2a14460451"
 }
 
 variable "joomla_lb_target_name" {
   description = "Name of the Joomla load balancer target group"
+  default     = "ProdVPC-Joomla"
 }
 
 variable "s3_readonly_access_key" {
@@ -158,4 +158,9 @@ variable "joomla_backup_file_name" {
 
 variable "joomla_db_password" {
   description = "Password for joomla database"
+}
+
+variable "joomla_db_identifier" {
+  description = "AWS RDS identifier for joomla db instance"
+  default     = "joomlaprod"
 }
