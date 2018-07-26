@@ -1,6 +1,6 @@
 provider "aws" {
   region = "${var.aws_region}"
-
+  version = "1.28.0"
   assume_role {
     role_arn = "${var.aws_role_arn}"
   }
