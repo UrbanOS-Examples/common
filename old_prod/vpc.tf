@@ -17,11 +17,12 @@ data "aws_security_group" "scos_servers" {
 }
 
 resource "aws_db_subnet_group" "default" {
-  name       = "main"
-  subnet_ids = ["${data.aws_subnet.subnet.*.id}"]
+  name        = "prodvpc-db subnet group"
+  description = "ProdVPC-DB Subnet Group"
+  subnet_ids  = ["${data.aws_subnet.subnet.*.id}"]
 
   tags {
-    Name = "Default Subnet Group"
+    Name = "Subnet Group for Prod VPC"
   }
 }
 
