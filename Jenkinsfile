@@ -10,11 +10,7 @@ node('master') {
         stage('Plan') {
             echo 'Write out plan into Jenkins build directory for this job'
             dir('env') {
-                def environment="dev"
-                sh("terraform init -backend-config=backends/${environment}.conf")
-                sh("terraform workspace new ${environment} || true")
-                sh("terraform workspace select ${environment}")
-                sh("set -o pipefail; terraform plan -var-file=variables/${environment}.tfvars -out plan.bin | tee -a plan.txt")
+                planTerraform()
             }
         }
 
@@ -23,7 +19,7 @@ node('master') {
         stage('Execute') {
             echo "Execute terraform"
             dir('env') {
-                sh('terraform apply plan.bin')
+                executeTerraform()
             }
         }
 
@@ -62,10 +58,31 @@ node('master') {
                 ''')
             }
         }
+
+        stage('Deploy Joomla Infrastructure') {
+            dir('env_joomla') {
+                withCredentials([string(credentialsId: 'joolmadb-dev', variable: 'db_password')]) {
+                   planTerraform("-var db_password=$db_password")
+                }
+                executeTerraform()
+            }
+        }
     }
 }
 
 def copyKubeConfig(kubernetes_master_ip) {
     sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig ~/.kube/config""")
     sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig /var/jenkins_home/.kube/config""")
+}
+
+def planTerraform(additionalPlanFlags='') {
+    def environment="dev"
+    sh("terraform init -backend-config=backends/${environment}.conf")
+    sh("terraform workspace new ${environment} || true")
+    sh("terraform workspace select ${environment}")
+    sh("set -o pipefail; terraform plan -var-file=variables/${environment}.tfvars ${additionalPlanFlags} -out plan.bin | tee -a plan.txt")
+}
+
+def executeTerraform() {
+    sh('terraform apply plan.bin')
 }
