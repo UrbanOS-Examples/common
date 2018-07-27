@@ -38,3 +38,10 @@ module "leaflet_notebook_repository" {
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "leaflet-notebook"
 }
+
+module "cota_streaming_consumer_repository" {
+  source = "../modules/ecr"
+
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "cota-streaming-consumer"
+}
