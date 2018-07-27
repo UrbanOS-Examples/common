@@ -1,18 +1,31 @@
-node('master') {
-    ansiColor('xterm') {
-        stage('Deploy Infrastructure') {
-            build job: 'common'
+pipeline {
+    agent any
+
+    options {
+        ansiColor('xterm')
+    }
+
+    stages {
+       stage('Deploy Infrastructure') {
+            steps {
+                build job: 'SmartColumbusOS/common/master'
+            }
         }
         stage('Deploy Kafka') {
-            build job: 'streaming-service'
+            steps {
+                build job: 'SmartColumbusOS/streaming-service/master'
+            }
         }
         stage('Deploy Streaming Services') {
-            build job: 'deploy-cota-streaming-producer'
-            build job: 'deploy-cota-streaming-consumer'
+            steps {
+                build job: 'SmartColumbusOS/cota-streaming-producer/master'
+                build job: 'SmartColumbusOS/cota-streaming-consumer/master'
+            }
         }
         stage('Deploy UI') {
-            build job: 'deploy-cota-streaming-ui'
-            build job: 'deploy-proxy-cluster'
+            steps {
+                build job: 'SmartColumbusOS/cota-streaming-ui/master'
+            }
         }
     }
 }
