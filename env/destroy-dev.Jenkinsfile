@@ -1,23 +1,40 @@
-node('master') {
-    def environment = "dev"
-    ansiColor('xterm') {
+def environment = "dev"
+
+pipeline {
+    agent any
+
+    options {
+        ansiColor('xterm')
+    }
+    stages {
         stage('Checkout') {
-            deleteDir()
-            checkout scm
+            steps {
+                deleteDir()
+                checkout scm
+            }
         }
 
         stage('Destroy services') {
-            dir('env') {
-                timeout(15) {
-                    sh('kubectl delete all --all || true')
+            options {
+                timeout(time: 15, unit: 'MINUTES')
+            }
+            steps {
+                script {
+                    dir('env') {
+                        sh('kubectl delete all --all || true')
+                    }
                 }
             }
         }
 
         stage('Destroy infrastructure') {
-            dir('env') {
-                initTerraform(environment)
-                destroyEnv(environment)
+            steps {
+                script {
+                    dir('env') {
+                        initTerraform(environment)
+                        destroyEnv(environment)
+                    }
+                }
             }
         }
     }
