@@ -1,7 +1,6 @@
 locals {
-  is_prod        = "${terraform.workspace == "prod" ? 1 : 0}"
-  zone_name      = "${local.is_prod ? var.root_dns_name : format("%s.%s", terraform.workspace, var.root_dns_name)}"
-  env_dns_prefix = "${local.is_prod ? "" : format(".%s", terraform.workspace)}"
+  is_prod   = "${terraform.workspace == "prod" ? 1 : 0}"
+  zone_name = "${local.is_prod ? var.root_dns_name : format("%s.%s", terraform.workspace, var.root_dns_name)}"
 }
 
 resource "aws_route53_zone" "public_hosted_zone" {
@@ -11,6 +10,11 @@ resource "aws_route53_zone" "public_hosted_zone" {
   tags = {
     Environment = "${terraform.workspace}"
   }
+}
+
+resource "aws_route53_zone" "private" {
+  name   = "${terraform.workspace}.internal.k8s"
+  vpc_id = "${module.vpc.vpc_id}"
 }
 
 module "sandbox_dns" {
