@@ -8,9 +8,6 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            when {
-                branch 'master'
-            }
             steps {
                 deleteDir()
                 checkout scm
@@ -18,9 +15,6 @@ pipeline {
         }
 
         stage('Plan') {
-            when {
-                branch 'master'
-            }
             steps {
                 echo 'Write out plan into Jenkins build directory for this job'
                 script {
@@ -36,9 +30,6 @@ pipeline {
         }
 
         stage('Execute') {
-            when {
-                branch 'master'
-            }
             steps {
                 echo "Execute terraform"
                 script {
@@ -50,9 +41,6 @@ pipeline {
         }
 
         stage('Copy Kubernetes config') {
-            when {
-                branch 'master'
-            }
             steps {
                 script {
                     dir('env') {
@@ -78,9 +66,6 @@ pipeline {
         }
 
         stage('Deploy Tiller') {
-            when {
-                branch 'master'
-            }
             steps {
                 script {
                     dir('env') {
@@ -103,7 +88,7 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
         }
     }
 }

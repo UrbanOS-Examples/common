@@ -1,3 +1,13 @@
+variable "ami_id" {
+  description = "AMI Id for the instance. Defaults to OpenVPN Access Server 'Bring your own license' version."
+  default     = "ami-6d163708"
+}
+
+variable "sandbox" {
+  description = "Behave as if we are running in sandbox (as opposed to prod)"
+  default = true
+}
+
 variable "public_subnet_id" {
   description = "Public subnet for VPN server"
 }
