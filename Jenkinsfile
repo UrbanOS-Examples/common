@@ -9,18 +9,18 @@ node('master') {
             scmVars = checkout scm
         }
 
-        if (scmVars.GIT_BRANCH == 'master') {
-            stage('Plan') {
-                echo 'Write out plan into Jenkins build directory for this job'
-                dir('env') {
-                    def environment="dev"
-                    sh("terraform init -backend-config=backends/${environment}.conf")
-                    sh("terraform workspace new ${environment} || true")
-                    sh("terraform workspace select ${environment}")
-                    sh("set -o pipefail; terraform plan -var-file=variables/${environment}.tfvars -out plan.bin | tee -a plan.txt")
-                }
+        stage('Plan') {
+            echo 'Write out plan into Jenkins build directory for this job'
+            dir('env') {
+                def environment="dev"
+                sh("terraform init -backend-config=backends/${environment}.conf")
+                sh("terraform workspace new ${environment} || true")
+                sh("terraform workspace select ${environment}")
+                sh("set -o pipefail; terraform plan -var-file=variables/${environment}.tfvars -out plan.bin | tee -a plan.txt")
             }
+        }
 
+        if (scmVars.GIT_BRANCH == 'master') {
             archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
 
             stage('Execute') {
