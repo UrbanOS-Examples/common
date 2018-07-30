@@ -45,3 +45,10 @@ module "cota_streaming_consumer_repository" {
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "cota-streaming-consumer"
 }
+
+module "jenkins_worker_terraform_repository" {
+  source = "../modules/ecr"
+
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "jenkins-worker-terraform"
+}
