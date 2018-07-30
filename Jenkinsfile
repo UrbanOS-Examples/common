@@ -1,10 +1,12 @@
+def scmVars
+
 node('master') {
     properties([disableConcurrentBuilds()])
 
     ansiColor('xterm') {
         stage('Checkout') {
             deleteDir()
-            checkout scm
+            scmVars = checkout scm
         }
 
         stage('Plan') {
@@ -18,48 +20,50 @@ node('master') {
             }
         }
 
-        archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
+        if (scmVars.GIT_BRANCH == 'master') {
+            archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
 
-        stage('Execute') {
-            echo "Execute terraform"
-            dir('env') {
-                sh('terraform apply plan.bin')
-            }
-        }
-
-        stage('Copy Kubernetes config') {
-            dir('env') {
-                kubernetes_master_ip = sh(
-                    script: 'terraform output kubernetes_master_private_ip',
-                    returnStdout: true
-                ).trim()
-
-                withCredentials([sshUserPrivateKey(credentialsId: "k8s-no-pass", keyFileVariable: 'keyfile')]) {
-                    sh("mkdir -p ~/.kube/")
-                    sh("mkdir -p /var/jenkins_home/.kube")
-                    sh("echo '====> WAITING FOR KUBERNETES TO START... <===='")
-                    retry(24) {
-                        sleep(10)
-                        copyKubeConfig(kubernetes_master_ip)
-                    }
+            stage('Execute') {
+                echo "Execute terraform"
+                dir('env') {
+                    sh('terraform apply plan.bin')
                 }
-
-                sh("kubectl get nodes")
             }
-        }
 
-        stage('Deploy Tiller') {
-            dir('env') {
-                sh('''
-                    if [ $(kubectl get serviceaccount --namespace kube-system | grep -wc tiller) -eq 0 ]; then
-                        kubectl --namespace kube-system create serviceaccount tiller
-                    fi
-                ''')
-                sh('''
-                    if [ $(kubectl get clusterrolebinding --namespace kube-system | grep -wc tiller) -eq 0 ]; then
-                        kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
-                    fi
-                ''')
+            stage('Copy Kubernetes config') {
+                dir('env') {
+                    kubernetes_master_ip = sh(
+                        script: 'terraform output kubernetes_master_private_ip',
+                        returnStdout: true
+                    ).trim()
+
+                    withCredentials([sshUserPrivateKey(credentialsId: "k8s-no-pass", keyFileVariable: 'keyfile')]) {
+                        sh("mkdir -p ~/.kube/")
+                        sh("mkdir -p /var/jenkins_home/.kube")
+                        sh("echo '====> WAITING FOR KUBERNETES TO START... <===='")
+                        retry(24) {
+                            sleep(10)
+                            copyKubeConfig(kubernetes_master_ip)
+                        }
+                    }
+
+                    sh("kubectl get nodes")
+                }
+            }
+
+            stage('Deploy Tiller') {
+                dir('env') {
+                    sh('''
+                        if [ $(kubectl get serviceaccount --namespace kube-system | grep -wc tiller) -eq 0 ]; then
+                            kubectl --namespace kube-system create serviceaccount tiller
+                        fi
+                    ''')
+                    sh('''
+                        if [ $(kubectl get clusterrolebinding --namespace kube-system | grep -wc tiller) -eq 0 ]; then
+                            kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+                        fi
+                    ''')
+                }
             }
         }
     }
