@@ -1,5 +1,5 @@
 locals {
-  lb_rule_env_prefix = "${var.env_subdomain == "" ? "" : "${var.env_subdomain}."}"
+  lb_rule_env_prefix = "${terraform.workspace == "prod" ? "" : "${terraform.workspace}."}"
 
   lb_rules = [
     {
@@ -103,10 +103,6 @@ resource "aws_alb_listener_rule" "https" {
     field  = "${lookup(local.lb_rules[count.index], "condition_field")}"
     values = ["${lookup(local.lb_rules[count.index], "condition_values")}"]
   }
-}
-
-variable "env_subdomain" {
-  description = "url subdomain by environment"
 }
 
 variable "is_external" {
