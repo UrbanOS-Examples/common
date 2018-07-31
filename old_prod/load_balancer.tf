@@ -1,6 +1,5 @@
 locals {
-  url_subdomain_by_env = "${terraform.workspace == "prod" ? "" : terraform.workspace}"
-  cert_env_prefix      = "${local.url_subdomain_by_env == "" ? "" : "${local.url_subdomain_by_env}."}"
+  cert_env_prefix = "${terraform.workspace == "prod" ? "" : "${terraform.workspace}."}"
 }
 
 module "load_balancer" {
@@ -12,7 +11,6 @@ module "load_balancer" {
   subnet_ids          = "${data.aws_subnet.subnet.*.id}"
   is_external         = false
   is_enabled          = true
-  env_subdomain       = "${local.url_subdomain_by_env}"
 }
 
 module "load_balancer_external" {
