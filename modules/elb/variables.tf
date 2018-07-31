@@ -21,7 +21,38 @@ variable "service_name" {
 }
 variable "service_port" {
   description = "The port on which the service containers are listening."
+  default     = 8080
 }
+variable "listener_ports" {
+  description = "The ports on which the load balance listener is listening."
+  default = [
+    {
+      instance_port     = 8080
+      instance_protocol = "http"
+      lb_port           = 80
+      lb_protocol       = "http"
+    },
+    // {
+    //   instance_port = 8080
+    //   instance_protocol = "http"
+    //   lb_port = 443
+    //   lb_protocol = "https"
+    //   ssl_certificate_id = "${var.service_certificate_arn}"
+    // }
+  ]
+}
+variable "ingress_rules" {
+  description = "The ingress rules to apply for the load balancer."
+  default     = [
+    {
+      instance_port     = "8080"
+      instance_protocol = "http"
+      lb_port           = 80
+      lb_protocol       = "http"
+    }
+  ]
+}
+
 variable "service_certificate_arn" {
   description = "The ARN of a certificate to use for TLS terminating at the ELB."
 }

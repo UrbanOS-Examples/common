@@ -3,6 +3,11 @@ output "name" {
   value = "${aws_elb.service.name}"
 }
 
+output "arn" {
+  description = "The ARN of the created ELB."
+  value = "${aws_elb.service.arn}"
+}
+
 output "zone_id" {
   description = "The zone ID of the created ELB."
   value = "${aws_elb.service.zone_id}"
@@ -21,9 +26,4 @@ output "address" {
 output "security_group_id" {
   description = "The ID of the security group associated with the ELB."
   value = "${aws_security_group.load_balancer.id}"
-}
-
-output "open_to_load_balancer_security_group_id" {
-  description = "The ID of the security group allowing access from the ELB."
-  value = "${aws_security_group.open_to_load_balancer.id}"
 }
