@@ -10,45 +10,18 @@ node('master') {
         }
 
         stage('Plan') {
-            echo 'Write out plan into Jenkins build directory for this job'
-            dir('env') {
-                def environment="dev"
-                sh("terraform init -backend-config=backends/${environment}.conf")
-                sh("terraform workspace new ${environment} || true")
-                sh("terraform workspace select ${environment}")
-                sh("set -o pipefail; terraform plan -var-file=variables/${environment}.tfvars -out plan.bin | tee -a plan.txt")
-            }
+            plan("dev")
         }
 
         if (scmVars.GIT_BRANCH == 'master') {
             archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
 
             stage('Execute') {
-                echo "Execute terraform"
-                dir('env') {
-                    sh('terraform apply plan.bin')
-                }
+                execute()
             }
 
             stage('Copy Kubernetes config') {
-                dir('env') {
-                    kubernetes_master_ip = sh(
-                        script: 'terraform output kubernetes_master_private_ip',
-                        returnStdout: true
-                    ).trim()
-
-                    withCredentials([sshUserPrivateKey(credentialsId: "k8s-no-pass", keyFileVariable: 'keyfile')]) {
-                        sh("mkdir -p ~/.kube/")
-                        sh("mkdir -p /var/jenkins_home/.kube")
-                        sh("echo '====> WAITING FOR KUBERNETES TO START... <===='")
-                        retry(24) {
-                            sleep(10)
-                            copyKubeConfig(kubernetes_master_ip)
-                        }
-                    }
-
-                    sh("kubectl get nodes")
-                }
+                copyKubeConfig("dev")
             }
 
             stage('Deploy Tiller') {
@@ -69,7 +42,46 @@ node('master') {
     }
 }
 
-def copyKubeConfig(kubernetes_master_ip) {
-    sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig ~/.kube/config""")
-    sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig /var/jenkins_home/.kube/config""")
+def plan(environment) {
+    echo "Write out plan into Jenkins build directory for ${environment}."
+    dir('env') {
+        sh("terraform init -backend-config=backends/${environment}.conf")
+        sh("terraform workspace new ${environment} || true")
+        sh("terraform workspace select ${environment}")
+        sh("set -o pipefail; terraform plan -var-file=variables/${environment}.tfvars -out plan.bin | tee -a plan.txt")
+    }
+}
+
+def execute() {
+    echo "Execute terraform"
+    dir('env') {
+        sh('terraform apply plan.bin')
+    }
+}
+
+def copyKubeConfig(environment) {
+    dir('env') {
+        kubernetes_master_ip = sh(
+            script: 'terraform output kubernetes_master_private_ip',
+            returnStdout: true
+        ).trim()
+
+        withCredentials([sshUserPrivateKey(credentialsId: "k8s-no-pass", keyFileVariable: 'keyfile')]) {
+            sh("mkdir -p ~/.kube/")
+            sh("mkdir -p /var/jenkins_home/.kube")
+            sh("mkdir -p /var/jenkins_home/.kube/${environment}")
+            sh("echo '====> WAITING FOR KUBERNETES TO START... <===='")
+            retry(24) {
+                sleep(10)
+                if (environment == "dev") {
+                    sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig ~/.kube/config""")
+                    sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig /var/jenkins_home/.kube/config""")
+                }
+
+                sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig /var/jenkins_home/.kube/${environment}/config""")
+            }
+        }
+
+        sh("kubectl get nodes")
+    }
 }
