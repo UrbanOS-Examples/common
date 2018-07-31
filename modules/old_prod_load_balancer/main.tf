@@ -1,19 +1,21 @@
 locals {
+  lb_rule_env_prefix = "${var.env_subdomain == "" ? "" : "${var.env_subdomain}."}"
+
   lb_rules = [
     {
       name             = "Joomla"
       condition_field  = "host-header"
-      condition_values = "${terraform.workspace}.smartcolumbusos.com"
+      condition_values = "${local.lb_rule_env_prefix}smartcolumbusos.com"
     },
     {
       name             = "CKAN"
       condition_field  = "host-header"
-      condition_values = "ckan.${terraform.workspace}.smartcolumbusos.com"
+      condition_values = "ckan.${local.lb_rule_env_prefix}smartcolumbusos.com"
     },
     {
       name             = "Kong"
       condition_field  = "host-header"
-      condition_values = "api.${terraform.workspace}.smartcolumbusos.com"
+      condition_values = "api.${local.lb_rule_env_prefix}smartcolumbusos.com"
     },
     {
       name             = "MaintenancePage"
@@ -101,6 +103,10 @@ resource "aws_alb_listener_rule" "https" {
     field  = "${lookup(local.lb_rules[count.index], "condition_field")}"
     values = ["${lookup(local.lb_rules[count.index], "condition_values")}"]
   }
+}
+
+variable "env_subdomain" {
+  description = "url subdomain by environment"
 }
 
 variable "is_external" {
