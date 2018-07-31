@@ -22,7 +22,6 @@ module "load_balancer_external" {
   subnet_ids          = "${data.aws_subnet.subnet.*.id}"
   is_external         = true
   is_enabled          = "${var.alb_external}"
-  env_subdomain       = "${local.url_subdomain_by_env}"
 }
 
 resource "aws_acm_certificate" "load_balancer" {

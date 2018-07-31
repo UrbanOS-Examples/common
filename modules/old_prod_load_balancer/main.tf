@@ -32,7 +32,7 @@ output "target_group_arns" {
 }
 
 resource "aws_alb_target_group" "this" {
-  count    = "${length(local.lb_rules) * var.is_enabled}"
+  count    = "${var.is_enabled ? length(local.lb_rules) : 0}"
   name     = "${var.target_group_prefix}-${lookup(local.lb_rules[count.index], "name")}"
   vpc_id   = "${var.vpc_id}"
   port     = 80
@@ -75,7 +75,7 @@ resource "aws_alb_listener" "http" {
 }
 
 resource "aws_alb_listener_rule" "http" {
-  count        = "${length(local.lb_rules) * var.is_enabled}"
+  count        = "${var.is_enabled ? length(local.lb_rules) : 0}"
   listener_arn = "${aws_alb_listener.http.arn}"
 
   action {
@@ -91,7 +91,7 @@ resource "aws_alb_listener_rule" "http" {
 }
 
 resource "aws_alb_listener_rule" "https" {
-  count        = "${length(local.lb_rules) * var.is_enabled}"
+  count        = "${var.is_enabled ? length(local.lb_rules) : 0}"
   listener_arn = "${aws_alb_listener.https.arn}"
 
   action {
@@ -115,6 +115,7 @@ variable "is_enabled" {
 
 variable "target_group_prefix" {
   default = "PROD"
+  description = "A prefix added to the name of the load balancers"
 }
 
 variable "vpc_id" {
