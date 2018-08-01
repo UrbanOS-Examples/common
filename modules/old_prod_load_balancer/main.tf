@@ -27,10 +27,6 @@ locals {
   target_group_arns = "${zipmap(aws_alb_target_group.all_target_groups.*.name, aws_alb_target_group.all_target_groups.*.arn)}"
 }
 
-output "target_group_arns" {
-  value = "${local.target_group_arns}"
-}
-
 resource "aws_alb_target_group" "all_target_groups" {
   count    = "${var.is_enabled ? length(local.lb_rules) : 0}"
   name     = "${var.target_group_prefix}-${lookup(local.lb_rules[count.index], "name")}"
@@ -114,7 +110,7 @@ variable "is_enabled" {
 }
 
 variable "target_group_prefix" {
-  default = "PROD"
+  default     = "PROD"
   description = "A prefix added to the name of the load balancers"
 }
 
@@ -133,4 +129,16 @@ variable "security_group_id" {
 variable "subnet_ids" {
   type        = "list"
   description = "list of subnet ids to associate with the load balancer"
+}
+
+output "target_group_arns" {
+  value = "${local.target_group_arns}"
+}
+
+output "dns_name" {
+  value = "${aws_alb.alb.*.dns_name}"
+}
+
+output "zone_id" {
+  value = "${aws_alb.alb.*.zone_id}"
 }

@@ -87,3 +87,11 @@ alb_external = false
 target_group_prefix = "DEV"
 
 ckan_db_storage_encrypted = false
+
+alm_workspace = "alm"
+
+alm_role_arn = "arn:aws:iam::199837183662:role/jenkins_role"
+
+alm_state_bucket_name = "scos-alm-terraform-state"
+
+public_dns_zone_id = "Z25PZI6XYQF2OB"
