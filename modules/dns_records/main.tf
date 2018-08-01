@@ -19,8 +19,7 @@ variable "alm_zone_id" {
 }
 
 locals {
-  is_prod        = "${terraform.workspace == "prod" ? 1 : 0}"
-  env_dns_prefix = "${local.is_prod ? "" : format(".%s", terraform.workspace)}"
+  env_dns_prefix = "${terraform.workspace == "prod" ? "" : ".${terraform.workspace}"}"
 }
 
 /*

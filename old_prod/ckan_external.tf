@@ -26,7 +26,7 @@ resource "aws_alb_target_group_attachment" "ckan_external" {
   port             = 80
 }
 
-resource "aws_route53_record" "ckan_external_dns" {
+resource "aws_route53_record" "ckan_external_private_dns" {
   zone_id = "${aws_route53_zone.private_hosted_zone.zone_id}"
   name    = "ckan"
   type    = "A"
@@ -35,7 +35,7 @@ resource "aws_route53_record" "ckan_external_dns" {
   records = ["${aws_instance.ckan_external.private_ip}"]
 }
 
-resource "aws_route53_record" "ckan_solr_dns" {
+resource "aws_route53_record" "ckan_solr_private_dns" {
   zone_id = "${aws_route53_zone.private_hosted_zone.zone_id}"
   name    = "solr.ckan"
   type    = "A"
@@ -44,13 +44,23 @@ resource "aws_route53_record" "ckan_solr_dns" {
   records = ["${aws_instance.ckan_external.private_ip}"]
 }
 
-resource "aws_route53_record" "ckan_redis_dns" {
+resource "aws_route53_record" "ckan_redis_private_dns" {
   zone_id = "${aws_route53_zone.private_hosted_zone.zone_id}"
   name    = "redis.ckan"
   type    = "A"
   count   = 1
   ttl     = 300
   records = ["${aws_instance.ckan_external.private_ip}"]
+}
+
+module "ckan_dns_records" {
+  source                = "../modules/dns_records"
+  name                  = "ckan"
+  dns_name              = "${module.load_balancer.dns_name[0]}"
+  lb_zone_id            = "${module.load_balancer.zone_id[0]}"
+  public_zone_id        = "${local.external_zone_id}"
+  compatability_zone_id = "${var.public_dns_zone_id}"
+  alm_zone_id           = "${local.alm_private_zone_id}"
 }
 
 variable "ckan_external_ami" {

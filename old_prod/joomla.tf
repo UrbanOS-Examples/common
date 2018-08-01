@@ -118,6 +118,26 @@ resource "aws_db_instance" "joomla_db" {
   }
 }
 
+module "joomla_dns_records" {
+  source                = "../modules/dns_records"
+  name                  = ""
+  dns_name              = "${module.load_balancer.dns_name[0]}"
+  lb_zone_id            = "${module.load_balancer.zone_id[0]}"
+  public_zone_id        = "${local.external_zone_id}"
+  compatability_zone_id = "${var.public_dns_zone_id}"
+  alm_zone_id           = "${local.alm_private_zone_id}"
+}
+
+module "joomla_www_dns_records" {
+  source                = "../modules/dns_records"
+  name                  = "www"
+  dns_name              = "${module.load_balancer.dns_name[0]}"
+  lb_zone_id            = "${module.load_balancer.zone_id[0]}"
+  public_zone_id        = "${local.external_zone_id}"
+  compatability_zone_id = "${var.public_dns_zone_id}"
+  alm_zone_id           = "${local.alm_private_zone_id}"
+}
+
 variable "joomla_instance_ebs_optimized" {
   description = "Whether or not the Joomla server is EBS optimized"
   default     = true

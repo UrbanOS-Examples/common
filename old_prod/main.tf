@@ -27,3 +27,7 @@ variable "aws_role_arn" {
 variable "bastion_host_ip" {
   description = "The IP address of a SSH jump host"
 }
+
+variable "public_dns_zone_id" {
+  description = "Public DNS zone ID"
+}

@@ -41,13 +41,23 @@ resource "aws_alb_target_group_attachment" "kong_external" {
   port             = 80
 }
 
-resource "aws_route53_record" "kong_dns" {
+resource "aws_route53_record" "kong_internal_dns" {
   zone_id = "${aws_route53_zone.private_hosted_zone.zone_id}"
   name    = "kong"
   type    = "A"
   count   = 1
-  ttl     = "300"
+  ttl     = 300
   records = ["${aws_instance.kong.private_ip}"]
+}
+
+module "kong_dns_records" {
+  source                = "../modules/dns_records"
+  name                  = "api"
+  dns_name              = "${module.load_balancer.dns_name[0]}"
+  lb_zone_id            = "${module.load_balancer.zone_id[0]}"
+  public_zone_id        = "${local.external_zone_id}"
+  compatability_zone_id = "${var.public_dns_zone_id}"
+  alm_zone_id           = "${local.alm_private_zone_id}"
 }
 
 resource "aws_db_instance" "kong" {
