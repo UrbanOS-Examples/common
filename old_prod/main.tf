@@ -22,3 +22,9 @@ variable "aws_role_arn" {
   description = "ARN of IAM role to assume for accessing the old prod subaccount"
   default     = "arn:aws:iam::374013108165:role/dev_view_only_role"
 }
+
+variable "bastion_host_ip" {
+  description = "The IP address of a SSH jump host"
+}
+
+

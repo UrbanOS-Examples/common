@@ -33,6 +33,7 @@ resource "aws_acm_certificate" "load_balancer" {
 
 variable "target_group_prefix" {
   default = "PROD"
+  description = "A prefix added to the name of the load balancers"
 }
 
 variable "alb_external" {

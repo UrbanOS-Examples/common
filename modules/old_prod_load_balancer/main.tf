@@ -24,14 +24,14 @@ locals {
     },
   ]
 
-  target_group_arns = "${zipmap(aws_alb_target_group.this.*.name, aws_alb_target_group.this.*.arn)}"
+  target_group_arns = "${zipmap(aws_alb_target_group.all_target_groups.*.name, aws_alb_target_group.all_target_groups.*.arn)}"
 }
 
 output "target_group_arns" {
   value = "${local.target_group_arns}"
 }
 
-resource "aws_alb_target_group" "this" {
+resource "aws_alb_target_group" "all_target_groups" {
   count    = "${var.is_enabled ? length(local.lb_rules) : 0}"
   name     = "${var.target_group_prefix}-${lookup(local.lb_rules[count.index], "name")}"
   vpc_id   = "${var.vpc_id}"
@@ -81,7 +81,7 @@ resource "aws_alb_listener_rule" "http" {
   action {
     type = "forward"
 
-    target_group_arn = "${element(aws_alb_target_group.this.*.arn, count.index)}"
+    target_group_arn = "${element(aws_alb_target_group.all_target_groups.*.arn, count.index)}"
   }
 
   condition {
@@ -96,7 +96,7 @@ resource "aws_alb_listener_rule" "https" {
 
   action {
     type             = "forward"
-    target_group_arn = "${element(aws_alb_target_group.this.*.arn, count.index)}"
+    target_group_arn = "${element(aws_alb_target_group.all_target_groups.*.arn, count.index)}"
   }
 
   condition {
