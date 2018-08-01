@@ -1,10 +1,10 @@
 properties([disableConcurrentBuilds()])
 
-def environment = "dev"
 def kubeConfigStashName = "kubernetes-config"
 
 node('terraform') {
     ansiColor('xterm') {
+
         withCredentials([
             [
                 $class: 'AmazonWebServicesCredentialsBinding',
@@ -20,21 +20,24 @@ node('terraform') {
                 deleteDir()
                 checkout scm
             }
-            stage('Plan') {
-                plan(environment)
-            }
 
-            if (env.BRANCH_NAME == 'master') {
+            stage('Deply to Dev') {
+                def cluster = 'dev'
+                plan(cluster)
+
                 archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
 
-                stage('Execute') {
+                execute()
+                stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
+                createTillerUser()
+            }
+
+            stage('Deploy to staging') {
+                if (env.BRANCH_NAME == 'master') {
+                    def cluster = 'staging'
+                    plan(cluster)
                     execute()
-                }
-                // TODO - delete this stage once we move to EKS as we no longer need this config
-                stage('Copy Legacy Kubernetes Config to Worker') {
-                    stashLegacyKubeConfig(kubeConfigStashName)
-                }
-                stage('Deploy Tiller') {
+                    stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
                     createTillerUser()
                 }
             }
@@ -45,10 +48,13 @@ node('terraform') {
 // TODO - delete this stage once we move to EKS as we no longer need this config
 node('master') {
     ansiColor('xterm') {
-        if (env.BRANCH_NAME == 'master') {
-            stage('Copy Legacy Kubernetes Config to Master') {
-                unstashLegacyKubeConfig(environment, kubeConfigStashName)
-                sh('kubectl get nodes')
+        stage('Copy Legacy Kubernetes Config to Master') {
+            def cluster = 'dev'
+            unstashLegacyKubeConfig(cluster, buildStashName(kubeConfigStashName, cluster))
+
+            if (env.BRANCH_NAME == 'master') {
+                cluster = 'staging'
+                unstashLegacyKubeConfig(cluster, buildStashName(kubeConfigStashName, cluster))
             }
         }
     }
@@ -65,7 +71,7 @@ def plan(environment) {
             echo "\${public_key}" > ~/.ssh/id_rsa.pub
 
             terraform init \
-                --backend-config=backends/${environment}.conf
+                --backend-config=backends/alm.conf
             terraform workspace new ${environment} || true
             terraform workspace select ${environment}
 
@@ -83,6 +89,10 @@ def execute() {
     dir('env') {
         sh('terraform apply plan.bin')
     }
+}
+
+def buildStashName(stashName, cluster) {
+    "${stashName}-${cluster}"
 }
 
 def stashLegacyKubeConfig(stashName) {
@@ -116,9 +126,9 @@ def copyKubeConfig(kubernetesMasterIP, destinationPath) {
 }
 
 def createTillerUser() {
+    /* Assumes this is running on the terraform node */
     sh('''#!/usr/bin/env bash
         set -e
-        kubectl get nodes
 
         if [ $(kubectl get serviceaccount \
                 --namespace kube-system \
@@ -150,4 +160,6 @@ def unstashLegacyKubeConfig(environment, stashName) {
     dir("/var/jenkins_home/.kube/${environment}") {
         unstash(stashName)
     }
+
+    sh("KUBECONFIG=/var/jenkins_home/.kube/${environment}/config kubectl get nodes")
 }
