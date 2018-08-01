@@ -32,13 +32,6 @@ variable "listener_ports" {
       lb_port           = 80
       lb_protocol       = "http"
     },
-    // {
-    //   instance_port = 8080
-    //   instance_protocol = "http"
-    //   lb_port = 443
-    //   lb_protocol = "https"
-    //   ssl_certificate_id = "${var.service_certificate_arn}"
-    // }
   ]
 }
 variable "ingress_rules" {

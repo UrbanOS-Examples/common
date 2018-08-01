@@ -1,6 +1,7 @@
 properties([disableConcurrentBuilds()])
 
 def environment = "dev"
+def kubeConfigStashName = "kubernetes-config"
 
 node('terraform') {
     ansiColor('xterm') {
@@ -24,14 +25,14 @@ node('terraform') {
             }
 
             if (env.BRANCH_NAME == 'master') {
-                archiveArtifacts artifacts: 'plan.txt', allowEmptyArchive: false
+                archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
 
                 stage('Execute') {
                     execute()
                 }
-                // TODO - delete the copyConfig part of this when we move to EKS
-                stage('Configure Legacy Kubernetes Cluster') {
-                    configureLegacyKubeCluster(environment)
+                // TODO - delete this stage once we move to EKS as we no longer need this config
+                stage('Copy Legacy Kubernetes Config to Worker') {
+                    stashLegacyKubeConfig(kubeConfigStashName)
                 }
                 stage('Deploy Tiller') {
                     createTillerUser()
@@ -41,17 +42,12 @@ node('terraform') {
     }
 }
 
-// TODO - delete this once we move to EKS as we no longer need this config
+// TODO - delete this stage once we move to EKS as we no longer need this config
 node('master') {
     ansiColor('xterm') {
         if (env.BRANCH_NAME == 'master') {
             stage('Copy Legacy Kubernetes Config to Master') {
-                dir('/var/jenkins_home/.kube') {
-                    unstash('kubernetes-config')
-                }
-                dir('/root/.kube') {
-                    unstash('kubernetes-config')
-                }
+                unstashLegacyKubeConfig(environment, kubeConfigStashName)
                 sh('kubectl get nodes')
             }
         }
@@ -89,37 +85,33 @@ def execute() {
     }
 }
 
-def configureLegacyKubeCluster(environment) {
+def stashLegacyKubeConfig(stashName) {
     dir('env') {
-        kubernetes_master_ip = sh(
+        def kubernetesMasterIP = sh(
             script: 'terraform output kubernetes_master_private_ip',
             returnStdout: true
         ).trim()
 
         retry(24) {
             sleep(10)
-            if (environment == 'dev') {
-                copyKubeConfig(kubernetes_master_ip, '~/.kube/config')
-                copyKubeConfig(kubernetes_master_ip, "${env.WORKSPACE}/config")
-            }
-
-            copyKubeConfig(kubernetes_master_ip, "/var/jenkins_home/.kube/${environment}/config")
-            stash includes: 'config', name: 'kubernetes-config'
+            copyKubeConfig(kubernetesMasterIP, '~/.kube/config') // for tiller
+            copyKubeConfig(kubernetesMasterIP, "config") // for stashing
+            stash includes: 'config', name: stashName
         }
     }
 }
 
-def copyKubeConfig(kubernetes_master_ip, destination_path) {
+def copyKubeConfig(kubernetesMasterIP, destinationPath) {
     sh("""#!/usr/bin/env bash
         set -e
-        mkdir -p \$(dirname ${destination_path})
+        mkdir -p \$(dirname ${destinationPath})
 
         scp \
             -o ConnectTimeout=30 \
             -o StrictHostKeyChecking=no \
             -i $keyfile \
-            centos@${kubernetes_master_ip}:~/kubeconfig \
-            ${destination_path}
+            centos@${kubernetesMasterIP}:~/kubeconfig \
+            ${destinationPath}
     """)
 }
 
@@ -144,4 +136,18 @@ def createTillerUser() {
                 --serviceaccount=kube-system:tiller
         fi
     ''')
+}
+
+def unstashLegacyKubeConfig(environment, stashName) {
+    if (environment == 'dev') {
+        dir('/var/jenkins_home/.kube') {
+            unstash(stashName)
+        }
+        dir('/root/.kube') {
+            unstash(stashName)
+        }
+    }
+    dir("/var/jenkins_home/.kube/${environment}/config") {
+        unstash(stashName)
+    }
 }
