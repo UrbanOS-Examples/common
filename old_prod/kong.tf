@@ -5,6 +5,7 @@ resource "aws_instance" "kong" {
   ebs_optimized          = "${var.kong_instance_ebs_optimized}"
   iam_instance_profile   = "${var.kong_instance_profile}"
   subnet_id              = "${data.aws_subnet.subnet.1.id}"
+  key_name               = "${var.kong_keypair_name}"
 
   tags {
     Name    = "kong"
@@ -119,6 +120,10 @@ variable "kong_db_instance_class" {
 variable "kong_instance_profile" {
   description = "Instance Profile for kong server"
   default     = "CloudWatch_EC2"
+}
+
+variable "kong_keypair_name" {
+  description = "The name of the keypair for ssh authentication"
 }
 
 variable "kong_instance_type" {
