@@ -53,6 +53,14 @@ node('terraform') {
                         createTillerUser()
                     }
                 }
+
+                stage('Execute Kubernetes Configs') {
+                    applyKubeConfigs()
+                }
+            }
+
+            stage('Execute Kubernetes Configs') {
+                applyKubeConfigs()
             }
         }
     }
@@ -185,4 +193,18 @@ def unstashLegacyKubeConfig(environment, stashName) {
     }
 
     sh("KUBECONFIG=/var/jenkins_home/.kube/${environment}/config kubectl get nodes")
+}
+
+def applyKubeConfigs() {
+    sh('''#!/usr/bin/env bash
+        set -e
+        cd env/
+        eks_cluster_name=$(terraform output eks_cluster_name)
+        aws_region=$(terraform output aws_region)
+        terraform output eks-cluster-kubeconfig > /tmp/eks-cluster-kubeconfig
+        cd ../
+        sed -ie "s/%CLUSTER_NAME%/$eks_cluster_name/" k8s/alb-ingress-controller/03-deployment.yaml
+        sed -ie "s/%AWS_REGION%/$aws_region/" k8s/alb-ingress-controller/03-deployment.yaml
+        kubectl apply --kubeconfig=/tmp/eks-cluster-kubeconfig -f k8s/alb-ingress-controller/
+    ''')
 }
