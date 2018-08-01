@@ -11,20 +11,7 @@ resource "aws_elb" "service" {
   connection_draining = true
   connection_draining_timeout = 60
 
-  // listener {
-  //   instance_port = "${var.service_port}"
-  //   instance_protocol = "http"
-  //   lb_port = 443
-  //   lb_protocol = "https"
-  //   ssl_certificate_id = "${var.service_certificate_arn}"
-  // }
-
-  listener {
-   instance_port     = "${var.service_port}"
-   instance_protocol = "http"
-   lb_port           = 80
-   lb_protocol       = "http"
- }
+  listener = ["${var.listener_ports}"]
 
   health_check {
     healthy_threshold = 3

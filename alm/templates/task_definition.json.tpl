@@ -8,8 +8,12 @@
     "environment" : [{ "name" : "ELB_NAME", "value" : "${elb_name}" }],
     "portMappings": [
       {
-        "containerPort": ${port},
-        "hostPort": ${port}
+        "containerPort": ${jenkins_port},
+        "hostPort": ${jenkins_port}
+      },
+      {
+        "containerPort": ${jnlp_port},
+        "hostPort": ${jnlp_port}
       }
     ],
     "mountPoints": [

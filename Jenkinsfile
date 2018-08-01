@@ -1,85 +1,153 @@
-node('master') {
-    properties([disableConcurrentBuilds()])
+properties([disableConcurrentBuilds()])
 
+def environment = "dev"
+def kubeConfigStashName = "kubernetes-config"
+
+node('terraform') {
     ansiColor('xterm') {
-        stage('Checkout') {
-            deleteDir()
-            checkout scm
-        }
-
-        stage('Plan') {
-            plan("dev")
-        }
-
-        if (env.BRANCH_NAME == 'master') {
-            archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
-
-            stage('Execute') {
-                execute()
+        withCredentials([
+            [
+                $class: 'AmazonWebServicesCredentialsBinding',
+                credentialsId: 'aws_jenkins_user',
+                variable: 'AWS_ACCESS_KEY_ID'
+            ],
+            sshUserPrivateKey(
+                credentialsId: "k8s-no-pass",
+                keyFileVariable: 'keyfile'
+            )
+        ]) {
+            stage('Checkout') {
+                deleteDir()
+                checkout scm
+            }
+            stage('Plan') {
+                plan(environment)
             }
 
-            stage('Copy Kubernetes config') {
-                copyKubeConfig("dev")
-            }
+            if (env.BRANCH_NAME == 'master') {
+                archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
 
-            stage('Deploy Tiller') {
-                dir('env') {
-                    sh('''
-                        if [ $(kubectl get serviceaccount --namespace kube-system | grep -wc tiller) -eq 0 ]; then
-                            kubectl --namespace kube-system create serviceaccount tiller
-                        fi
-                    ''')
-                    sh('''
-                        if [ $(kubectl get clusterrolebinding --namespace kube-system | grep -wc tiller) -eq 0 ]; then
-                            kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
-                        fi
-                    ''')
+                stage('Execute') {
+                    execute()
                 }
+                // TODO - delete this stage once we move to EKS as we no longer need this config
+                stage('Copy Legacy Kubernetes Config to Worker') {
+                    stashLegacyKubeConfig(kubeConfigStashName)
+                }
+                stage('Deploy Tiller') {
+                    createTillerUser()
+                }
+            }
+        }
+    }
+}
+
+// TODO - delete this stage once we move to EKS as we no longer need this config
+node('master') {
+    ansiColor('xterm') {
+        if (env.BRANCH_NAME == 'master') {
+            stage('Copy Legacy Kubernetes Config to Master') {
+                unstashLegacyKubeConfig(environment, kubeConfigStashName)
+                sh('kubectl get nodes')
             }
         }
     }
 }
 
 def plan(environment) {
-    echo "Write out plan into Jenkins build directory for ${environment}."
     dir('env') {
-        sh("terraform init -backend-config=backends/${environment}.conf")
-        sh("terraform workspace new ${environment} || true")
-        sh("terraform workspace select ${environment}")
-        sh("set -o pipefail; terraform plan -var-file=variables/${environment}.tfvars -out plan.bin | tee -a plan.txt")
+        sh("""#!/usr/bin/env bash
+            set -e
+            set -o pipefail
+
+            mkdir -p ~/.ssh
+            public_key=\$(ssh-keygen -y -f ${keyfile})
+            echo "\${public_key}" > ~/.ssh/id_rsa.pub
+
+            terraform init \
+                --backend-config=backends/${environment}.conf
+            terraform workspace new ${environment} || true
+            terraform workspace select ${environment}
+
+            terraform plan \
+                --var=key_pair_public_key="\${public_key}" \
+                --var=kube_key="~/.ssh/id_rsa.pub" \
+                --var-file=variables/${environment}.tfvars \
+                --out=plan.bin \
+                | tee -a plan.txt
+        """)
     }
 }
 
 def execute() {
-    echo "Execute terraform"
     dir('env') {
         sh('terraform apply plan.bin')
     }
 }
 
-def copyKubeConfig(environment) {
+def stashLegacyKubeConfig(stashName) {
     dir('env') {
-        kubernetes_master_ip = sh(
+        def kubernetesMasterIP = sh(
             script: 'terraform output kubernetes_master_private_ip',
             returnStdout: true
         ).trim()
 
-        withCredentials([sshUserPrivateKey(credentialsId: "k8s-no-pass", keyFileVariable: 'keyfile')]) {
-            sh("mkdir -p ~/.kube/")
-            sh("mkdir -p /var/jenkins_home/.kube")
-            sh("mkdir -p /var/jenkins_home/.kube/${environment}")
-            sh("echo '====> WAITING FOR KUBERNETES TO START... <===='")
-            retry(24) {
-                sleep(10)
-                if (environment == "dev") {
-                    sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig ~/.kube/config""")
-                    sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig /var/jenkins_home/.kube/config""")
-                }
-
-                sh("""scp -o ConnectTimeout=30 -o StrictHostKeyChecking=no -i $keyfile centos@${kubernetes_master_ip}:~/kubeconfig /var/jenkins_home/.kube/${environment}/config""")
-            }
+        retry(24) {
+            sleep(10)
+            copyKubeConfig(kubernetesMasterIP, '~/.kube/config') // for tiller
+            copyKubeConfig(kubernetesMasterIP, "config") // for stashing
+            stash includes: 'config', name: stashName
         }
+    }
+}
 
-        sh("kubectl get nodes")
+def copyKubeConfig(kubernetesMasterIP, destinationPath) {
+    sh("""#!/usr/bin/env bash
+        set -e
+        mkdir -p \$(dirname ${destinationPath})
+
+        scp \
+            -o ConnectTimeout=30 \
+            -o StrictHostKeyChecking=no \
+            -i $keyfile \
+            centos@${kubernetesMasterIP}:~/kubeconfig \
+            ${destinationPath}
+    """)
+}
+
+def createTillerUser() {
+    sh('''#!/usr/bin/env bash
+        set -e
+        kubectl get nodes
+
+        if [ $(kubectl get serviceaccount \
+                --namespace kube-system \
+                | grep -wc tiller) -eq 0 ]; then
+
+            kubectl create serviceaccount tiller \
+                --namespace kube-system
+        fi
+        if [ $(kubectl get clusterrolebinding \
+                --namespace kube-system \
+                | grep -wc tiller) -eq 0 ]; then
+
+            kubectl create clusterrolebinding tiller \
+                --clusterrole cluster-admin \
+                --serviceaccount=kube-system:tiller
+        fi
+    ''')
+}
+
+def unstashLegacyKubeConfig(environment, stashName) {
+    if (environment == 'dev') {
+        dir('/var/jenkins_home/.kube') {
+            unstash(stashName)
+        }
+        dir('/root/.kube') {
+            unstash(stashName)
+        }
+    }
+    dir("/var/jenkins_home/.kube/${environment}/config") {
+        unstash(stashName)
     }
 }
