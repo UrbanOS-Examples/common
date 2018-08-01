@@ -8,3 +8,4 @@ plan.bin
 sandbox_dev.tfvars
 sandbox_prod.tfvars
 sandbox_staging.tfvars
+**/*.out

@@ -1,6 +1,6 @@
 aws_role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
-joomla_backup_ami = "ami-11a3a16e"
+joomla_backup_ami = "ami-7a342205"
 
 joomla_backup_file_name = "site-www.smartcolumbusos.com-20180722-200002edt.zip"
 
@@ -12,12 +12,68 @@ joomla_instance_profile = ""
 
 joomla_instance_type = "t2.small"
 
-joomla_lb_target_arn = "arn:aws:elasticloadbalancing:us-east-1:073132350570:targetgroup/DEV-Joomla/e5be5792c2b056f1"
-
-joomla_lb_target_name = "DEV-Joomla"
-
 scos_servers_sg_description = "SCOS Servers"
 
 vpc_name = "DEV VPC"
 
-vpc_regions = ["us-east-1a", "us-east-1b"]
+vpc_regions = ["us-east-1a", "us-east-1b", "us-east-1f"]
+
+ckan_internal_instance_type = "t2.small"
+
+ckan_internal_backup_ami = "ami-5c302623"
+
+ckan_internal_instance_ebs_optimized = false
+
+ckan_internal_instance_profile = ""
+
+ckan_db_instance_class = "db.t2.large"
+
+ckan_db_engine_version = "9.5.10"
+
+ckan_db_parameter_group_name = "default.postgres9.5"
+
+ckan_db_allocated_storage = 100
+
+ckan_db_identifier = "dev-ckan"
+
+ckan_rds_snapshot_id = "rds:dev-postgresql-instance-2018-07-30-07-39"
+
+load_balancer_internal = true
+
+ckan_external_ami = "ami-103d2b6f"
+
+ckan_external_instance_type = "t2.small"
+
+ckan_external_instance_ebs_optimized = false
+
+ckan_external_instance_profile = ""
+
+ckan_external_instance_class = "db.t2.large"
+
+kong_db_identifier = "dev-kong"
+
+kong_db_instance_class = "db.t2.large"
+
+kong_ami = "ami-9b3f29e4"
+
+kong_instance_profile = ""
+
+kong_instance_type = "t2.small"
+
+kong_rds_snapshot_id = "rds:dev-kong-0-13-1-2018-07-30-03-58"
+
+rds_multi_az = false
+
+kong_engine_version = "9.6.6"
+
+kong_db_parameter_group_name = "default.postgres9.6"
+
+kong_allocated_storage = 25
+
+kong_instance_ebs_optimized = false
+
+alb_external = false
+
+target_group_prefix = "DEV"
+
+ckan_db_storage_encrypted = false

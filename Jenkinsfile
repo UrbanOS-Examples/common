@@ -1,6 +1,5 @@
 properties([disableConcurrentBuilds()])
 
-def kubernetes_master_ip
 def environment = "dev"
 
 node('terraform') {
@@ -21,54 +20,22 @@ node('terraform') {
                 checkout scm
             }
             stage('Plan') {
-                dir('env') {
-                    sh("""#!/usr/bin/env bash
-                        set -e
-                        set -o pipefail
-
-                        mkdir -p ~/.ssh
-                        public_key=\$(ssh-keygen -y -f ${keyfile})
-                        echo "\${public_key}" > ~/.ssh/id_rsa.pub
-
-                        terraform init \
-                            --backend-config=backends/${environment}.conf
-                        terraform workspace new ${environment} || true
-                        terraform workspace select ${environment}
-
-                        terraform plan \
-                            --var=key_pair_public_key="\${public_key}" \
-                            --var=kube_key="~/.ssh/id_rsa.pub" \
-                            --var-file=variables/${environment}.tfvars \
-                            --out=plan.bin \
-                            | tee -a plan.txt
-                    """)
-                }
+                plan(environment)
             }
 
             if (env.BRANCH_NAME == 'master') {
-                stage('Execute') {
-                    dir('env') {
-                        archiveArtifacts artifacts: 'plan.txt', allowEmptyArchive: false
-                        sh('terraform apply plan.bin')
+                archiveArtifacts artifacts: 'plan.txt', allowEmptyArchive: false
 
-                        kubernetes_master_ip = sh(
-                            script: 'terraform output kubernetes_master_private_ip',
-                            returnStdout: true
-                        ).trim()
-                    }
+                stage('Execute') {
+                    execute()
                 }
                 // TODO - delete the copyConfig part of this when we move to EKS
-                stage('Configure Legacy K8s Cluster') {
-                    retry(24) {
-                        sleep(10)
-                        copyKubeConfig(kubernetes_master_ip, '~/.kube/config')
-                        copyKubeConfig(kubernetes_master_ip, "${env.WORKSPACE}/config")
-                        stash includes: 'config', name: 'kubernetes-config'
-                    }
-
+                stage('Configure Legacy Kubernetes Cluster') {
+                    configureLegacyKubeCluster(environment)
+                }
+                stage('Deploy Tiller') {
                     createTillerUser()
                 }
-
             }
         }
     }
@@ -76,15 +43,68 @@ node('terraform') {
 
 // TODO - delete this once we move to EKS as we no longer need this config
 node('master') {
-    if (env.BRANCH_NAME == 'master') {
-        stage('Copy Legacy K8S Config to Master') {
-            dir('/var/jenkins_home/.kube') {
-                unstash('kubernetes-config')
+    ansiColor('xterm') {
+        if (env.BRANCH_NAME == 'master') {
+            stage('Copy Legacy Kubernetes Config to Master') {
+                dir('/var/jenkins_home/.kube') {
+                    unstash('kubernetes-config')
+                }
+                dir('/root/.kube') {
+                    unstash('kubernetes-config')
+                }
+                sh('kubectl get nodes')
             }
-            dir('/root/.kube') {
-                unstash('kubernetes-config')
+        }
+    }
+}
+
+def plan(environment) {
+    dir('env') {
+        sh("""#!/usr/bin/env bash
+            set -e
+            set -o pipefail
+
+            mkdir -p ~/.ssh
+            public_key=\$(ssh-keygen -y -f ${keyfile})
+            echo "\${public_key}" > ~/.ssh/id_rsa.pub
+
+            terraform init \
+                --backend-config=backends/${environment}.conf
+            terraform workspace new ${environment} || true
+            terraform workspace select ${environment}
+
+            terraform plan \
+                --var=key_pair_public_key="\${public_key}" \
+                --var=kube_key="~/.ssh/id_rsa.pub" \
+                --var-file=variables/${environment}.tfvars \
+                --out=plan.bin \
+                | tee -a plan.txt
+        """)
+    }
+}
+
+def execute() {
+    dir('env') {
+        sh('terraform apply plan.bin')
+    }
+}
+
+def configureLegacyKubeCluster(environment) {
+    dir('env') {
+        kubernetes_master_ip = sh(
+            script: 'terraform output kubernetes_master_private_ip',
+            returnStdout: true
+        ).trim()
+
+        retry(24) {
+            sleep(10)
+            if (environment == 'dev') {
+                copyKubeConfig(kubernetes_master_ip, '~/.kube/config')
+                copyKubeConfig(kubernetes_master_ip, "${env.WORKSPACE}/config")
             }
-            sh('kubectl get nodes')
+
+            copyKubeConfig(kubernetes_master_ip, "/var/jenkins_home/.kube/${environment}/config")
+            stash includes: 'config', name: 'kubernetes-config'
         }
     }
 }

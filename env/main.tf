@@ -8,44 +8,14 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    key            = "operating-system"
-    encrypt        = true
+    key     = "operating-system"
+    encrypt = true
   }
 }
 
 resource "aws_key_pair" "cloud_key" {
   key_name   = "${terraform.workspace}_env_cloud_key"
   public_key = "${var.key_pair_public_key}"
-}
-
-resource "aws_elb" "jupyter_elb" {
-  name = "jupyter-elb-${terraform.workspace}"
-
-  internal = true
-
-  subnets         = ["${module.vpc.private_subnets}"]
-  security_groups = ["${module.kubernetes.kubeconfig_security_group}"]
-
-  listener {
-    instance_port = "${local.jupyter_port}"
-
-    instance_protocol = "TCP"
-    lb_port           = 80
-    lb_protocol       = "TCP"
-  }
-
-  health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 3
-    target              = "TCP:${local.jupyter_port}"
-    interval            = 30
-  }
-}
-
-resource "aws_autoscaling_attachment" "jupyter_k8s_attachment" {
-  autoscaling_group_name = "${module.kubernetes.autoscaling_group_name}"
-  elb                    = "${aws_elb.jupyter_elb.id}"
 }
 
 resource "aws_security_group_rule" "allow_inbound_traffic_from_alm" {
@@ -55,10 +25,6 @@ resource "aws_security_group_rule" "allow_inbound_traffic_from_alm" {
   protocol          = "-1"
   cidr_blocks       = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
   security_group_id = "${module.kubernetes.kubeconfig_security_group}"
-}
-
-locals {
-  jupyter_port = 30001
 }
 
 variable "region" {

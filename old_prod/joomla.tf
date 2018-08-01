@@ -85,13 +85,15 @@ resource "aws_instance" "joomla" {
   }
 }
 
-data "aws_lb_target_group" "joomla" {
-  arn  = "${var.joomla_lb_target_arn}"
-  name = "${var.joomla_lb_target_name}"
+resource "aws_lb_target_group_attachment" "joomla_internal" {
+  target_group_arn = "${module.load_balancer.target_group_arns["${var.target_group_prefix}-Internal-Joomla"]}"
+  target_id        = "${aws_instance.joomla.id}"
+  port             = 80
 }
 
-resource "aws_lb_target_group_attachment" "joomla" {
-  target_group_arn = "${data.aws_lb_target_group.joomla.arn}"
+resource "aws_lb_target_group_attachment" "joomla_external" {
+  count            = "${var.alb_external}"
+  target_group_arn = "${module.load_balancer_external.target_group_arns["${var.target_group_prefix}-Joomla"]}"
   target_id        = "${aws_instance.joomla.id}"
   port             = 80
 }
@@ -132,16 +134,6 @@ variable "joomla_instance_type" {
 
 variable "joomla_backup_ami" {
   description = "AMI to restore Joomla from"
-}
-
-variable "joomla_lb_target_arn" {
-  description = "ARN of the Joomla load balancer target group"
-  default     = "arn:aws:elasticloadbalancing:us-east-1:374013108165:targetgroup/ProdVPC-Joomla/41d7ff2a14460451"
-}
-
-variable "joomla_lb_target_name" {
-  description = "Name of the Joomla load balancer target group"
-  default     = "ProdVPC-Joomla"
 }
 
 variable "s3_readonly_access_key" {
