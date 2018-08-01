@@ -1,19 +1,17 @@
-def scmVars
-
 node('master') {
     properties([disableConcurrentBuilds()])
 
     ansiColor('xterm') {
         stage('Checkout') {
             deleteDir()
-            scmVars = checkout scm
+            checkout scm
         }
 
         stage('Plan') {
             plan("dev")
         }
 
-        if (scmVars.GIT_BRANCH == 'master') {
+        if (env.BRANCH_NAME == 'master') {
             archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
 
             stage('Execute') {
