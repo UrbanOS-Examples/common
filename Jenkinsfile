@@ -147,7 +147,7 @@ def unstashLegacyKubeConfig(environment, stashName) {
             unstash(stashName)
         }
     }
-    dir("/var/jenkins_home/.kube/${environment}/config") {
+    dir("/var/jenkins_home/.kube/${environment}") {
         unstash(stashName)
     }
 }
