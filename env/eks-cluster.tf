@@ -22,7 +22,41 @@ module "eks-cluster" {
   }
 }
 
+resource "aws_iam_policy" "eks_work_alb_permissions" {
+  name        = "eks_work_alb_permissions"
+  description = "This policy allows EKS Worker nodes to do everything it needs to do with an ALB"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "123",
+            "Effect": "Allow",
+            "Action": [
+                "tag:GetResources",
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "ec2:*",
+                "elasticloadbalancing:*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
+  role       = "${module.eks-cluster.worker_iam_role_name}"
+  policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
+}
+
 output "eks-cluster-kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
   value       = "${module.eks-cluster.kubeconfig}"
+}
+
+output "eks_cluster_name" {
+  description = "Name of the EKS cluster"
+  value       = "${var.kubernetes_cluster_name}"
 }
