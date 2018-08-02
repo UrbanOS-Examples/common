@@ -139,10 +139,12 @@ def copyKubeConfig(kubernetesMasterIP, destinationPath) {
 }
 
 def getEksKubeConfig(config_file) {
-    sh("""#!/usr/bin/env bash
-        set -e
-        terraform output eks-cluster-kubeconfig > ./$config_file
-    """)
+    dir('env') {
+        sh("""#!/usr/bin/env bash
+            set -e
+            terraform output eks-cluster-kubeconfig > ./$config_file
+        """)
+    }
 }
 
 
