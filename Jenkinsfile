@@ -22,6 +22,7 @@ node('terraform') {
             }
 
             def cluster = 'dev'
+            def eks_config = "${cluster}_kubeconfig"
             stage('Plan Dev') {
                 plan(cluster)
 
@@ -33,14 +34,24 @@ node('terraform') {
                     execute()
                     stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
                     createTillerUser()
+                    getEksKubeConfig(eks_config)
+                    withEnv(['KUBECONFIG=./$eks_config']) {
+                        // Create tiller user for EKS cluster
+                        createTillerUser()
+                    }
                 }
 
                 stage('Deploy to staging') {
                     cluster = 'staging'
+                    eks_config = "${cluster}_kubeconfig"
                     plan(cluster)
                     execute()
                     stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
                     createTillerUser()
+                    getEksKubeConfig(eks_config)
+                    withEnv(['KUBECONFIG=./$eks_config']) {
+                        createTillerUser()
+                    }
                 }
             }
         }
@@ -126,6 +137,14 @@ def copyKubeConfig(kubernetesMasterIP, destinationPath) {
             ${destinationPath}
     """)
 }
+
+def getEksKubeConfig(config_file) {
+    sh("""#!/usr/bin/env bash
+        set -e
+        terraform output eks-cluster-kubeconfig > ./$config_file
+    """)
+}
+
 
 def createTillerUser() {
     /* Assumes this is running on the terraform node */
