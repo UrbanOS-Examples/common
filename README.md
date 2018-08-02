@@ -11,7 +11,15 @@ The following is a series of shell snippets for running terraform scripts in the
 
 On first use of a set of terraform scripts, terraform must first be initialized so that plugins and modules can be fetched, and the S3 backend can be configured.  The Terraform scripts are configured to reference the `sandbox` profile by default, and Terraform should correctly recognize the AWS profile configuration on initialization.
 
-**Note** Previously, this documentation recommended creating and using dedicated sandbox credentials. Now you should only need your regular ALM credentials. Regular role assumption should work as expected.
+Backend configurations are stored in the [backends](backends/) directory.
+Use the `--backend-config` flag to specify the file path to the conf file.
+
+```bash
+cd env
+terraform init --backend-config=../backends/sandbox-alm.conf
+```
+
+All projects share the same two backends: the one in sandbox-alm and the one in alm.
 
 ## Selecting a workspace
 
@@ -42,6 +50,38 @@ terraform apply sandbox.plan
 ## The Configs
 
 - [Bootstrap](bootstrap/README.md) - bootstrap scripts for creating the Terraform state S3 bucket and DynamoDB table
+- [ALM-durable](alm-durable/README.md) - Persistance for the ALM network: file systems, elastic container repositories, etc.
 - [ALM](alm/README.md) - deploy and configure an Application Lifecycle Management VPC
-- [Nexus](nexus/README.md) (WIP) - deploy and configure a Nexus in an ALM VPC
 - [Users](users/README.md) - create users and assign roles in the various AWS subaccounts
+- [Env](env/README.md) - Deploys application environments
+
+Some of these projects have implicit dependencies on others because we need to manage their lifecycles separately.
+For example, the Jenkins file system has a longer lifespan than the ALM network.
+We never want to delete that file system, so it is managed by a separate terraform state.
+
+All projects rely on the Terraform state bucket and lock table being created first (Bootstrap).
+Env has a dependency on ALM existing so that it can create the VPC peering our CI system needs to gain access to the system.
+
+```
+
+              +-------------+
+              |             |
+              |  Bootstrap  |
+        +----->  (tf state) <-----+
+        |     |             |     |
+        |     +-------------+     |
+        |                         |
++-------+------+                  |
+|              |                  |
+|  ALM-Durable |                  |
+|              |                  |
++-------^------+                  |
+        |                         |
+        |                         |
++-------+------+          +-------+------+
+|              |          |              |
+|     ALM      <----------+     ENV      |
+|              |          |              |
++--------------+          +--------------+
+
+```
