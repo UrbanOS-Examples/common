@@ -13,7 +13,7 @@ resource "aws_lb" "cota" {
 }
 
 resource "aws_lb_target_group" "cota_ui" {
-  name     = "cota-ui-lb-tg"
+  name     = "cota-ui-lb-tg-${terraform.workspace}"
   port     = "${local.ui_port}"
   protocol = "HTTP"
   vpc_id   = "${module.vpc.vpc_id}"
@@ -28,7 +28,7 @@ resource "aws_lb_target_group" "cota_ui" {
 }
 
 resource "aws_lb_target_group" "cota_stream" {
-  name     = "cota-stream-lb-tg"
+  name     = "cota-stream-lb-tg-${terraform.workspace}"
   port     = "${local.stream_port}"
   protocol = "HTTP"
   vpc_id   = "${module.vpc.vpc_id}"
