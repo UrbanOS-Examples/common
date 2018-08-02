@@ -33,10 +33,29 @@ terraform workspace use foo-workspace
 
 ### Deploying or Updating
 
+#### Shared Sandbox
 ```bash
 terraform plan -out sandbox.plan -var-file variables/sandbox.tfvars
 
 terraform apply sandbox.plan
+```
+
+#### Isolated Sandbox (env only)
+Until we can automate this, here are the minimal things (without renaming/adding resources, etc.) you need to do to make your own env. Note that the `vpc_cidr` and `vpc_*_subnets` need to match up.
+```bash
+cd env
+terraform init --backend-config=backends/sandbox.conf
+terraform workspace new my-own-personal-sandbox
+terraform workspace select my-own-personal-sandbox
+terraform plan \
+  --var-file=variables/sandbox.tfvars \
+  --var=vpc_name=ben-test-dev \
+  --var=kubernetes_cluster_name=ben-test-kube \
+  --var=vpc_cidr=10.101.0.0/16 \
+  --var=vpc_private_subnets='["10.101.0.0/19", "10.101.64.0/19", "10.101.128.0/19"]' \
+  --var=vpc_public_subnets='["10.101.32.0/20", "10.101.96.0/20", "10.101.160.0/20"]' \
+  --out=update.plan
+terraform apply update.plan
 ```
 
 ### Destroying
