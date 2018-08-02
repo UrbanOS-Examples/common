@@ -74,15 +74,11 @@ kong_rds_snapshot_id = "rds:dev-kong-0-13-1-2018-07-30-03-58"
 
 rds_multi_az = false
 
-kong_engine_version = "9.6.6"
-
 kong_db_parameter_group_name = "default.postgres9.6"
 
 kong_allocated_storage = 25
 
 kong_instance_ebs_optimized = false
-
-alb_external = false
 
 target_group_prefix = "DEV"
 
@@ -93,5 +89,3 @@ alm_workspace = "alm"
 alm_role_arn = "arn:aws:iam::199837183662:role/jenkins_role"
 
 alm_state_bucket_name = "scos-alm-terraform-state"
-
-public_dns_zone_id = "Z25PZI6XYQF2OB"

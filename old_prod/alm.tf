@@ -25,14 +25,17 @@ data "terraform_remote_state" "alm_remote_state" {
 
 variable "alm_role_arn" {
   description = "The ARN for the assume role for ALM access"
+  default     = "arn:aws:iam::199837183662:role/jenkins_role"
 }
 
 variable "alm_state_bucket_name" {
   description = "The name of the S3 state bucket for ALM"
+  default     = "scos-alm-terraform-state"
 }
 
 variable "alm_workspace" {
   description = "Workspace for the ALM state"
+  default     = "alm"
 }
 
 variable "alm_region" {
