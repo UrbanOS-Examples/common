@@ -58,10 +58,6 @@ node('terraform') {
                     applyKubeConfigs()
                 }
             }
-
-            stage('Execute Kubernetes Configs') {
-                applyKubeConfigs()
-            }
         }
     }
 }
