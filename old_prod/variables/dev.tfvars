@@ -1,5 +1,9 @@
 aws_role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
+bastion_host_ip = "35.170.88.146"
+
+joomla_old_ip = "172.16.5.114"
+
 joomla_backup_ami = "ami-7a342205"
 
 joomla_backup_file_name = "site-www.smartcolumbusos.com-20180722-200002edt.zip"
@@ -12,6 +16,8 @@ joomla_instance_profile = ""
 
 joomla_instance_type = "t2.small"
 
+joomla_keypair_name = "scos_joomla_dev"
+
 scos_servers_sg_description = "SCOS Servers"
 
 vpc_name = "DEV VPC"
@@ -21,6 +27,8 @@ vpc_regions = ["us-east-1a", "us-east-1b", "us-east-1f"]
 ckan_internal_instance_type = "t2.small"
 
 ckan_internal_backup_ami = "ami-5c302623"
+
+ckan_keypair_name = "IDE_DEV_Key_Pair"
 
 ckan_internal_instance_ebs_optimized = false
 
@@ -57,6 +65,8 @@ kong_db_instance_class = "db.t2.large"
 kong_ami = "ami-9b3f29e4"
 
 kong_instance_profile = ""
+
+kong_keypair_name = "Dev_Kong_Key_Pair"
 
 kong_instance_type = "t2.small"
 

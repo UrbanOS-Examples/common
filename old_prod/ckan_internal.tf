@@ -1,7 +1,3 @@
-locals {
-  ckan_internal_old_ip = "" # The IP hard coded into the ckan nginx and apache configs
-}
-
 resource "aws_instance" "ckan_internal" {
   instance_type          = "${var.ckan_internal_instance_type}"
   ami                    = "${var.ckan_internal_backup_ami}"
@@ -9,6 +5,7 @@ resource "aws_instance" "ckan_internal" {
   ebs_optimized          = "${var.ckan_internal_instance_ebs_optimized}"
   iam_instance_profile   = "${var.ckan_internal_instance_profile}"
   subnet_id              = "${data.aws_subnet.subnet.1.id}"
+  key_name               = "${var.ckan_keypair_name}"
 
   tags {
     Name    = "CKAN Internal"

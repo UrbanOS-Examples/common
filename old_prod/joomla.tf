@@ -15,8 +15,8 @@ data "template_file" "joomla_unite_config" {
 }
 
 locals {
-  bastion_host  = "35.170.88.146"
-  joomla_old_ip = "172.16.5.114"                                    # The IP hard coded into the joomla nginx and apache configs
+  bastion_host  = "${var.bastion_host_ip}"
+  joomla_old_ip = "${var.joomla_old_ip}"                            # The IP hard coded into the joomla nginx and apache configs
   joomla_path   = "/home/admin/web/smartcolumbusos.com/public_html"
 }
 
@@ -27,6 +27,7 @@ resource "aws_instance" "joomla" {
   ebs_optimized          = "${var.joomla_instance_ebs_optimized}"
   iam_instance_profile   = "${var.joomla_instance_profile}"
   subnet_id              = "${data.aws_subnet.subnet.1.id}"
+  key_name               = "${var.joomla_keypair_name}"
 
   tags {
     Name    = "Joomla"
@@ -136,6 +137,10 @@ variable "joomla_backup_ami" {
   description = "AMI to restore Joomla from"
 }
 
+variable "joomla_keypair_name" {
+  description = "The name of the keypair for ssh authentication"
+}
+
 variable "s3_readonly_access_key" {
   description = "Access Key for S3 read only user"
 }
@@ -155,4 +160,8 @@ variable "joomla_db_password" {
 variable "joomla_db_identifier" {
   description = "AWS RDS identifier for joomla db instance"
   default     = "joomlaprod"
+}
+
+variable "joomla_old_ip" {
+  description = "The ip of the old joomla instance in production"
 }
