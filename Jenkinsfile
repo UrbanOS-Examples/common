@@ -21,19 +21,21 @@ node('terraform') {
                 checkout scm
             }
 
-            stage('Deply to Dev') {
+            stage('Plan Dev') {
                 def cluster = 'dev'
                 plan(cluster)
 
                 archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
-
-                execute()
-                stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
-                createTillerUser()
             }
 
-            stage('Deploy to staging') {
-                if (env.BRANCH_NAME == 'master') {
+            if (env.BRANCH_NAME == 'master') {
+                stage('Deploy to Dev') {
+                    execute()
+                    stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
+                    createTillerUser()
+                }
+
+                stage('Deploy to staging') {
                     def cluster = 'staging'
                     plan(cluster)
                     execute()
@@ -48,11 +50,11 @@ node('terraform') {
 // TODO - delete this stage once we move to EKS as we no longer need this config
 node('master') {
     ansiColor('xterm') {
-        stage('Copy Legacy Kubernetes Config to Master') {
-            def cluster = 'dev'
-            unstashLegacyKubeConfig(cluster, buildStashName(kubeConfigStashName, cluster))
+        if (env.BRANCH_NAME == 'master') {
+            stage('Copy Legacy Kubernetes Config to Master') {
+                def cluster = 'dev'
+                unstashLegacyKubeConfig(cluster, buildStashName(kubeConfigStashName, cluster))
 
-            if (env.BRANCH_NAME == 'master') {
                 cluster = 'staging'
                 unstashLegacyKubeConfig(cluster, buildStashName(kubeConfigStashName, cluster))
             }
