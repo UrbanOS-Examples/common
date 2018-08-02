@@ -14,14 +14,13 @@ resource "aws_instance" "ckan_external" {
 }
 
 resource "aws_alb_target_group_attachment" "ckan_internal" {
-  target_group_arn = "${module.load_balancer.target_group_arns["${var.target_group_prefix}-Internal-CKAN"]}"
+  target_group_arn = "${module.load_balancer_private.target_group_arns["${var.target_group_prefix}-Internal-CKAN"]}"
   target_id        = "${aws_instance.ckan_external.id}"
   port             = 80
 }
 
 resource "aws_alb_target_group_attachment" "ckan_external" {
-  count            = "${var.alb_external}"
-  target_group_arn = "${module.load_balancer_external.target_group_arns["${var.target_group_prefix}-CKAN"]}"
+  target_group_arn = "${module.load_balancer_public.target_group_arns["${var.target_group_prefix}-CKAN"]}"
   target_id        = "${aws_instance.ckan_external.id}"
   port             = 80
 }
@@ -53,14 +52,31 @@ resource "aws_route53_record" "ckan_redis_private_dns" {
   records = ["${aws_instance.ckan_external.private_ip}"]
 }
 
-module "ckan_dns_records" {
-  source                = "../modules/dns_records"
-  name                  = "ckan"
-  dns_name              = "${module.load_balancer.dns_name[0]}"
-  lb_zone_id            = "${module.load_balancer.zone_id[0]}"
-  public_zone_id        = "${local.external_zone_id}"
-  compatability_zone_id = "${var.public_dns_zone_id}"
-  alm_zone_id           = "${local.alm_private_zone_id}"
+resource "aws_route53_record" "ckan_external_public_dns" {
+  zone_id = "${local.public_zone_id}"
+  name    = "ckan"
+  type    = "A"
+  count   = 1
+
+  alias {
+    name                   = "${module.load_balancer_public.dns_name}"
+    zone_id                = "${module.load_balancer_public.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "ckan_external_alm_dns" {
+  provider = "aws.alm"
+  zone_id  = "${local.alm_private_zone_id}"
+  name     = "ckan.${terraform.workspace}"
+  type     = "A"
+  count    = 1
+
+  alias {
+    name                   = "${module.load_balancer_private.dns_name}"
+    zone_id                = "${module.load_balancer_private.zone_id}"
+    evaluate_target_health = false
+  }
 }
 
 variable "ckan_external_ami" {
@@ -79,9 +95,10 @@ variable "ckan_external_instance_profile" {
 
 variable "ckan_external_instance_type" {
   description = "Instance type for ckan_external server"
-  default     = "m4.2xlarge"
+  default     = "m4.xlarge"
 }
 
 variable "ckan_keypair_name" {
   description = "The name of the keypair for ssh authentication"
+  default     = "Production_CKAN_Key_Pair"
 }

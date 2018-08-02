@@ -30,13 +30,14 @@ resource "aws_db_instance" "ckan_internal" {
   final_snapshot_identifier = "ckan-${sha1(timestamp())}"
   multi_az                  = "${var.rds_multi_az}"
   storage_encrypted         = "${var.ckan_db_storage_encrypted}"
+  monitoring_interval       = 60
 
   lifecycle {
     ignore_changes = ["snapshot_identifier"]
   }
 
   tags {
-    workload-type = "other"
+    workload-type = "production"
   }
 }
 
@@ -62,6 +63,7 @@ resource "aws_route53_record" "ckan_internal_db_record" {
 
 variable "ckan_rds_snapshot_id" {
   description = "The id of the ckan RDS snapshot to restore"
+  default     = ""
 }
 
 variable "ckan_internal_instance_ebs_optimized" {
@@ -71,18 +73,22 @@ variable "ckan_internal_instance_ebs_optimized" {
 
 variable "ckan_db_instance_class" {
   description = "The type of the instance for the ckan database"
+  default     = "db.m4.large"
 }
 
 variable "ckan_db_allocated_storage" {
   description = "The size of the ckan database in GB"
+  default     = 1000
 }
 
 variable "ckan_db_parameter_group_name" {
   description = "The identifier for the db parameter group for a version of postgres"
+  default     = "default.postgres9.6"
 }
 
 variable "ckan_db_engine_version" {
   description = "The version of postgresql used for ckan"
+  default     = "9.6.6"
 }
 
 variable "ckan_internal_instance_profile" {
@@ -105,8 +111,10 @@ variable "ckan_db_password" {
 
 variable "ckan_db_identifier" {
   description = "AWS RDS identifier for ckan_internal db instance"
+  default     = "production-ckan"
 }
 
 variable "ckan_db_storage_encrypted" {
   description = "Is ckan db encrypted"
+  default     = true
 }

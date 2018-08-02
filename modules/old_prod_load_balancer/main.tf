@@ -28,7 +28,7 @@ locals {
 }
 
 resource "aws_alb_target_group" "all_target_groups" {
-  count    = "${var.is_enabled ? length(local.lb_rules) : 0}"
+  count    = "${length(local.lb_rules)}"
   name     = "${var.target_group_prefix}-${lookup(local.lb_rules[count.index], "name")}"
   vpc_id   = "${var.vpc_id}"
   port     = 80
@@ -36,16 +36,14 @@ resource "aws_alb_target_group" "all_target_groups" {
 }
 
 resource "aws_alb" "alb" {
-  count              = "${var.is_enabled}"
   name               = "${var.is_external ? "${terraform.workspace}-scos-external-elb" : "${terraform.workspace}-scos-elb"}"
   internal           = "${!var.is_external}"
   load_balancer_type = "application"
-  security_groups    = ["${var.security_group_id}"]
+  security_groups    = ["${var.security_group_ids}"]
   subnets            = ["${var.subnet_ids}"]
 }
 
 resource "aws_alb_listener" "https" {
-  count             = "${var.is_enabled}"
   load_balancer_arn = "${aws_alb.alb.arn}"
   certificate_arn   = "${var.certificate_arn}"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -59,7 +57,6 @@ resource "aws_alb_listener" "https" {
 }
 
 resource "aws_alb_listener" "http" {
-  count             = "${var.is_enabled}"
   load_balancer_arn = "${aws_alb.alb.arn}"
   port              = 80
   protocol          = "HTTP"
@@ -71,7 +68,7 @@ resource "aws_alb_listener" "http" {
 }
 
 resource "aws_alb_listener_rule" "http" {
-  count        = "${var.is_enabled ? length(local.lb_rules) : 0}"
+  count        = "${length(local.lb_rules)}"
   listener_arn = "${aws_alb_listener.http.arn}"
 
   action {
@@ -87,7 +84,7 @@ resource "aws_alb_listener_rule" "http" {
 }
 
 resource "aws_alb_listener_rule" "https" {
-  count        = "${var.is_enabled ? length(local.lb_rules) : 0}"
+  count        = "${length(local.lb_rules)}"
   listener_arn = "${aws_alb_listener.https.arn}"
 
   action {
@@ -105,10 +102,6 @@ variable "is_external" {
   description = "should the load balancer be external"
 }
 
-variable "is_enabled" {
-  description = "If true, the resources defined in this module are created."
-}
-
 variable "target_group_prefix" {
   default     = "PROD"
   description = "A prefix added to the name of the load balancers"
@@ -122,8 +115,9 @@ variable "certificate_arn" {
   description = "ARN of the https certificate"
 }
 
-variable "security_group_id" {
-  description = "id of the sercurity group"
+variable "security_group_ids" {
+  type        = "list"
+  description = "list of the sercurity group IDs"
 }
 
 variable "subnet_ids" {
@@ -136,9 +130,9 @@ output "target_group_arns" {
 }
 
 output "dns_name" {
-  value = "${aws_alb.alb.*.dns_name}"
+  value = "${aws_alb.alb.dns_name}"
 }
 
 output "zone_id" {
-  value = "${aws_alb.alb.*.zone_id}"
+  value = "${aws_alb.alb.zone_id}"
 }

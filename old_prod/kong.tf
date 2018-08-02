@@ -4,7 +4,6 @@ resource "aws_instance" "kong" {
   vpc_security_group_ids = ["${data.aws_security_group.scos_servers.id}"]
   ebs_optimized          = "${var.kong_instance_ebs_optimized}"
   iam_instance_profile   = "${var.kong_instance_profile}"
-  subnet_id              = "${data.aws_subnet.subnet.1.id}"
   key_name               = "${var.kong_keypair_name}"
 
   tags {
@@ -28,20 +27,19 @@ resource "aws_instance" "kong" {
   }
 }
 
-resource "aws_alb_target_group_attachment" "kong_internal" {
-  target_group_arn = "${module.load_balancer.target_group_arns["${var.target_group_prefix}-Internal-Kong"]}"
+resource "aws_alb_target_group_attachment" "kong_private" {
+  target_group_arn = "${module.load_balancer_private.target_group_arns["${var.target_group_prefix}-Internal-Kong"]}"
   target_id        = "${aws_instance.kong.id}"
   port             = 80
 }
 
-resource "aws_alb_target_group_attachment" "kong_external" {
-  count            = "${var.alb_external}"
-  target_group_arn = "${module.load_balancer_external.target_group_arns["${var.target_group_prefix}-Kong"]}"
+resource "aws_alb_target_group_attachment" "kong_public" {
+  target_group_arn = "${module.load_balancer_public.target_group_arns["${var.target_group_prefix}-Kong"]}"
   target_id        = "${aws_instance.kong.id}"
   port             = 80
 }
 
-resource "aws_route53_record" "kong_internal_dns" {
+resource "aws_route53_record" "kong_private_dns" {
   zone_id = "${aws_route53_zone.private_hosted_zone.zone_id}"
   name    = "kong"
   type    = "A"
@@ -50,14 +48,31 @@ resource "aws_route53_record" "kong_internal_dns" {
   records = ["${aws_instance.kong.private_ip}"]
 }
 
-module "kong_dns_records" {
-  source                = "../modules/dns_records"
-  name                  = "api"
-  dns_name              = "${module.load_balancer.dns_name[0]}"
-  lb_zone_id            = "${module.load_balancer.zone_id[0]}"
-  public_zone_id        = "${local.external_zone_id}"
-  compatability_zone_id = "${var.public_dns_zone_id}"
-  alm_zone_id           = "${local.alm_private_zone_id}"
+resource "aws_route53_record" "kong_public_dns" {
+  zone_id = "${local.public_zone_id}"
+  name    = "api"
+  type    = "A"
+  count   = 1
+
+  alias {
+    name                   = "${module.load_balancer_public.dns_name}"
+    zone_id                = "${module.load_balancer_public.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "kong_alm_dns" {
+  provider = "aws.alm"
+  zone_id  = "${local.alm_private_zone_id}"
+  name     = "api.${terraform.workspace}"
+  type     = "A"
+  count    = 1
+
+  alias {
+    name                   = "${module.load_balancer_private.dns_name}"
+    zone_id                = "${module.load_balancer_private.zone_id}"
+    evaluate_target_health = false
+  }
 }
 
 resource "aws_db_instance" "kong" {
@@ -67,18 +82,19 @@ resource "aws_db_instance" "kong" {
   db_subnet_group_name   = "${aws_db_subnet_group.default.name}"
   skip_final_snapshot    = true
   engine                 = "postgres"
-  engine_version         = "${var.kong_engine_version}"
+  engine_version         = "9.6.6"
   parameter_group_name   = "${var.kong_db_parameter_group_name}"
   allocated_storage      = "${var.kong_allocated_storage}"
-  storage_type           = "gp2"
-  username               = "Sysadmin"
+  storage_type           = "io1"
+  username               = "sysadmin"
   password               = "${var.kong_db_password}"
   snapshot_identifier    = "${var.kong_rds_snapshot_id}"
   multi_az               = "${var.rds_multi_az}"
-  storage_encrypted      = true
+  storage_encrypted      = false
+  iops                   = 1000
 
   tags {
-    workload-type = "other"
+    workload-type = "production"
   }
 
   lifecycle {
@@ -92,22 +108,22 @@ variable "kong_ami" {
 
 variable "kong_rds_snapshot_id" {
   description = "The snapshot to restore for the kong db"
+  default     = ""
 }
 
 variable "rds_multi_az" {
   description = "Are RDS instances hosted accross multiple AZs (boolean)"
-}
-
-variable "kong_engine_version" {
-  description = "Engine version of kong"
+  default     = true
 }
 
 variable "kong_db_parameter_group_name" {
   description = "The aws parameter group for the kong db"
+  default     = "default.postgres9.6"
 }
 
 variable "kong_allocated_storage" {
   description = "How much storage is allocated for the kong db"
+  default     = 100
 }
 
 variable "kong_db_password" {
@@ -121,10 +137,12 @@ variable "kong_instance_ebs_optimized" {
 
 variable "kong_db_identifier" {
   description = "AWS RDS identifier for kong db instance"
+  default     = "prod-kong-0-13-1"
 }
 
 variable "kong_db_instance_class" {
   description = "The size of the instance for the kong database"
+  default     = "db.m4.large"
 }
 
 variable "kong_instance_profile" {
@@ -134,6 +152,7 @@ variable "kong_instance_profile" {
 
 variable "kong_keypair_name" {
   description = "The name of the keypair for ssh authentication"
+  default     = "Prod_Kong_Key_Pair"
 }
 
 variable "kong_instance_type" {
