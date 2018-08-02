@@ -6,6 +6,7 @@ resource "aws_instance" "ckan_external" {
   iam_instance_profile   = "${var.ckan_external_instance_profile}"
   subnet_id              = "${data.aws_subnet.subnet.1.id}"
   key_name               = "${var.ckan_keypair_name}"
+
   tags {
     Name    = "CKAN external"
     BaseAMI = "${var.ckan_external_ami}"
@@ -70,6 +71,7 @@ variable "ckan_external_instance_type" {
   description = "Instance type for ckan_external server"
   default     = "m4.2xlarge"
 }
+
 variable "ckan_keypair_name" {
   description = "The name of the keypair for ssh authentication"
 }

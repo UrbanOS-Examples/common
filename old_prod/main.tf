@@ -1,6 +1,7 @@
 provider "aws" {
-  region = "${var.aws_region}"
+  region  = "${var.aws_region}"
   version = "1.28.0"
+
   assume_role {
     role_arn = "${var.aws_role_arn}"
   }
@@ -26,5 +27,3 @@ variable "aws_role_arn" {
 variable "bastion_host_ip" {
   description = "The IP address of a SSH jump host"
 }
-
-
