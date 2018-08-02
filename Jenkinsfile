@@ -71,7 +71,7 @@ def plan(environment) {
             echo "\${public_key}" > ~/.ssh/id_rsa.pub
 
             terraform init \
-                --backend-config=backends/alm.conf
+                --backend-config=../backends/alm.conf
             terraform workspace new ${environment} || true
             terraform workspace select ${environment}
 
