@@ -21,8 +21,8 @@ node('terraform') {
                 checkout scm
             }
 
+            def cluster = 'dev'
             stage('Plan Dev') {
-                def cluster = 'dev'
                 plan(cluster)
 
                 archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
@@ -36,7 +36,7 @@ node('terraform') {
                 }
 
                 stage('Deploy to staging') {
-                    def cluster = 'staging'
+                    cluster = 'staging'
                     plan(cluster)
                     execute()
                     stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
