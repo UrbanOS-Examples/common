@@ -172,14 +172,6 @@ def createTillerUser() {
 }
 
 def unstashLegacyKubeConfig(environment, stashName) {
-    if (environment == 'dev') {
-        dir('/var/jenkins_home/.kube') {
-            unstash(stashName)
-        }
-        dir('/root/.kube') {
-            unstash(stashName)
-        }
-    }
     dir("/var/jenkins_home/.kube/${environment}") {
         unstash(stashName)
     }
