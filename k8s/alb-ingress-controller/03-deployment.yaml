@@ -51,7 +51,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
-        image: quay.io/coreos/alb-ingress-controller:latest
+        image: quay.io/coreos/alb-ingress-controller:1.0-beta.5
         imagePullPolicy: Always
         name: server
         resources: {}
