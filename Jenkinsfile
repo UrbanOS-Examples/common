@@ -35,7 +35,7 @@ node('terraform') {
                     stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
                     createTillerUser()
                     getEksKubeConfig(eks_config)
-                    withEnv(['KUBECONFIG=./$eks_config']) {
+                    withEnv(["KUBECONFIG=./$eks_config"]) {
                         // Create tiller user for EKS cluster
                         createTillerUser()
                     }
@@ -49,7 +49,7 @@ node('terraform') {
                     stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
                     createTillerUser()
                     getEksKubeConfig(eks_config)
-                    withEnv(['KUBECONFIG=./$eks_config']) {
+                    withEnv(["KUBECONFIG=./$eks_config"]) {
                         createTillerUser()
                     }
                 }
