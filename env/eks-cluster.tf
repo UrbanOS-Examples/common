@@ -37,7 +37,9 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "tag:GetResources",
                 "ec2:*",
                 "elasticloadbalancing:*",
-                "waf-regional:*"
+                "waf-regional:*",
+                "acm:ListCertificates",
+                "iam:ListServerCertificates"
             ],
             "Resource": "*"
         }
