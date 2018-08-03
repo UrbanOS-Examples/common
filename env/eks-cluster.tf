@@ -35,7 +35,6 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
             "Effect": "Allow",
             "Action": [
                 "tag:GetResources",
-                "elasticloadbalancing:DescribeLoadBalancers",
                 "ec2:*",
                 "elasticloadbalancing:*",
                 "waf-regional:*"
