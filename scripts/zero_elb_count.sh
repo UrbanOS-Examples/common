@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-./setup_aws_creds.sh $1 $2
+environment=$1
+vpc_id=$2
+./setup_aws_creds.sh $environment $vpc_id
 
 function get_elb_number {
     echo $(aws elb describe-load-balancers | jq '[.LoadBalancerDescriptions[] | select(.VPCId == "'"${vpc_id}"'")] | length')
