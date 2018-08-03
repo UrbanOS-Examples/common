@@ -22,10 +22,10 @@ node('terraform') {
             }
 
             def cluster = 'dev'
-            def eks_config = "${cluster}_kubeconfig"
+            def eks_config = "/var/jenkins_home/.kube/${cluster}_config"
+
             stage('Plan Dev') {
                 plan(cluster)
-
                 archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
             }
 
@@ -35,7 +35,7 @@ node('terraform') {
                     stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
                     createTillerUser()
                     getEksKubeConfig(eks_config)
-                    withEnv(["KUBECONFIG=./$eks_config"]) {
+                    withEnv(["KUBECONFIG=${eks_config}"]) {
                         // Create tiller user for EKS cluster
                         createTillerUser()
                     }
@@ -43,13 +43,13 @@ node('terraform') {
 
                 stage('Deploy to staging') {
                     cluster = 'staging'
-                    eks_config = "${cluster}_kubeconfig"
+                    eks_config = "/var/jenkins_home/.kube/${cluster}_config"
                     plan(cluster)
                     execute()
                     stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
                     createTillerUser()
                     getEksKubeConfig(eks_config)
-                    withEnv(["KUBECONFIG=./$eks_config"]) {
+                    withEnv(["KUBECONFIG=${eks_config}"]) {
                         createTillerUser()
                     }
                 }
