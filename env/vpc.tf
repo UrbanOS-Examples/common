@@ -17,6 +17,11 @@ module "vpc" {
   enable_dynamodb_endpoint = "${var.vpc_enable_dynamodb_endpoint}"
   enable_dns_hostnames     = "${var.vpc_enable_dns_hostnames}"
 
+  private_subnet_tags = {
+    "kubernetes.io/role/internal-elb" = ""
+    "kubernetes.io/role/alb-ingress"  = ""
+  }
+
   tags = {
     Owner                                                  = "${var.owner}"
     Environment                                            = "${terraform.workspace}"

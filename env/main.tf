@@ -44,3 +44,8 @@ output "key_pair_name" {
   description = "Name of the keypair to use for env deployments"
   value       = "${aws_key_pair.cloud_key.key_name}"
 }
+
+output "aws_region" {
+  description = "Name of aws region"
+  value       = "${var.region}"
+}
