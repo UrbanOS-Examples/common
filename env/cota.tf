@@ -92,10 +92,11 @@ resource "aws_route53_record" "cota_external_dns" {
 }
 
 resource "aws_route53_record" "cota_alm_dns" {
-  zone_id = "${data.terraform_remote_state.alm_remote_state.private_zone_id}"
-  name    = "cota.${terraform.workspace}"
-  type    = "A"
-  count   = 1
+  provider = "aws.alm"
+  zone_id  = "${data.terraform_remote_state.alm_remote_state.private_zone_id}"
+  name     = "cota.${terraform.workspace}"
+  type     = "A"
+  count    = 1
 
   alias {
     name                   = "${aws_lb.cota.dns_name}"
