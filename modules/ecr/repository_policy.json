@@ -2,6 +2,21 @@
     "Version": "2008-10-17",
     "Statement": [
         {
+            "Sid": "EksAllowPullFromRegistry",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::073132350570:root",
+                    "arn:aws:iam::647770347641:root"
+                ]
+            },
+            "Action": [
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "ecr:BatchCheckLayerAvailability"
+            ]
+        },
+        {
             "Sid": "JenkinsUserRegistryAccess",
             "Effect": "Allow",
             "Principal": {
