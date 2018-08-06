@@ -46,10 +46,11 @@ resource "aws_route53_record" "jupyter_external_dns" {
 }
 
 resource "aws_route53_record" "jupyter_alm_dns" {
-  zone_id = "${data.terraform_remote_state.alm_remote_state.private_zone_id}"
-  name    = "jupyter.${terraform.workspace}"
-  type    = "A"
-  count   = 1
+  provider = "aws.alm"
+  zone_id  = "${data.terraform_remote_state.alm_remote_state.private_zone_id}"
+  name     = "jupyter.${terraform.workspace}"
+  type     = "A"
+  count    = 1
 
   alias {
     name                   = "${aws_elb.jupyter_elb.dns_name}"
