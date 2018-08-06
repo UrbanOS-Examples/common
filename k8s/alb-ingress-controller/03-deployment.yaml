@@ -1,0 +1,64 @@
+# Application Load Balancer (ALB) Ingress Controller Deployment Manifest.
+# This file was largely copied from the following github repo:
+# https://github.com/kubernetes-sigs/aws-alb-ingress-controller/tree/1.0-beta.4
+# Following the walkthrough outlined here:
+# https://github.com/kubernetes-sigs/aws-alb-ingress-controller/blob/1.0-beta.4/docs/walkthrough.md
+# And was a copy of this file:
+# https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/1.0-beta.4/examples/alb-ingress-controller.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: alb-ingress-controller
+  name: alb-ingress-controller
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alb-ingress-controller
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: alb-ingress-controller
+    spec:
+      containers:
+      - args:
+        - /server
+        - --ingress-class=alb
+        env:
+        - name: AWS_REGION
+          value: %AWS_REGION% 
+        - name: CLUSTER_NAME
+          value: %CLUSTER_NAME% 
+        - name: AWS_DEBUG
+          value: "false"
+        - name: AWS_MAX_RETRIES
+          value: "20"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        image: quay.io/coreos/alb-ingress-controller:1.0-beta.5
+        imagePullPolicy: Always
+        name: server
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      serviceAccountName: eks-admin
+      serviceAccount: eks-admin

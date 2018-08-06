@@ -26,4 +26,5 @@ variable "aws_role_arn" {
 
 variable "bastion_host_ip" {
   description = "The IP address of a SSH jump host"
+  default     = "35.170.88.146"
 }

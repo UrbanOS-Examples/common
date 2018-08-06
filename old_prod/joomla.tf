@@ -86,15 +86,14 @@ resource "aws_instance" "joomla" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "joomla_internal" {
-  target_group_arn = "${module.load_balancer.target_group_arns["${var.target_group_prefix}-Internal-Joomla"]}"
+resource "aws_lb_target_group_attachment" "joomla_private" {
+  target_group_arn = "${module.load_balancer_private.target_group_arns["${var.target_group_prefix}-Internal-Joomla"]}"
   target_id        = "${aws_instance.joomla.id}"
   port             = 80
 }
 
-resource "aws_lb_target_group_attachment" "joomla_external" {
-  count            = "${var.alb_external}"
-  target_group_arn = "${module.load_balancer_external.target_group_arns["${var.target_group_prefix}-Joomla"]}"
+resource "aws_lb_target_group_attachment" "joomla_public" {
+  target_group_arn = "${module.load_balancer_public.target_group_arns["${var.target_group_prefix}-Joomla"]}"
   target_id        = "${aws_instance.joomla.id}"
   port             = 80
 }
@@ -115,6 +114,60 @@ resource "aws_db_instance" "joomla_db" {
 
   tags {
     workload-type = "other"
+  }
+}
+
+resource "aws_route53_record" "joomla_public_dns" {
+  zone_id = "${local.public_zone_id}"
+  name    = ""
+  type    = "A"
+  count   = 1
+
+  alias {
+    name                   = "${module.load_balancer_public.dns_name}"
+    zone_id                = "${module.load_balancer_public.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "joomla_alm_dns" {
+  provider = "aws.alm"
+  zone_id  = "${local.alm_private_zone_id}"
+  name     = "${terraform.workspace}"
+  type     = "A"
+  count    = 1
+
+  alias {
+    name                   = "${module.load_balancer_private.dns_name}"
+    zone_id                = "${module.load_balancer_private.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "joomla_www_public_dns" {
+  zone_id = "${local.public_zone_id}"
+  name    = "www"
+  type    = "A"
+  count   = 1
+
+  alias {
+    name                   = "${module.load_balancer_public.dns_name}"
+    zone_id                = "${module.load_balancer_public.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "joomla_www_alm_dns" {
+  provider = "aws.alm"
+  zone_id  = "${local.alm_private_zone_id}"
+  name     = "www.${terraform.workspace}"
+  type     = "A"
+  count    = 1
+
+  alias {
+    name                   = "${module.load_balancer_private.dns_name}"
+    zone_id                = "${module.load_balancer_private.zone_id}"
+    evaluate_target_health = false
   }
 }
 
@@ -139,6 +192,7 @@ variable "joomla_backup_ami" {
 
 variable "joomla_keypair_name" {
   description = "The name of the keypair for ssh authentication"
+  default     = "Production_Joomla_Key_Pair"
 }
 
 variable "s3_readonly_access_key" {
@@ -164,4 +218,5 @@ variable "joomla_db_identifier" {
 
 variable "joomla_old_ip" {
   description = "The ip of the old joomla instance in production"
+  default     = "172.16.5.114"
 }

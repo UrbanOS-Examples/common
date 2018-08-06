@@ -16,6 +16,11 @@ data "aws_security_group" "scos_servers" {
   vpc_id = "${data.aws_vpc.default.id}"
 }
 
+data "aws_security_group" "scos_external_access" {
+  name   = "SCOS External Access"
+  vpc_id = "${data.aws_vpc.default.id}"
+}
+
 resource "aws_db_subnet_group" "default" {
   name        = "prodvpc-db subnet group"
   description = "ProdVPC-DB Subnet Group"
