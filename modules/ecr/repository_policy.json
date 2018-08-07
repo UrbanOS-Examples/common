@@ -2,6 +2,18 @@
     "Version": "2008-10-17",
     "Statement": [
         {
+            "Sid": "SandboxAllowPullFromRegistry",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::068920858268:root"
+            },
+            "Action": [
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "ecr:BatchCheckLayerAvailability"
+            ]
+        },
+        {
             "Sid": "EksAllowPullFromRegistry",
             "Effect": "Allow",
             "Principal": {
