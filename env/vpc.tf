@@ -1,13 +1,54 @@
+data "external" "first_available_cidr_block_for_peering" {
+  program = ["python", "${path.module}/first_available_cidr_block.py"]
+
+  query = {
+    alm_vpc_id        = "${data.terraform_remote_state.alm_remote_state.vpc_id}"
+    alm_region        = "us-east-2"
+    alm_role_arn      = "${var.alm_role_arn}"
+    parent_network    = "10.0.0.0/8"
+    minimum_host_bits = "16"
+  }
+}
+
+data "terraform_remote_state" "env_remote_state" {
+  backend   = "s3"
+  workspace = "${terraform.workspace}"
+
+  config {
+    bucket   = "${var.alm_state_bucket_name}"
+    key      = "operating-system"
+    region   = "us-east-2"
+    role_arn = "${var.role_arn}"
+  }
+
+  defaults {
+    vpc_cidr = "${data.external.first_available_cidr_block_for_peering.result.cidr_block}"
+  }
+}
+
+locals {
+  vpc_cidr = "${length(var.vpc_cidr) > 0 ? var.vpc_cidr : data.terraform_remote_state.env_remote_state.vpc_cidr}"
+  vpc_name = "${terraform.workspace}"
+}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "1.32.0"
 
-  name = "${var.vpc_name}"
-  cidr = "${var.vpc_cidr}"
+  name = "${local.vpc_name}"
+  cidr = "${local.vpc_cidr}"
   azs  = "${var.vpc_azs}"
 
-  private_subnets = "${var.vpc_private_subnets}"
-  public_subnets  = "${var.vpc_public_subnets}"
+  private_subnets = [
+    "${cidrsubnet(local.vpc_cidr, 3, 0)}",
+    "${cidrsubnet(local.vpc_cidr, 3, 2)}",
+    "${cidrsubnet(local.vpc_cidr, 3, 4)}",
+  ]
+  public_subnets  = [
+    "${cidrsubnet(local.vpc_cidr, 4, 2)}",
+    "${cidrsubnet(local.vpc_cidr, 4, 6)}",
+    "${cidrsubnet(local.vpc_cidr, 4, 10)}",
+  ]
 
   enable_nat_gateway = "${var.vpc_enable_nat_gateway}"
   single_nat_gateway = "${var.vpc_single_nat_gateway}"
@@ -23,15 +64,11 @@ module "vpc" {
   }
 
   tags = {
-    Owner                                                  = "${var.owner}"
-    Environment                                            = "${terraform.workspace}"
-    Name                                                   = "${var.vpc_name}"
-    "kubernetes.io/cluster/${var.kubernetes_cluster_name}" = "shared"
+    Owner                                               = "${var.owner}"
+    Environment                                         = "${terraform.workspace}"
+    Name                                                = "${local.vpc_name}"
+    "kubernetes.io/cluster/${terraform.workspace}-kube" = "shared"
   }
-}
-
-variable "vpc_name" {
-  description = "The name of the VPC"
 }
 
 variable "vpc_cidr" {
@@ -42,16 +79,6 @@ variable "vpc_cidr" {
 variable "vpc_azs" {
   description = "A list of availability zones in the region"
   default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
-}
-
-variable "vpc_private_subnets" {
-  description = "CIDR blocks for Private Subnets"
-  default     = ["10.0.0.0/19"]
-}
-
-variable "vpc_public_subnets" {
-  description = "CIDR blocks for Public Subnets"
-  default     = ["10.0.32.0/20"]
 }
 
 variable "vpc_single_nat_gateway" {
@@ -92,6 +119,11 @@ variable "owner" {
 output "vpc_id" {
   description = "The ID of the VPC"
   value       = "${module.vpc.vpc_id}"
+}
+
+output "vpc_cidr" {
+  description = "The CIDR block of the VPC"
+  value       = "${module.vpc.vpc_cidr_block}"
 }
 
 output "private_subnets" {
