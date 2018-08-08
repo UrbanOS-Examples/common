@@ -35,7 +35,7 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
             "Effect": "Allow",
             "Action": [
                 "tag:GetResources",
-                
+
                 "ec2:Describe*",
                 "ec2:GetLaunchTemplateData",
                 "ec2:GetConsoleOutput",
@@ -50,7 +50,10 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "acm:ListCertificates",
                 "iam:ListServerCertificates",
 
-                "elasticloadbalancing:*"
+                "elasticloadbalancing:*",
+
+                "route53:ListHostedZones",
+                "route53:ListResourceRecordSets"                
             ],
             "Resource": "*"
         },
@@ -62,17 +65,7 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
             "Resource": [
               "arn:aws:route53:::hostedzone/*"
             ]
-          },
-          {
-            "Effect": "Allow",
-            "Action": [
-              "route53:ListHostedZones",
-              "route53:ListResourceRecordSets"
-            ],
-            "Resource": [
-              "*"
-            ]
-          }
+        }
     ]
 }
 EOF
