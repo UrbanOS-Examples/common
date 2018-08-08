@@ -54,9 +54,21 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "acm:ListCertificates",
                 "iam:ListServerCertificates",
 
-                "elasticloadbalancing:*"
+                "elasticloadbalancing:*",
+
+                "route53:ListHostedZones",
+                "route53:ListResourceRecordSets"                
             ],
             "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+              "route53:ChangeResourceRecordSets"
+            ],
+            "Resource": [
+              "arn:aws:route53:::hostedzone/*"
+            ]
         }
     ]
 }
