@@ -110,10 +110,6 @@ def plan(environment, alm) {
             variable_file="variables/${environment}.tfvars"
             if [[ ! -f \${variable_file} ]]; then
                 variable_file="variables/sandbox.tfvars"
-                extra_variables="
-                \${extra_variables} \
-                --var="vpc_cidr="
-                "
             fi
 
             terraform plan \
