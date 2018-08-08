@@ -1,13 +1,33 @@
+data "external" "seeded_random" {
+  program = [
+    "python2",
+    "-c",
+    "import random; import json; random.seed('${terraform.workspace}'); print(json.dumps({'cidr_block': '10.{}.0.0/16'.format(random.randint(0, 255))}))"
+  ]
+}
+
+locals {
+  vpc_cidr = "${length(var.vpc_cidr) > 0 ? var.vpc_cidr : data.external.seeded_random.result.cidr_block}"
+}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "1.32.0"
 
-  name = "${var.vpc_name}"
-  cidr = "${var.vpc_cidr}"
+  name = "${local.vpc_name}"
+  cidr = "${local.vpc_cidr}"
   azs  = "${var.vpc_azs}"
 
-  private_subnets = "${var.vpc_private_subnets}"
-  public_subnets  = "${var.vpc_public_subnets}"
+  private_subnets = [
+    "${cidrsubnet(local.vpc_cidr, 3, 0)}",
+    "${cidrsubnet(local.vpc_cidr, 3, 2)}",
+    "${cidrsubnet(local.vpc_cidr, 3, 4)}",
+  ]
+  public_subnets  = [
+    "${cidrsubnet(local.vpc_cidr, 4, 2)}",
+    "${cidrsubnet(local.vpc_cidr, 4, 6)}",
+    "${cidrsubnet(local.vpc_cidr, 4, 10)}",
+  ]
 
   enable_nat_gateway = "${var.vpc_enable_nat_gateway}"
   single_nat_gateway = "${var.vpc_single_nat_gateway}"
@@ -23,15 +43,11 @@ module "vpc" {
   }
 
   tags = {
-    Owner                                                  = "${var.owner}"
-    Environment                                            = "${terraform.workspace}"
-    Name                                                   = "${var.vpc_name}"
-    "kubernetes.io/cluster/${var.kubernetes_cluster_name}" = "shared"
+    Owner                                                    = "${var.owner}"
+    Environment                                              = "${terraform.workspace}"
+    Name                                                     = "${local.vpc_name}"
+    "kubernetes.io/cluster/${local.kubernetes_cluster_name}" = "shared"
   }
-}
-
-variable "vpc_name" {
-  description = "The name of the VPC"
 }
 
 variable "vpc_cidr" {
@@ -42,16 +58,6 @@ variable "vpc_cidr" {
 variable "vpc_azs" {
   description = "A list of availability zones in the region"
   default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
-}
-
-variable "vpc_private_subnets" {
-  description = "CIDR blocks for Private Subnets"
-  default     = ["10.0.0.0/19"]
-}
-
-variable "vpc_public_subnets" {
-  description = "CIDR blocks for Public Subnets"
-  default     = ["10.0.32.0/20"]
 }
 
 variable "vpc_single_nat_gateway" {

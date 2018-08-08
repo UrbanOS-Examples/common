@@ -2,7 +2,7 @@ module "eks-cluster" {
   source  = "terraform-aws-modules/eks/aws"
   version = "1.3.0"
 
-  cluster_name = "${var.kubernetes_cluster_name}"
+  cluster_name = "${local.kubernetes_cluster_name}"
   subnets      = "${module.vpc.private_subnets}"
   vpc_id       = "${module.vpc.vpc_id}"
 
@@ -23,7 +23,7 @@ module "eks-cluster" {
 }
 
 resource "aws_iam_policy" "eks_work_alb_permissions" {
-  name        = "eks_work_alb_permissions"
+  name        = "eks_work_alb_permissions-${terraform.workspace}"
   description = "This policy allows EKS Worker nodes to do everything it needs to do with an ALB"
 
   policy = <<EOF
@@ -43,7 +43,7 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "ec2:GetReservedInstancesExchangeQuote",
                 "ec2:GetConsoleScreenshot",
                 "ec2:GetHostReservationPurchasePreview",
-                
+
                 "waf-regional:Get*",
                 "waf-regional:List*",
 
@@ -83,5 +83,5 @@ output "eks-cluster-kubeconfig" {
 
 output "eks_cluster_name" {
   description = "Name of the EKS cluster"
-  value       = "${var.kubernetes_cluster_name}"
+  value       = "${local.kubernetes_cluster_name}"
 }
