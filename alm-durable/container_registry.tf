@@ -46,11 +46,11 @@ module "cota_streaming_consumer_repository" {
   repository_name = "cota-streaming-consumer"
 }
 
-module "jenkins_worker_terraform_repository" {
+module "jenkins_worker_infrastructure_repository" {
   source = "../modules/ecr"
 
   alm_account_id  = "${var.alm_account_id}"
-  repository_name = "jenkins-worker-terraform"
+  repository_name = "jenkins-worker-infrastructure"
 }
 
 module "jenkins_worker_kubernetes_repository" {
