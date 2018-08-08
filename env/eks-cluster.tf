@@ -53,7 +53,26 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "elasticloadbalancing:*"
             ],
             "Resource": "*"
-        }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+              "route53:ChangeResourceRecordSets"
+            ],
+            "Resource": [
+              "arn:aws:route53:::hostedzone/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "route53:ListHostedZones",
+              "route53:ListResourceRecordSets"
+            ],
+            "Resource": [
+              "*"
+            ]
+          }
     ]
 }
 EOF
