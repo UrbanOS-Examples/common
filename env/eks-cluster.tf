@@ -1,5 +1,5 @@
 locals {
-  kubernetes_cluster_name = "${terraform.workspace}-kube"
+  kubernetes_cluster_name = "${length(var.kubernetes_cluster_name) > 0 ? var.kubernetes_cluster_name : format("%s-kube", terraform.workspace)}"
 }
 
 module "eks-cluster" {

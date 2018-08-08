@@ -1,6 +1,6 @@
 module "kubernetes" {
   source              = "github.com/SmartColumbusOS/terraform-aws-kubernetes"
-  cluster_name        = "${terraform.workspace}-kube"
+  cluster_name        = "${local.kubernetes_cluster_name}"
   aws_region          = "${var.region}"
   hosted_zone         = "${aws_route53_zone.private.name}"
   hosted_zone_id      = "${aws_route53_zone.private.zone_id}"

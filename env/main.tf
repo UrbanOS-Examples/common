@@ -40,6 +40,11 @@ variable "role_arn" {
   description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
 }
 
+variable "kubernetes_cluster_name" {
+  description = "The cluster name for kubernetes"
+  default     = ""
+}
+
 output "key_pair_name" {
   description = "Name of the keypair to use for env deployments"
   value       = "${aws_key_pair.cloud_key.key_name}"

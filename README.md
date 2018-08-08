@@ -49,11 +49,7 @@ terraform workspace new my-own-personal-sandbox
 terraform workspace select my-own-personal-sandbox
 terraform plan \
   --var-file=variables/sandbox.tfvars \
-  --var=vpc_name=ben-test-dev \
-  --var=kubernetes_cluster_name=ben-test-kube \
-  --var=vpc_cidr=10.101.0.0/16 \
-  --var=vpc_private_subnets='["10.101.0.0/19", "10.101.64.0/19", "10.101.128.0/19"]' \
-  --var=vpc_public_subnets='["10.101.32.0/20", "10.101.96.0/20", "10.101.160.0/20"]' \
+  --var="vpc_cidr=" \
   --out=update.plan
 terraform apply update.plan
 ```

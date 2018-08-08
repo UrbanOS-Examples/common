@@ -4,6 +4,8 @@ region = "us-west-2"
 
 role_arn = "arn:aws:iam::647770347641:role/jenkins_role"
 
+kubernetes_cluster_name = "streaming-kube-staging"
+
 alm_account_id = "199837183662"
 
 alm_role_arn = "arn:aws:iam::199837183662:role/jenkins_role"
