@@ -1,5 +1,5 @@
 data "external" "first_available_cidr_block_for_peering" {
-  program = ["python3", "${path.module}/first_available_cidr_block.py"]
+  program = ["python", "${path.module}/first_available_cidr_block.py"]
 
   query = {
     alm_vpc_id        = "${data.terraform_remote_state.alm_remote_state.vpc_id}"
