@@ -1,10 +1,30 @@
-properties([disableConcurrentBuilds()])
-
+def defaultEnvironmentList = ['dev', 'staging']
 def kubeConfigStashName = "kubernetes-config"
+
+properties(
+    [
+        disableConcurrentBuilds(),
+        parameters([
+            text(
+                name: 'environmentsParameter',
+                defaultValue: defaultEnvironmentList.join("\n"),
+                description: 'Environments in which to deploy common/env'
+            ),
+            string(
+                name: 'alm',
+                defaultValue: 'alm',
+                description: 'The ALM to which the common/env should attach'
+            )
+        ])
+    ]
+)
+
+def environments = environmentsParameter.trim().split("\n").collect({ environment ->
+    environment.trim()
+})
 
 node('terraform') {
     ansiColor('xterm') {
-
         withCredentials([
             [
                 $class: 'AmazonWebServicesCredentialsBinding',
@@ -21,43 +41,28 @@ node('terraform') {
                 checkout scm
             }
 
-            def cluster = 'dev'
-            def eks_config = "${cluster}_kubeconfig"
-            stage('Plan Dev') {
-                plan(cluster)
+            environments.each({ environment ->
+                def eksConfiguration = "${environment}_kubeconfig"
 
-                archiveArtifacts artifacts: 'env/plan.txt', allowEmptyArchive: false
-            }
-
-            if (env.BRANCH_NAME == 'master') {
-                stage('Deploy to Dev') {
-                    execute()
-                    stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
-                    createTillerUser()
-                    getEksKubeConfig(eks_config)
-                    withEnv(["KUBECONFIG=./$eks_config"]) {
-                        // Create tiller user for EKS cluster
+                stage("Plan ${environment}") {
+                    plan(environment, alm)
+                    archiveArtifacts artifacts: 'env/plan-*.txt', allowEmptyArchive: false
+                }
+                if (!(environment in defaultEnvironmentList) || env.BRANCH_NAME == 'master') {
+                    stage("Deploy ${environment}") {
+                        execute(environment)
+                        stashLegacyKubeConfig(buildStashName(kubeConfigStashName, environment))
                         createTillerUser()
+                        getEksKubeConfig(eksConfiguration)
+                        withEnv(["KUBECONFIG=./${eksConfiguration}"]) {
+                            createTillerUser()
+                        }
+                    }
+                    stage("Execute Kubernetes Configs for ${environment}") {
+                        applyKubeConfigs()
                     }
                 }
-
-                stage('Deploy to staging') {
-                    cluster = 'staging'
-                    eks_config = "${cluster}_kubeconfig"
-                    plan(cluster)
-                    execute()
-                    stashLegacyKubeConfig(buildStashName(kubeConfigStashName, cluster))
-                    createTillerUser()
-                    getEksKubeConfig(eks_config)
-                    withEnv(["KUBECONFIG=./$eks_config"]) {
-                        createTillerUser()
-                    }
-                }
-
-                stage('Execute Kubernetes Configs') {
-                    applyKubeConfigs()
-                }
-            }
+            })
         }
     }
 }
@@ -65,19 +70,17 @@ node('terraform') {
 // TODO - delete this stage once we move to EKS as we no longer need this config
 node('master') {
     ansiColor('xterm') {
-        if (env.BRANCH_NAME == 'master') {
-            stage('Copy Legacy Kubernetes Config to Master') {
-                def cluster = 'dev'
-                unstashLegacyKubeConfig(cluster, buildStashName(kubeConfigStashName, cluster))
-
-                cluster = 'staging'
-                unstashLegacyKubeConfig(cluster, buildStashName(kubeConfigStashName, cluster))
+        environments.each({ environment ->
+            if (!(environment in defaultEnvironmentList) || env.BRANCH_NAME == 'master') {
+                stage("Copy Legacy Kubernetes Config to Master for ${environment}") {
+                    unstashLegacyKubeConfig(environment, buildStashName(kubeConfigStashName, environment))
+                }
             }
-        }
+        })
     }
 }
 
-def plan(environment) {
+def plan(environment, alm) {
     dir('env') {
         sh("""#!/usr/bin/env bash
             set -e
@@ -87,29 +90,51 @@ def plan(environment) {
             public_key=\$(ssh-keygen -y -f ${keyfile})
             echo "\${public_key}" > ~/.ssh/id_rsa.pub
 
+            extra_variables=""
+
+            backend_file="../backends/${alm}.conf"
+            if [[ ! -f \${backend_file} ]]; then
+                backend_file="../backends/sandbox-alm.conf"
+                extra_variables="
+                \${extra_variables} \
+                --var=alm_workspace=${alm}
+                "
+            fi
+
             terraform init \
-                --backend-config=../backends/alm.conf
+                --backend-config=\${backend_file}
+
             terraform workspace new ${environment} || true
             terraform workspace select ${environment}
+
+            variable_file="variables/${environment}.tfvars"
+            if [[ ! -f \${variable_file} ]]; then
+                variable_file="variables/sandbox.tfvars"
+                extra_variables="
+                \${extra_variables} \
+                --var="vpc_cidr="
+                "
+            fi
 
             terraform plan \
                 --var=key_pair_public_key="\${public_key}" \
                 --var=kube_key="~/.ssh/id_rsa.pub" \
-                --var-file=variables/${environment}.tfvars \
-                --out=plan.bin \
-                | tee -a plan.txt
+                --var-file="\${variable_file}" \
+                --out="plan-${environment}.bin" \
+                \${extra_variables} \
+                | tee -a "plan-${environment}.txt"
         """)
     }
 }
 
-def execute() {
+def execute(environment) {
     dir('env') {
-        sh('terraform apply plan.bin')
+        sh("terraform apply plan-${environment}.bin")
     }
 }
 
-def buildStashName(stashName, cluster) {
-    "${stashName}-${cluster}"
+def buildStashName(stashName, environment) {
+    "${stashName}-${environment}"
 }
 
 def stashLegacyKubeConfig(stashName) {
