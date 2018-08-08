@@ -8,7 +8,6 @@ data "external" "seeded_random" {
 
 locals {
   vpc_cidr = "${length(var.vpc_cidr) > 0 ? var.vpc_cidr : data.external.seeded_random.result.cidr_block}"
-  vpc_name = "${terraform.workspace}"
 }
 
 module "vpc" {

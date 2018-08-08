@@ -1,3 +1,5 @@
+vpc_name = "test"
+
 root_dns_name = "smartcolumbusos.com"
 
 region = "us-west-2"

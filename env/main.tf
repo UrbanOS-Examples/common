@@ -27,6 +27,11 @@ resource "aws_security_group_rule" "allow_inbound_traffic_from_alm" {
   security_group_id = "${module.kubernetes.kubeconfig_security_group}"
 }
 
+locals {
+  kubernetes_cluster_name = "${length(var.kubernetes_cluster_name) > 0 ? var.kubernetes_cluster_name : format("%s-kube", terraform.workspace)}"
+  vpc_name                = "${length(var.vpc_name) > 0 ? var.vpc_name : terraform.workspace}"
+}
+
 variable "region" {
   description = "AWS Region"
   default     = "us-west-2"
@@ -42,6 +47,11 @@ variable "role_arn" {
 
 variable "kubernetes_cluster_name" {
   description = "The cluster name for kubernetes"
+  default     = ""
+}
+
+variable "vpc_name" {
+  description = "The name of the environment VPC"
   default     = ""
 }
 
