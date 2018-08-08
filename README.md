@@ -49,7 +49,6 @@ terraform workspace new my-own-personal-sandbox
 terraform workspace select my-own-personal-sandbox
 terraform plan \
   --var-file=variables/sandbox.tfvars \
-  --var="vpc_cidr=" \
   --out=update.plan
 terraform apply update.plan
 ```

@@ -19,7 +19,7 @@ properties(
     ]
 )
 
-def environments = environmentsParameter.trim().split("\n").collect({ environment ->
+def environments = params.environmentsParameter.trim().split("\n").collect({ environment ->
     environment.trim()
 })
 
@@ -45,7 +45,7 @@ node('terraform') {
                 def eksConfiguration = "${environment}_kubeconfig"
 
                 stage("Plan ${environment}") {
-                    plan(environment, alm)
+                    plan(environment, params.alm)
                     archiveArtifacts artifacts: 'env/plan-*.txt', allowEmptyArchive: false
                 }
                 if (!(environment in defaultEnvironmentList) || env.BRANCH_NAME == 'master') {
@@ -110,10 +110,6 @@ def plan(environment, alm) {
             variable_file="variables/${environment}.tfvars"
             if [[ ! -f \${variable_file} ]]; then
                 variable_file="variables/sandbox.tfvars"
-                extra_variables="
-                \${extra_variables} \
-                --var="vpc_cidr="
-                "
             fi
 
             terraform plan \
