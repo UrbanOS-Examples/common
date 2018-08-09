@@ -19,9 +19,9 @@ properties(
     ]
 )
 
-def environments = params.environmentsParameter.trim().split("\n").collect({ environment ->
+def environments = params.environmentsParameter.trim().split("\n").collect { environment ->
     environment.trim()
-})
+}
 
 node('terraform') {
     ansiColor('xterm') {
@@ -41,7 +41,7 @@ node('terraform') {
                 checkout scm
             }
 
-            environments.each({ environment ->
+            environments.each { environment ->
                 def eksConfiguration = "${environment}_kubeconfig"
 
                 stage("Plan ${environment}") {
@@ -62,7 +62,7 @@ node('terraform') {
                         applyKubeConfigs()
                     }
                 }
-            })
+            }
         }
     }
 }
@@ -70,13 +70,13 @@ node('terraform') {
 // TODO - delete this stage once we move to EKS as we no longer need this config
 node('master') {
     ansiColor('xterm') {
-        environments.each({ environment ->
+        environments.each { environment ->
             if (!(environment in defaultEnvironmentList) || env.BRANCH_NAME == 'master') {
                 stage("Copy Legacy Kubernetes Config to Master for ${environment}") {
                     unstashLegacyKubeConfig(environment, buildStashName(kubeConfigStashName, environment))
                 }
             }
-        })
+        }
     }
 }
 
