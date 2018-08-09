@@ -12,8 +12,6 @@ alm_workspace = "sandbox"
 
 alm_state_bucket_name = "scos-sandbox-terraform-state"
 
-vpc_cidr = "10.100.0.0/16"
-
 region = "us-west-2"
 
 role_arn = "arn:aws:iam::068920858268:role/admin_role"
