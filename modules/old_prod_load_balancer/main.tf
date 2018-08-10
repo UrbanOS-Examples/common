@@ -1,21 +1,21 @@
 locals {
-  lb_rule_env_prefix = "${terraform.workspace == "prod" ? "" : "${terraform.workspace}."}"
+  fqdn_suffix = "${terraform.workspace}.${var.root_dns_zone}"
 
   lb_rules = [
     {
       name             = "Joomla"
       condition_field  = "host-header"
-      condition_values = "${local.lb_rule_env_prefix}smartcolumbusos.com"
+      condition_values = "${local.fqdn_suffix}"
     },
     {
       name             = "CKAN"
       condition_field  = "host-header"
-      condition_values = "ckan.${local.lb_rule_env_prefix}smartcolumbusos.com"
+      condition_values = "ckan.${local.fqdn_suffix}"
     },
     {
       name             = "Kong"
       condition_field  = "host-header"
-      condition_values = "api.${local.lb_rule_env_prefix}smartcolumbusos.com"
+      condition_values = "api.${local.fqdn_suffix}"
     },
     {
       name             = "MaintenancePage"
@@ -123,6 +123,10 @@ variable "security_group_ids" {
 variable "subnet_ids" {
   type        = "list"
   description = "list of subnet ids to associate with the load balancer"
+}
+
+variable "root_dns_zone" {
+  description = "Name of root domain (ex. example.com)"
 }
 
 output "target_group_arns" {
