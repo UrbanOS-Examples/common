@@ -8,7 +8,6 @@ data "terraform_remote_state" "durable" {
     region   = "us-east-2"
     role_arn = "${var.alm_role_arn}"
   }
-}
 
 resource "aws_route53_zone" "public_hosted_zone" {
   name          = "${terraform.workspace}.${var.root_dns_zone}"
