@@ -64,7 +64,7 @@ node('infrastructure') {
                         withEnv(["KUBECONFIG=./${eksConfiguration}"]) {
                             sh('''#!/usr/bin/env bash
                                 set -e
-                                helm init --serviceaccount tiller
+                                helm init --service-account tiller
                             ''')
                         }
                     }
