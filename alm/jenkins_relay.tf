@@ -2,9 +2,9 @@ data "template_file" "jenkins_relay_user_data" {
   template = "${file(var.jenkins_relay_user_data_template)}"
 
   vars {
-    jenkins_host = "${module.jenkins_ecs_load_balancer.dns_name}"
+    jenkins_host = "jenkins.${terraform.workspace}.${var.root_dns_zone}"
     jenkins_port = 80
-    dns_name     = "ci-webhook.${var.environment}.${var.root_dns_zone}"
+    dns_name     = "ci-webhook.${terraform.workspace}.${var.root_dns_zone}"
   }
 }
 
@@ -68,6 +68,10 @@ resource "aws_instance" "jenkins_relay" {
   tags {
     Name      = "JenkinsRelay"
     Workspace = "${terraform.workspace}"
+  }
+
+  lifecycle {
+    ignore_changes = ["key_name"]
   }
 }
 

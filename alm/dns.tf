@@ -3,7 +3,7 @@ data "aws_route53_zone" "root_zone" {
 }
 
 resource "aws_route53_zone" "public_hosted_zone" {
-  name          = "${var.environment}.${var.root_dns_zone}"
+  name          = "${terraform.workspace}.${var.root_dns_zone}"
   force_destroy = true
 
   tags = {
@@ -12,7 +12,7 @@ resource "aws_route53_zone" "public_hosted_zone" {
 }
 
 resource "aws_route53_record" "alm_ns_record" {
-  name = "${var.environment}"
+  name = "${terraform.workspace}"
   zone_id = "${data.aws_route53_zone.root_zone.zone_id}"
   type = "NS"
   ttl = 300

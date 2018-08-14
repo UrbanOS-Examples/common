@@ -6,7 +6,7 @@ prod_role_arn = "arn:aws:iam::199837183662:role/jenkins_role"
 
 sandbox = false
 
-root_dns_name = "internal.smartcolumbusos.com"
+root_dns_zone = "internal.smartcolumbusos.com"
 
 openvpn_admin_password_secret_arn = "arn:aws:secretsmanager:us-east-2:199837183662:secret:openvpn_admin_password-beMNOa"
 
