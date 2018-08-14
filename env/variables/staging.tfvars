@@ -1,6 +1,6 @@
 vpc_name = "test"
 
-root_dns_name = "smartcolumbusos.com"
+root_dns_zone = "internal.smartcolumbusos.com"
 
 region = "us-west-2"
 

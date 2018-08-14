@@ -4,7 +4,7 @@ accepter_credentials_profile = "sandbox"
 
 vpc_single_nat_gateway = true
 
-root_dns_name = "smartcolumbusos.com"
+root_dns_zone = "sandbox.internal.smartcolumbusos.com"
 
 alm_account_id = "068920858268"
 

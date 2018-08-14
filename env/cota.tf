@@ -78,38 +78,11 @@ resource "aws_autoscaling_attachment" "cota_stream_k8s_attachment" {
   alb_target_group_arn   = "${aws_lb_target_group.cota_stream.arn}"
 }
 
-resource "aws_route53_record" "cota_old_external_dns" {
-  zone_id = "${var.public_dns_zone_id}"
-  name    = "cota"
-  type    = "A"
-  count   = 1
-
-  alias {
-    name                   = "${aws_lb.cota.dns_name}"
-    zone_id                = "${aws_lb.cota.zone_id}"
-    evaluate_target_health = false
-  }
-}
-
 resource "aws_route53_record" "cota_external_dns" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
   name    = "cota"
   type    = "A"
   count   = 1
-
-  alias {
-    name                   = "${aws_lb.cota.dns_name}"
-    zone_id                = "${aws_lb.cota.zone_id}"
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_route53_record" "cota_alm_dns" {
-  provider = "aws.alm"
-  zone_id  = "${data.terraform_remote_state.alm_remote_state.private_zone_id}"
-  name     = "cota.${terraform.workspace}"
-  type     = "A"
-  count    = 1
 
   alias {
     name                   = "${aws_lb.cota.dns_name}"
