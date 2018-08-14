@@ -8,6 +8,8 @@ resource "aws_route53_zone" "public_hosted_zone" {
 }
 
 resource "aws_route53_record" "alm_ns_record" {
+  provider = "aws.alm"
+
   name = "${terraform.workspace}"
   zone_id = "${data.terraform_remote_state.alm_remote_state.public_hosted_zone_id}"
   type = "NS"
