@@ -1,3 +1,15 @@
+data "terraform_remote_state" "durable" {
+  backend   = "s3"
+  workspace = "${var.alm_workspace}"
+
+  config {
+    bucket   = "${var.alm_state_bucket_name}"
+    key      = "alm-durable"
+    region   = "us-east-2"
+    role_arn = "${var.alm_role_arn}"
+  }
+}
+
 resource "aws_route53_zone" "public_hosted_zone" {
   name          = "${terraform.workspace}.${var.root_dns_zone}"
   force_destroy = true
@@ -11,7 +23,7 @@ resource "aws_route53_record" "alm_ns_record" {
   provider = "aws.alm"
 
   name = "${terraform.workspace}"
-  zone_id = "${data.terraform_remote_state.alm_remote_state.public_hosted_zone_id}"
+  zone_id = "${data.terraform_remote_state.durable.hosted_zone_id}"
   type = "NS"
   ttl = 300
   records = ["${aws_route53_zone.public_hosted_zone.name_servers}"]
