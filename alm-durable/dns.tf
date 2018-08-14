@@ -1,29 +1,33 @@
 provider "aws" {
   alias  = "prod"
-  region = "${var.region}"
 
   assume_role {
-    role_arn = "${var.prod_role_arn}"
+    role_arn = "${var.root_zone_role_arn}"
   }
 }
 
 data "aws_route53_zone" "root_zone" {
   provider = "aws.prod"
-  name = "${var.root_dns_name}"
+  name = "${var.root_zone_name}"
 }
 
 resource "aws_route53_zone" "internal" {
-    name = "internal.smartcolumbusos.com"
+    name = "${var.hosted_zone_name}.${var.root_zone_name}"
 }
 
 resource "aws_route53_record" "parent_ns_record" {
     provider = "aws.prod"
     zone_id = "${data.aws_route53_zone.root_zone.zone_id}"
-    name = "${hosted_zone_name}"
+    name = "${var.hosted_zone_name}"
     type = "NS"
-    records = []
+    records = ["${aws_route53_zone.internal.name_servers}"]
 }
 
+variable "root_zone_name" {}
+
+variable "root_zone_role_arn" {
+    description = "Role arn that allows manipulating of the root zone"
+}
 
 variable "hosted_zone_name" {
     description = "The hosted zone for the non production environments"
