@@ -33,6 +33,11 @@ module "kubernetes" {
   ]
 }
 
+resource "aws_route53_zone" "private" {
+  name   = "${terraform.workspace}.internal.k8s"
+  vpc_id = "${module.vpc.vpc_id}"
+}
+
 variable "min_worker_count" {
   description = "Minimum kubernetes workers"
   default     = 5

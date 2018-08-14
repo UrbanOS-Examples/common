@@ -50,18 +50,6 @@ variable "service_certificate_arn" {
   description = "The ARN of a certificate to use for TLS terminating at the ELB."
 }
 
-variable "domain_name" {
-  description = "The domain name of the supplied Route 53 zones."
-}
-variable "public_zone_id" {
-  description = "The ID of the public Route 53 zone."
-  default = ""
-}
-variable "private_zone_id" {
-  description = "The ID of the private Route 53 zone."
-  default = ""
-}
-
 variable "health_check_target" {
   description = "The target to use for health checks."
   default = "HTTP:80/health"

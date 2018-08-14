@@ -32,38 +32,11 @@ resource "aws_autoscaling_attachment" "jupyter_k8s_attachment" {
   elb                    = "${aws_elb.jupyter_elb.id}"
 }
 
-resource "aws_route53_record" "jupyter_old_external_dns" {
-  zone_id = "${var.public_dns_zone_id}"
-  name    = "jupyter"
-  type    = "A"
-  count   = 1
-
-  alias {
-    name                   = "${aws_elb.jupyter_elb.dns_name}"
-    zone_id                = "${aws_elb.jupyter_elb.zone_id}"
-    evaluate_target_health = false
-  }
-}
-
 resource "aws_route53_record" "jupyter_external_dns" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
   name    = "jupyter"
   type    = "A"
   count   = 1
-
-  alias {
-    name                   = "${aws_elb.jupyter_elb.dns_name}"
-    zone_id                = "${aws_elb.jupyter_elb.zone_id}"
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_route53_record" "jupyter_alm_dns" {
-  provider = "aws.alm"
-  zone_id  = "${data.terraform_remote_state.alm_remote_state.private_zone_id}"
-  name     = "jupyter.${terraform.workspace}"
-  type     = "A"
-  count    = 1
 
   alias {
     name                   = "${aws_elb.jupyter_elb.dns_name}"
