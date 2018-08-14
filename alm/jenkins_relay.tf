@@ -4,7 +4,7 @@ data "template_file" "jenkins_relay_user_data" {
   vars {
     jenkins_host = "${module.jenkins_ecs_load_balancer.dns_name}"
     jenkins_port = 80
-    dns_name     = "ci-webhook.${var.environment}.${var.root_dns_name}"
+    dns_name     = "ci-webhook.${var.environment}.${var.root_dns_zone}"
   }
 }
 
@@ -47,10 +47,14 @@ resource "aws_security_group" "jenkins_relay_sg" {
 
 resource "aws_route53_record" "github-webhook" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
-  name    = "ci-webhook.${var.environment}.${var.root_dns_name}"
+  name    = "ci-webhook"
   type    = "A"
   ttl     = "300"
   records = ["${aws_instance.jenkins_relay.public_ip}"]
+
+  lifecycle {
+    ignore_changes = ["name", "allow_overwrite"]
+  }
 }
 
 resource "aws_instance" "jenkins_relay" {

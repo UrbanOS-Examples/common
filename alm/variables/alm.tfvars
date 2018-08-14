@@ -2,7 +2,7 @@ vpc_name = "alm"
 
 environment = "alm"
 
-prod_role_arn = "arn:aws:iam::374013108165:role/dev_view_only_role"
+prod_role_arn = "arn:aws:iam::199837183662:role/jenkins_role"
 
 sandbox = false
 
@@ -27,8 +27,6 @@ cluster_minimum_size = 1
 cluster_maximum_size = 3
 
 cluster_desired_capacity = 2
-
-domain_name = "deliveryPipeline.smartcolumbusos.com"
 
 alm_account_id = "199837183662"
 

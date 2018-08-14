@@ -1,10 +1,10 @@
 vpc_name = "sandbox-alm"
 
-environment = "sandbox"
+environment = "alm"
 
-root_dns_name = "sandbox.internal.smartcolumbusos.com"
+root_dns_zone = "sandbox.internal.smartcolumbusos.com"
 
-prod_role_arn = "" # Assuming no role should put the user back in ALM
+prod_role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
 openvpn_admin_password_secret_arn = "arn:aws:secretsmanager:us-east-2:068920858268:secret:openvpn_admin_password-8p4kVH"
 
@@ -19,8 +19,6 @@ cluster_minimum_size = 1
 cluster_maximum_size = 3
 
 cluster_desired_capacity = 2
-
-domain_name = "deliveryPipeline.smartcolumbusos.com"
 
 alm_account_id = "068920858268"
 

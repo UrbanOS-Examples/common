@@ -8,19 +8,9 @@ output "arn" {
   value = "${aws_elb.service.arn}"
 }
 
-output "zone_id" {
-  description = "The zone ID of the created ELB."
-  value = "${aws_elb.service.zone_id}"
-}
-
 output "dns_name" {
   description = "The DNS name of the created ELB."
   value = "${aws_elb.service.dns_name}"
-}
-
-output "address" {
-  description = "The name of the service DNS record."
-  value = "${var.component}-${var.deployment_identifier}.${var.domain_name}"
 }
 
 output "security_group_id" {

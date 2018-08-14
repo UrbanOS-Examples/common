@@ -81,6 +81,18 @@ module "jenkins_cluster" {
   allowed_cidrs            = "${var.allowed_cidrs}"
 }
 
+resource "aws_route53_record" "jenkins" {
+  zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
+  name    = "jenkins"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["${module.jenkins_ecs_load_balancer.dns_name}"]
+
+  lifecycle {
+    ignore_changes = ["name", "allow_overwrite"]
+  }
+}
+
 module "jenkins_ecs_load_balancer" {
   source = "../modules/elb"
 
@@ -96,8 +108,6 @@ module "jenkins_ecs_load_balancer" {
   listener_ports          = "${local.listener_ports}"
   ingress_rules           = "${local.ingress_rules}"
   service_certificate_arn = ""
-
-  domain_name = "${var.domain_name}"
 
   health_check_target = "HTTP:8080/login"
 
@@ -205,10 +215,6 @@ variable "cluster_maximum_size" {
 variable "cluster_desired_capacity" {
   description = "The desired capacity of the ECS cluster"
   default     = 3
-}
-
-variable "domain_name" {
-  description = "The domain name of the supplied Route 53 zones."
 }
 
 variable "jenkins_relay_user_data_template" {

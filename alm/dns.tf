@@ -1,19 +1,9 @@
-provider "aws" {
-  alias  = "prod"
-  region = "${var.region}"
-
-  assume_role {
-    role_arn = "${var.prod_role_arn}"
-  }
-}
-
 data "aws_route53_zone" "root_zone" {
-  provider = "aws.prod"
-  name = "${var.root_dns_name}"
+  name = "${var.root_dns_zone}"
 }
 
 resource "aws_route53_zone" "public_hosted_zone" {
-  name          = "${var.environment}.${var.root_dns_name}"
+  name          = "${var.environment}.${var.root_dns_zone}"
   force_destroy = true
 
   tags = {
@@ -22,7 +12,6 @@ resource "aws_route53_zone" "public_hosted_zone" {
 }
 
 resource "aws_route53_record" "alm_ns_record" {
-  provider = "aws.prod"
   name = "${var.environment}"
   zone_id = "${data.aws_route53_zone.root_zone.zone_id}"
   type = "NS"
@@ -30,7 +19,7 @@ resource "aws_route53_record" "alm_ns_record" {
   records = ["${aws_route53_zone.public_hosted_zone.name_servers}"]
 }
 
-variable "root_dns_name" {
+variable "root_dns_zone" {
   description = "Name of root domain (ex. example.com)"
 }
 
@@ -40,4 +29,8 @@ variable "prod_role_arn" {
 
 output "name_servers" {
   value = "${aws_route53_zone.public_hosted_zone.name_servers}"
+}
+
+output "public_hosted_zone_id" {
+  value = "${aws_route53_zone.public_hosted_zone.zone_id}"
 }
