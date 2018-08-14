@@ -1,16 +1,16 @@
 vpc_name = "sandbox-alm"
 
-environment = "sandbox-alm"
+environment = "sandbox"
 
-root_dns_name = "smartcolumbusos.com"
+root_dns_name = "sandbox.internal.smartcolumbusos.com"
+
+prod_role_arn = "" # Assuming no role should put the user back in ALM
 
 openvpn_admin_password_secret_arn = "arn:aws:secretsmanager:us-east-2:068920858268:secret:openvpn_admin_password-8p4kVH"
 
 docker_registry = "068920858268.dkr.ecr.us-east-2.amazonaws.com"
 
 cluster_instance_ssh_public_key_path = "files/oasis_id_rsa.pub"
-
-cluster6_instance_ssh_public_key_path = "files/oasis6_id_rsa.pub"
 
 cluster_instance_type = "t2.medium"
 

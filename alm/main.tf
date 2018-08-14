@@ -53,10 +53,6 @@ variable "cluster_instance_ssh_public_key_path" {
   description = "AWS The path to the 'oasis@MBP-' public key to use for the container instances"
 }
 
-variable "cluster6_instance_ssh_public_key_path" {
-  description = "AWS The path to the 'oasis@MBP-6' public key to use for the container instances"
-}
-
 variable "allowed_cidrs" {
   description = "The CIDRs allowed access to containers"
   type        = "list"

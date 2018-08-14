@@ -2,9 +2,11 @@ vpc_name = "alm"
 
 environment = "alm"
 
+prod_role_arn = "arn:aws:iam::374013108165:role/dev_view_only_role"
+
 sandbox = false
 
-root_dns_name = "smartcolumbusos.com"
+root_dns_name = "internal.smartcolumbusos.com"
 
 openvpn_admin_password_secret_arn = "arn:aws:secretsmanager:us-east-2:199837183662:secret:openvpn_admin_password-beMNOa"
 
@@ -17,8 +19,6 @@ vpc_azs = ["us-east-2a", "us-east-2b", "us-east-2c"]
 docker_registry = "199837183662.dkr.ecr.us-east-2.amazonaws.com"
 
 cluster_instance_ssh_public_key_path = "files/oasis_id_rsa.pub"
-
-cluster6_instance_ssh_public_key_path = "files/oasis6_id_rsa.pub"
 
 cluster_instance_type = "t2.medium"
 
