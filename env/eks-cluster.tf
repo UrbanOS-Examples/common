@@ -53,7 +53,9 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "elasticloadbalancing:*",
 
                 "route53:ListHostedZones",
-                "route53:ListResourceRecordSets"                
+                "route53:ListResourceRecordSets",
+
+                "cloudwatch:PutMetricData"
             ],
             "Resource": "*"
         },
