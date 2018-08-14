@@ -11,45 +11,6 @@ resource "aws_route53_zone" "public_hosted_zone" {
     Environment = "${terraform.workspace}"
   }
 }
-
-resource "aws_route53_zone" "private" {
-  name   = "${terraform.workspace}.internal.k8s"
-  vpc_id = "${module.vpc.vpc_id}"
-}
-
-module "sandbox_dns" {
-  source                = "../modules/remote_dns/"
-  remote_workspace      = "sandbox"
-  remote_bucket_name    = "${var.alm_state_bucket_name}"
-  remote_region         = "${var.alm_region}"
-  remote_role_arn       = "${var.alm_role_arn}"
-  public_hosted_zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
-  count                 = "${local.is_prod}"
-  key                   = "operating-system"
-}
-
-module "dev_dns" {
-  source                = "../modules/remote_dns/"
-  remote_workspace      = "dev"
-  remote_bucket_name    = "${var.alm_state_bucket_name}"
-  remote_region         = "${var.alm_region}"
-  remote_role_arn       = "${var.alm_role_arn}"
-  public_hosted_zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
-  count                 = "${local.is_prod}"
-  key                   = "operating-system"
-}
-
-module "staging_dns" {
-  source                = "../modules/remote_dns/"
-  remote_workspace      = "staging"
-  remote_bucket_name    = "${var.alm_state_bucket_name}"
-  remote_region         = "${var.alm_region}"
-  remote_role_arn       = "${var.alm_role_arn}"
-  public_hosted_zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
-  count                 = "${local.is_prod}"
-  key                   = "operating-system"
-}
-
 module "alm_dns" {
   source                = "../modules/remote_dns/"
   remote_workspace      = "alm"

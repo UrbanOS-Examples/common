@@ -45,6 +45,7 @@ resource "aws_instance" "openvpn_instance_sandbox" {
 
   lifecycle = {
     prevent_destroy = false
+    ignore_changes  = ["key_name"]
   }
 
   user_data = "${local.user_data}"
@@ -67,6 +68,7 @@ resource "aws_instance" "openvpn_instance" {
 
   lifecycle = {
     prevent_destroy = true
+    ignore_changes  = ["key_name"]
   }
 
   user_data = "${local.user_data}"
