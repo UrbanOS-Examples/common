@@ -23,7 +23,7 @@ def environments = params.environmentsParameter.trim().split("\n").collect { env
     environment.trim()
 }
 
-node('terraform') {
+node('infrastructure') {
     ansiColor('xterm') {
         withCredentials([
             [
@@ -58,6 +58,14 @@ node('terraform') {
                     stage("Execute Kubernetes Configs for ${environment}") {
                         withEnv(["KUBECONFIG=./${eksConfiguration}"]) {
                             applyKubeConfigs()
+                        }
+                    }
+                    stage("Deploy tiller service for ${environment}") {
+                        withEnv(["KUBECONFIG=./${eksConfiguration}"]) {
+                            sh('''#!/usr/bin/env bash
+                                set -e
+                                helm init --service-account tiller
+                            ''')
                         }
                     }
                 }
@@ -173,7 +181,7 @@ def getEksKubeConfig(config_file) {
 
 
 def createTillerUser() {
-    /* Assumes this is running on the terraform node */
+    /* Assumes this is running on the infrastructure node */
     sh('''#!/usr/bin/env bash
         set -e
 
