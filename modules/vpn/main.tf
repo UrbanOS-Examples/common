@@ -46,7 +46,6 @@ resource "aws_instance" "openvpn_instance" {
   lifecycle = {
     ignore_changes = ["key_name"]
     prevent_destroy = true
-    ignore_changes  = ["key_name"]
   }
 
   user_data = "${local.user_data}"
