@@ -9,7 +9,7 @@ resource "aws_route53_zone" "public_hosted_zone" {
 
 resource "aws_route53_record" "alm_ns_record" {
   name = "${terraform.workspace}"
-  zone_id = "${data.terraform_remote_state.alm_state.public_dns_zone_id}"
+  zone_id = "${data.terraform_remote_state.alm_state.public_hosted_zone_id}"
   type = "NS"
   ttl = 300
   records = ["${aws_route53_zone.public_hosted_zone.name_servers}"]
