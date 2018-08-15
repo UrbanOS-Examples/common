@@ -1,11 +1,5 @@
-library(
-    identifier: 'pipeline-lib@master',
-    retriever: modernSCM([$class: 'GitSCMSource',
-                          remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
-                          credentialsId: 'jenkins-github-user'])
-)
-
 def defaultEnvironmentList = ['dev', 'staging']
+def kubeConfigStashName = "kubernetes-config"
 
 properties(
     [
@@ -48,22 +42,22 @@ node('infrastructure') {
             }
 
             environments.each { environment ->
+                def eksConfiguration = "${environment}_kubeconfig"
+
                 stage("Plan ${environment}") {
                     plan(environment, params.alm)
                     archiveArtifacts artifacts: 'env/plan-*.txt', allowEmptyArchive: false
                 }
                 if (!(environment in defaultEnvironmentList) || env.BRANCH_NAME == 'master') {
-                    def eksConfiguration = "${environment}_kubeconfig"
-
                     stage("Deploy ${environment}") {
                         execute(environment)
+                        stashLegacyKubeConfig(buildStashName(kubeConfigStashName, environment))
                         createTillerUser()
-
-                        sh(""" echo "${scos.terraformOutput(environment).eks_cluster_kubeconfig}" > ${eksConfiguration}""")
+                        getEksKubeConfig(eksConfiguration)
                     }
                     stage("Execute Kubernetes Configs for ${environment}") {
                         withEnv(["KUBECONFIG=./${eksConfiguration}"]) {
-                            applyKubeConfigs(environment)
+                            applyKubeConfigs()
                         }
                     }
                     stage("Deploy tiller service for ${environment}") {
@@ -74,6 +68,19 @@ node('infrastructure') {
                             ''')
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+// TODO - delete this stage once we move to EKS as we no longer need this config
+node('master') {
+    ansiColor('xterm') {
+        environments.each { environment ->
+            if (!(environment in defaultEnvironmentList) || env.BRANCH_NAME == 'master') {
+                stage("Copy Legacy Kubernetes Config to Master for ${environment}") {
+                    unstashLegacyKubeConfig(environment, buildStashName(kubeConfigStashName, environment))
                 }
             }
         }
@@ -129,6 +136,50 @@ def execute(environment) {
     }
 }
 
+def buildStashName(stashName, environment) {
+    "${stashName}-${environment}"
+}
+
+def stashLegacyKubeConfig(stashName) {
+    dir('env') {
+        def kubernetesMasterIP = sh(
+            script: 'terraform output kubernetes_master_private_ip',
+            returnStdout: true
+        ).trim()
+
+        retry(24) {
+            sleep(10)
+            copyKubeConfig(kubernetesMasterIP, '~/.kube/config') // for tiller
+            copyKubeConfig(kubernetesMasterIP, "config") // for stashing
+            stash includes: 'config', name: stashName
+        }
+    }
+}
+
+def copyKubeConfig(kubernetesMasterIP, destinationPath) {
+    sh("""#!/usr/bin/env bash
+        set -e
+        mkdir -p \$(dirname ${destinationPath})
+
+        scp \
+            -o ConnectTimeout=30 \
+            -o StrictHostKeyChecking=no \
+            -i $keyfile \
+            centos@${kubernetesMasterIP}:~/kubeconfig \
+            ${destinationPath}
+    """)
+}
+
+def getEksKubeConfig(config_file) {
+    dir('env') {
+        sh("""#!/usr/bin/env bash
+            set -e
+            terraform output eks_cluster_kubeconfig > ../$config_file
+        """)
+    }
+}
+
+
 def createTillerUser() {
     /* Assumes this is running on the infrastructure node */
     sh('''#!/usr/bin/env bash
@@ -152,19 +203,28 @@ def createTillerUser() {
     ''')
 }
 
-def applyKubeConfigs(environment) {
-    scos.withEksCredentials(environment) {
-        def terraformOutputs = scos.terraformOutput(environment)
-        def eks_cluster_name = terraformOutputs.eks_cluster_name.value
-        def aws_region = terraformOutputs.aws_region.value
-
-        sh("""#!/bin/bash
-            export EKS_CLUSTER_NAME='${eks_cluster_name}'
-            export AWS_REGION='${aws_region}'
-
-            find k8s/alb-ingress-controller -type f -exec cat {} \\; -exec echo -e '\\n---' \\; | envsubst | kubectl apply -f -
-            kubectl apply -f k8s/tiller-role/
-            kubectl apply -f k8s/persistent-storage/
-        """.trim())
+def unstashLegacyKubeConfig(environment, stashName) {
+    dir("/var/jenkins_home/.kube/${environment}") {
+        unstash(stashName)
     }
+
+    sh("KUBECONFIG=/var/jenkins_home/.kube/${environment}/config kubectl get nodes")
+}
+
+def applyKubeConfigs() {
+    sh('''#!/usr/bin/env bash
+        set -e
+        cd env/
+        eks_cluster_name=$(terraform output eks_cluster_name)
+        aws_region=$(terraform output aws_region)
+
+        terraform output eks_cluster_kubeconfig > /tmp/eks_cluster_kubeconfig
+        cd ../
+        sed -ie "s/%CLUSTER_NAME%/$eks_cluster_name/" k8s/alb-ingress-controller/02-deployment.yaml
+        sed -ie "s/%AWS_REGION%/$aws_region/" k8s/alb-ingress-controller/02-deployment.yaml
+
+        kubectl apply --kubeconfig=/tmp/eks_cluster_kubeconfig -f k8s/alb-ingress-controller/
+        kubectl apply --kubeconfig=/tmp/eks_cluster_kubeconfig -f k8s/tiller-role/
+        kubectl apply --kubeconfig=/tmp/eks_cluster_kubeconfig -f k8s/persistent-storage/
+    ''')
 }
