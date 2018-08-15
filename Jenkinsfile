@@ -118,8 +118,10 @@ def plan(environment, alm) {
 }
 
 def apply(environment) {
-    dir('env') {
-        sh("terraform apply plan-${environment}.bin")
+    scos.withEksCredentials(environment) {
+        dir('env') {
+            sh("terraform apply plan-${environment}.bin")
+        }
     }
 }
 
