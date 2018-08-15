@@ -8,7 +8,7 @@ root_dns_zone = "sandbox.internal.smartcolumbusos.com"
 
 alm_account_id = "068920858268"
 
-alm_workspace = "sandbox"
+alm_workspace = "alm"
 
 alm_state_bucket_name = "scos-sandbox-terraform-state"
 
