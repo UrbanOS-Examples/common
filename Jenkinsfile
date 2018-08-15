@@ -174,7 +174,7 @@ def getEksKubeConfig(config_file) {
     dir('env') {
         sh("""#!/usr/bin/env bash
             set -e
-            terraform output eks-cluster-kubeconfig > ../$config_file
+            terraform output eks_cluster_kubeconfig > ../$config_file
         """)
     }
 }
@@ -217,11 +217,14 @@ def applyKubeConfigs() {
         cd env/
         eks_cluster_name=$(terraform output eks_cluster_name)
         aws_region=$(terraform output aws_region)
+
+        terraform output eks_cluster_kubeconfig > /tmp/eks_cluster_kubeconfig
         cd ../
         sed -ie "s/%CLUSTER_NAME%/$eks_cluster_name/" k8s/alb-ingress-controller/02-deployment.yaml
         sed -ie "s/%AWS_REGION%/$aws_region/" k8s/alb-ingress-controller/02-deployment.yaml
-        kubectl apply -f k8s/alb-ingress-controller/
-        kubectl apply -f k8s/tiller-role/
-        kubectl apply -f k8s/persistent-storage/
+
+        kubectl apply --kubeconfig=/tmp/eks_cluster_kubeconfig -f k8s/alb-ingress-controller/
+        kubectl apply --kubeconfig=/tmp/eks_cluster_kubeconfig -f k8s/tiller-role/
+        kubectl apply --kubeconfig=/tmp/eks_cluster_kubeconfig -f k8s/persistent-storage/
     ''')
 }
