@@ -50,26 +50,6 @@ module "vpc" {
   }
 }
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
-  vpc_id      = "${module.vpc.vpc_id}"
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 variable "vpc_cidr" {
   description = "The CIDR block for the VPC"
   default     = ""
@@ -137,9 +117,4 @@ output "nat_public_ips" {
 
 variable "key_pair_public_key" {
   description = "The public key used to create a key pair"
-}
-
-output "allow_all_security_group" {
-  description = "Security group id to allow all traffic to access albs"
-  value       = "${aws_security_group.allow_all.id}"
 }
