@@ -16,3 +16,7 @@ variable "efs_encrypted" {
   description = "Is EFS encrypted?  true/false"
   type = "string"
 }
+
+variable "environment" {
+  description = "name of the environment the efs is being deployed to"
+}

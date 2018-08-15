@@ -16,3 +16,7 @@ terraform {
 variable "alm_role_arn" {
   description = "ALM role to assume"
 }
+
+variable "environment" {
+  description = "Name of the environment being deployed"
+}

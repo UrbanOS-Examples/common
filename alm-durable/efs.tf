@@ -4,6 +4,8 @@ module "jenkins_efs" {
   efs_name      = "jenkins"
   efs_mode      = "generalPurpose"
   efs_encrypted = true
+
+  environment   = "${var.environment}"
 }
 
 output "jenkins_efs_dns_name" {
