@@ -5,6 +5,7 @@ resource "aws_elb" "service" {
   ]
 
   internal = "${var.expose_to_public_internet == "yes" ? false : true}"
+  name = "elb-${var.component}-${var.deployment_identifier}"
 
   cross_zone_load_balancing = true
   idle_timeout = "${var.idle_timeout}"
