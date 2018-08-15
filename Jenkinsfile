@@ -53,15 +53,21 @@ node('infrastructure') {
                     archiveArtifacts artifacts: 'env/plan-*.txt', allowEmptyArchive: false
                 }
                 if (!(environment in defaultEnvironmentList) || env.BRANCH_NAME == 'master') {
+                    def eksConfiguration = "${environment}_kubeconfig"
+
                     stage("Deploy ${environment}") {
-                        apply(environment)
+                        execute(environment)
                         createTillerUser()
+
+                        sh(""" echo "${scos.terraformOutput(environment).eks_cluster_kubeconfig}" > ${eksConfiguration}""")
                     }
                     stage("Execute Kubernetes Configs for ${environment}") {
-                        applyKubeConfigs(environment)
+                        withEnv(["KUBECONFIG=./${eksConfiguration}"]) {
+                            applyKubeConfigs(environment)
+                        }
                     }
                     stage("Deploy tiller service for ${environment}") {
-                        scos.withEksCredentials(environment) {
+                        withEnv(["KUBECONFIG=./${eksConfiguration}"]) {
                             sh('''#!/usr/bin/env bash
                                 set -e
                                 helm init --service-account tiller
@@ -117,7 +123,7 @@ def plan(environment, alm) {
     }
 }
 
-def apply(environment) {
+def execute(environment) {
     dir('env') {
         sh("terraform apply plan-${environment}.bin")
     }
