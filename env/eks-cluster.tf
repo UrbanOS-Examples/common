@@ -78,7 +78,7 @@ resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
 }
 
-output "eks-cluster-kubeconfig" {
+output "eks_cluster_kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
   value       = "${module.eks-cluster.kubeconfig}"
 }
