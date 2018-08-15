@@ -34,9 +34,9 @@ spec:
         - --ingress-class=alb
         env:
         - name: AWS_REGION
-          value: ${AWS_REGION}
+          value: %AWS_REGION% 
         - name: CLUSTER_NAME
-          value: ${EKS_CLUSTER_NAME}
+          value: %CLUSTER_NAME% 
         - name: AWS_DEBUG
           value: "false"
         - name: AWS_MAX_RETRIES
