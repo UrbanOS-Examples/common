@@ -55,7 +55,7 @@ node('infrastructure') {
                 if (!(environment in defaultEnvironmentList) || env.BRANCH_NAME == 'master') {
                     stage("Deploy ${environment}") {
                         apply(environment)
-                        createTillerUser()
+                        createTillerUser(environment)
                     }
                     stage("Execute Kubernetes Configs for ${environment}") {
                         applyKubeConfigs(environment)
@@ -118,34 +118,34 @@ def plan(environment, alm) {
 }
 
 def apply(environment) {
-    scos.withEksCredentials(environment) {
-        dir('env') {
-            sh("terraform apply plan-${environment}.bin")
-        }
+    dir('env') {
+        sh("terraform apply plan-${environment}.bin")
     }
 }
 
-def createTillerUser() {
-    /* Assumes this is running on the infrastructure node */
-    sh('''#!/usr/bin/env bash
-        set -e
+def createTillerUser(environment) {
+    scos.withEksCredentials(environment) {
+        /* Assumes this is running on the infrastructure node */
+        sh('''#!/usr/bin/env bash
+            set -e
 
-        if [ $(kubectl get serviceaccount \
-                --namespace kube-system \
-                | grep -wc tiller) -eq 0 ]; then
+            if [ $(kubectl get serviceaccount \
+                    --namespace kube-system \
+                    | grep -wc tiller) -eq 0 ]; then
 
-            kubectl create serviceaccount tiller \
-                --namespace kube-system
-        fi
-        if [ $(kubectl get clusterrolebinding \
-                --namespace kube-system \
-                | grep -wc tiller) -eq 0 ]; then
+                kubectl create serviceaccount tiller \
+                    --namespace kube-system
+            fi
+            if [ $(kubectl get clusterrolebinding \
+                    --namespace kube-system \
+                    | grep -wc tiller) -eq 0 ]; then
 
-            kubectl create clusterrolebinding tiller \
-                --clusterrole cluster-admin \
-                --serviceaccount=kube-system:tiller
-        fi
-    ''')
+                kubectl create clusterrolebinding tiller \
+                    --clusterrole cluster-admin \
+                    --serviceaccount=kube-system:tiller
+            fi
+        ''')
+    }
 }
 
 def applyKubeConfigs(environment) {
