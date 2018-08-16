@@ -76,6 +76,16 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
             "Resource": [
               "arn:aws:route53:::hostedzone/*"
             ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+              "s3:*"
+            ],
+            "Resource": [
+              "arn:aws:s3:::${aws_s3_bucket.jupyter_backup.bucket}",
+              "arn:aws:s3:::${aws_s3_bucket.jupyter_backup.bucket}/*"
+            ]
         }
     ]
 }
