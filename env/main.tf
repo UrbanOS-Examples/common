@@ -18,15 +18,6 @@ resource "aws_key_pair" "cloud_key" {
   public_key = "${var.key_pair_public_key}"
 }
 
-resource "aws_security_group_rule" "allow_inbound_traffic_from_alm" {
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "-1"
-  cidr_blocks       = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
-  security_group_id = "${module.kubernetes.kubeconfig_security_group}"
-}
-
 locals {
   kubernetes_cluster_name = "${length(var.kubernetes_cluster_name) > 0 ? var.kubernetes_cluster_name : format("%s-kube", terraform.workspace)}"
   vpc_name                = "${length(var.vpc_name) > 0 ? var.vpc_name : terraform.workspace}"
