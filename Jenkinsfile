@@ -158,7 +158,9 @@ def applyKubeConfigs(environment) {
             export EKS_CLUSTER_NAME='${eks_cluster_name}'
             export AWS_REGION='${aws_region}'
 
-            find k8s/alb-ingress-controller -type f -exec cat {} \\; -exec echo -e '\\n---' \\; | envsubst | kubectl apply -f -
+            for manifest in k8s/alb-ingress-controller/*; do
+                cat \$manifest | envsubst | kubectl apply -f -
+            done
             kubectl apply -f k8s/tiller-role/
             kubectl apply -f k8s/persistent-storage/
         """.trim())
