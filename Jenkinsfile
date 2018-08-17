@@ -164,18 +164,5 @@ def applyKubeConfigs(environment) {
             kubectl apply -f k8s/tiller-role/
             kubectl apply -f k8s/persistent-storage/
         """.trim())
-        kubectl get serviceaccount --namespace kube-system | grep -q tiller || \
-            kubectl create serviceaccount tiller  --namespace kube-system
-
-        kubectl get clusterrolebinding --namespace kube-system | grep -q tiller || \
-            kubectl create clusterrolebinding tiller \
-                --clusterrole cluster-admin \
-                --serviceaccount=kube-system:tiller
-    ''')
-}
-
-def unstashLegacyKubeConfig(environment, stashName) {
-    dir("/var/jenkins_home/.kube/${environment}") {
-        unstash(stashName)
     }
 }
