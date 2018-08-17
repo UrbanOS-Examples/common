@@ -1,3 +1,4 @@
+
 root_dns_zone = "internal.smartcolumbusos.com"
 
 region = "us-west-2"
