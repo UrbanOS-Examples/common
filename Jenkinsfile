@@ -1,11 +1,9 @@
 library(
-    identifier: 'pipeline-lib@master',
+    identifier: 'pipeline-lib@1.2.1',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
 )
-
-def defaultEnvironmentList = ['dev', 'staging']
 
 properties(
     [
@@ -13,7 +11,7 @@ properties(
         parameters([
             text(
                 name: 'environmentsParameter',
-                defaultValue: defaultEnvironmentList.join("\n"),
+                defaultValue: scos.environments().join("\n"),
                 description: 'Environments in which to deploy common/env'
             ),
             string(
@@ -45,6 +43,8 @@ node('infrastructure') {
             stage('Checkout') {
                 deleteDir()
                 checkout scm
+
+                scos.addGitHubRemoteForTagging('SmartColumbusOS/common.git')
             }
 
             environments.each { environment ->
@@ -52,7 +52,7 @@ node('infrastructure') {
                     plan(environment, params.alm)
                     archiveArtifacts artifacts: 'env/plan-*.txt', allowEmptyArchive: false
                 }
-                if (!(environment in defaultEnvironmentList) || env.BRANCH_NAME == 'master') {
+                if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
                     stage("Deploy ${environment}") {
                         apply(environment)
                         createTillerUser(environment)
@@ -67,6 +67,13 @@ node('infrastructure') {
                                 helm init --service-account tiller
                             ''')
                         }
+                    }
+                    stage('Tag') {
+                        if (environment == 'staging') {
+                            scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
+                        }
+
+                        scos.applyAndPushGitHubTag(environment)
                     }
                 }
             }
