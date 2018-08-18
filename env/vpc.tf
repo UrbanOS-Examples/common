@@ -1,6 +1,6 @@
 data "external" "seeded_random" {
   program = [
-    "python2",
+    "python",
     "-c",
     "import random; import json; random.seed('${terraform.workspace}'); print(json.dumps({'cidr_block': '10.{}.0.0/16'.format(random.randint(0, 255))}))"
   ]
