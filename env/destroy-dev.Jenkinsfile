@@ -37,7 +37,7 @@ def destroyEnv(environment) {
 }
 
 def initTerraform(environment) {
-    sh("terraform init -backend-config=backends/${environment}.conf")
+    sh("terraform init -backend-config=../backends/alm.conf")
     tfSwitchWorkspace(environment)
 }
 
