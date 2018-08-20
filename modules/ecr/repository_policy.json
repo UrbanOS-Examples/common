@@ -19,7 +19,8 @@
             "Principal": {
                 "AWS": [
                     "arn:aws:iam::073132350570:root",
-                    "arn:aws:iam::647770347641:root"
+                    "arn:aws:iam::647770347641:root",
+                    "arn:aws:iam::374013108165:root"
                 ]
             },
             "Action": [
