@@ -18,17 +18,6 @@ resource "aws_key_pair" "cloud_key" {
   public_key = "${var.key_pair_public_key}"
 }
 
-provider "random" {
-    # the old kubernetes module used a module that needed the random provider.
-    # Apparently, Terraform needs the plug in to delete the old cluster,
-    # but since we removed the last refernce to the plug-in, it's not downloaded
-    # on init.
-    #
-    # We can remove this provider block after module.kubernetes is removed from the remote state.
-    #
-    # See https://github.com/hashicorp/terraform/issues/16127
-}
-
 locals {
   kubernetes_cluster_name = "${length(var.kubernetes_cluster_name) > 0 ? var.kubernetes_cluster_name : format("%s-kube", terraform.workspace)}"
   vpc_name                = "${length(var.vpc_name) > 0 ? var.vpc_name : terraform.workspace}"
