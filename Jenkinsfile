@@ -53,7 +53,6 @@ node('infrastructure') {
                     def terraform = scos.terraform('prod-prime')
 
                     stage('Checkout current prod code') {
-                        scos.addGitHubRemoteForTagging('common')
                         sh 'git fetch github --tags && git checkout prod'
                     }
 
