@@ -86,13 +86,13 @@ def plan(environment, alm) {
         def terraform = scos.terraform(environment)
         String publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
         String publicKeyFileName = "${environment}_id_rsa.pub"
-        writeFile(publicKeyFileName, publicKey)
+        writeFile(file: publicKeyFileName, text: publicKey)
 
         terraform.init()
 
         terraform.plan(
-            key_pair_public_key: publicKey,
-            kube_key: publicKeyFileName,
+            'key_pair_public_key': publicKey,
+            'kube_key': publicKeyFileName,
         )
     }
 }
