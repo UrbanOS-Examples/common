@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@smrt-340',
+    identifier: 'pipeline-lib@1.4.0',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -35,6 +35,8 @@ node('infrastructure') {
                 keyFileVariable: 'keyfile'
             )
         ]) {
+        String publicKey, publicKeyFileName
+
             stage('Checkout') {
                 deleteDir()
                 checkout scm
@@ -43,12 +45,46 @@ node('infrastructure') {
             }
 
             dir('env') {
-                String publicKey, publicKeyFileName
-
                 stage('Setup SSH keys') {
                     publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
                     publicKeyFileName = "id_rsa.pub"
                     writeFile(file: publicKeyFileName, text: publicKey)
+                }
+
+                if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
+                    def terraform = scos.terraform('prod-prime')
+
+                    stage('Checkout current prod code') {
+                        sh 'git checkout prod'
+                    }
+
+                    stage('Create Ephemeral Prod In Dev') {
+                        terraform.init()
+
+                        terraform.plan(
+                            'key_pair_public_key': publicKey,
+                            'kube_key': publicKeyFileName,
+                        )
+                        terraform.apply()
+                    }
+
+                    stage('Return to current git revision') {
+                        checkout scm
+                    }
+
+                    try {
+                        stage('Apply to ephemeral prod') {
+                            terraform.plan(
+                                'key_pair_public_key': publicKey,
+                                'kube_key': publicKeyFileName,
+                            )
+                            terraform.apply()
+                        }
+                    } finally {
+                        stage('Destroy ephemeral prod') {
+                            terraform.destroy()
+                        }
+                    }
                 }
 
                 environments.each { environment ->
