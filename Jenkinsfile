@@ -47,8 +47,6 @@ node('infrastructure') {
             dir('env') {
                 stage('Setup SSH keys') {
                     publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
-                    publicKeyFileName = "id_rsa.pub"
-                    writeFile(file: publicKeyFileName, text: publicKey)
                 }
 
                 if (scos.shouldDeploy('dev', env.BRANCH_NAME)) {
@@ -63,8 +61,7 @@ node('infrastructure') {
                         terraform.init()
 
                         terraform.plan(
-                            'key_pair_public_key': publicKey,
-                            'kube_key': publicKeyFileName,
+                            'key_pair_public_key': publicKey
                         )
                         terraform.apply()
                     }
@@ -76,8 +73,7 @@ node('infrastructure') {
                     try {
                         stage('Apply to ephemeral prod') {
                             terraform.plan(
-                                'key_pair_public_key': publicKey,
-                                'kube_key': publicKeyFileName,
+                                'key_pair_public_key': publicKey
                             )
                             terraform.apply()
                         }
@@ -95,8 +91,7 @@ node('infrastructure') {
                         terraform.init()
 
                         terraform.plan(
-                            'key_pair_public_key': publicKey,
-                            'kube_key': publicKeyFileName,
+                            'key_pair_public_key': publicKey
                         )
 
                         archiveArtifacts artifacts: 'plan-*.txt', allowEmptyArchive: false
