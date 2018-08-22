@@ -67,7 +67,7 @@ node('infrastructure') {
                             'kube_key': publicKeyFileName,
                         )
 
-                        archiveArtifacts artifacts: 'env/plan-*.txt', allowEmptyArchive: false
+                        archiveArtifacts artifacts: 'plan-*.txt', allowEmptyArchive: false
                     }
                     if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
                         stage("Deploy ${environment}") {
