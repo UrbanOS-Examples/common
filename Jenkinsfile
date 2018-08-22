@@ -51,11 +51,12 @@ node('infrastructure') {
                     writeFile(file: publicKeyFileName, text: publicKey)
                 }
 
-                if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
+                if (scos.shouldDeploy('dev', env.BRANCH_NAME)) {
                     def terraform = scos.terraform('prod-prime')
 
                     stage('Checkout current prod code') {
-                        sh 'git checkout prod'
+                        scos.addGitHubRemoteForTagging('common')
+                        sh 'git fetch github --tags && git checkout prod'
                     }
 
                     stage('Create Ephemeral Prod In Dev') {
