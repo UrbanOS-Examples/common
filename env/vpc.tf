@@ -89,7 +89,7 @@ variable "vpc_azs" {
 
 variable "vpc_single_nat_gateway" {
   description = "Should be true if you want to provision a single shared NAT Gateway across all of your private networks"
-  default     = false
+  default     = true
 }
 
 variable "vpc_enable_nat_gateway" {
@@ -144,6 +144,8 @@ output "nat_public_ips" {
 
 variable "key_pair_public_key" {
   description = "The public key used to create a key pair"
+  # The Jenkins public key
+  default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRAvH6k7iEeRDz9SQtkH1o8KiUaed/e2hmzTUjA8bhmeWVLPsgCMKIUKR0jdPlvdZ0AmMLXswobsXj08dPgWxUZxoAWIqKCjd969KckydUpBtcb+X2Q+tpOcugBOQSY1H8hgNrdcRKEaUllTfvseJ9pBOYU7j9VuZ608HQhfZw7+aS8wi9o/BJwejtpWdlo6gkxXoIRqDX/ioYg+W6Tc7yoUzAEANwZAy3/3GKWDrh+9jnzR6mEEN48Nuee49wWfP5G0T/v4+Gvux5zioHb3rcmmR9YTkFOiv1poInhXlPdc7Q38yj+z6E+hACNN3rK80YjU0ByaSPltPjqm9ZYmPX"
 }
 
 output "allow_all_security_group" {

@@ -76,20 +76,25 @@ variable "alm_region" {
 
 variable "alm_role_arn" {
   description = "The ARN for the assume role for ALM access"
+  default     = "arn:aws:iam::199837183662:role/jenkins_role"
 }
 
 variable "alm_state_bucket_name" {
   description = "The name of the S3 state bucket for ALM"
+  default     = "scos-alm-terraform-state"
 }
 
 variable "alm_account_id" {
-  description = "Id if the account to peer to"
+  description = "Id of the account to peer to"
+  default     = "199837183662"
 }
 
 variable "alm_workspace" {
   description = "Workspace for the ALM state"
+  default     = "alm"
 }
 
 variable "accepter_credentials_profile" {
   description = "The AWS credentials profile to use for accepting peering"
+  default     = "jenkins"
 }
