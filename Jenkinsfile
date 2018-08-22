@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@1.2.1',
+    identifier: 'pipeline-lib@1.3.1',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -47,6 +47,10 @@ node('infrastructure') {
                 scos.addGitHubRemoteForTagging('SmartColumbusOS/common.git')
             }
 
+            stage("Check Terraform against Prod") {
+
+            }
+
             environments.each { environment ->
                 stage("Plan ${environment}") {
                     plan(environment, params.alm)
@@ -83,44 +87,21 @@ node('infrastructure') {
 
 def plan(environment, alm) {
     dir('env') {
+        def terraform = scos.terraform(environment)
+
+        terraform.init()
         sh("""#!/usr/bin/env bash
             set -e
-            set -o pipefail
 
             mkdir -p ~/.ssh
             public_key=\$(ssh-keygen -y -f ${keyfile})
             echo "\${public_key}" > ~/.ssh/id_rsa.pub
-
-            extra_variables=""
-
-            backend_file="../backends/${alm}.conf"
-            if [[ ! -f \${backend_file} ]]; then
-                backend_file="../backends/sandbox-alm.conf"
-                extra_variables="
-                \${extra_variables} \
-                --var=alm_workspace=${alm}
-                "
-            fi
-
-            terraform init \
-                --backend-config=\${backend_file}
-
-            terraform workspace new ${environment} || true
-            terraform workspace select ${environment}
-
-            variable_file="variables/${environment}.tfvars"
-            if [[ ! -f \${variable_file} ]]; then
-                variable_file="variables/sandbox.tfvars"
-            fi
-
-            terraform plan \
-                --var=key_pair_public_key="\${public_key}" \
-                --var=kube_key="~/.ssh/id_rsa.pub" \
-                --var-file="\${variable_file}" \
-                --out="plan-${environment}.bin" \
-                \${extra_variables} \
-                | tee -a "plan-${environment}.txt"
         """)
+
+        terraform.plan(
+            key_pair_public_key: new File('~/.ssh/id_rsa.pub').text,
+            kube_key: '~/.ssh/id_rsa.pub',
+        )
     }
 }
 
