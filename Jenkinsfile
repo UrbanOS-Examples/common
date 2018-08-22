@@ -26,7 +26,6 @@ properties(
 def environments = params.environmentsParameter.trim().split("\n").collect { environment ->
     environment.trim()
 }
-def terraform = scos.terraform(environment)
 
 node('infrastructure') {
     ansiColor('xterm') {
@@ -48,58 +47,55 @@ node('infrastructure') {
                 scos.addGitHubRemoteForTagging('SmartColumbusOS/common.git')
             }
 
-            environments.each { environment ->
-                stage("Plan ${environment}") {
-                    plan()
-                    archiveArtifacts artifacts: 'env/plan-*.txt', allowEmptyArchive: false
-                }
-                if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
-                    stage("Deploy ${environment}") {
-                        apply()
-                        createTillerUser(environment)
-                    }
-                    stage("Execute Kubernetes Configs for ${environment}") {
-                        applyKubeConfigs(environment)
-                    }
-                    stage("Deploy tiller service for ${environment}") {
-                        scos.withEksCredentials(environment) {
-                            sh('''#!/usr/bin/env bash
-                                set -e
-                                helm init --service-account tiller
-                            ''')
-                        }
-                    }
-                    stage('Tag') {
-                        if (environment == 'staging') {
-                            scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
-                        }
+            dir('env') {
+                String publicKey, publicKeyFileName
 
-                        scos.applyAndPushGitHubTag(environment)
+                stage('Setup SSH keys') {
+                    publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
+                    publicKeyFileName = "id_rsa.pub"
+                    writeFile(file: publicKeyFileName, text: publicKey)
+                }
+
+                environments.each { environment ->
+                    def terraform = scos.terraform(environment)
+
+                    stage("Plan ${environment}") {
+                        terraform.init()
+
+                        terraform.plan(
+                            'key_pair_public_key': publicKey,
+                            'kube_key': publicKeyFileName,
+                        )
+
+                        archiveArtifacts artifacts: 'env/plan-*.txt', allowEmptyArchive: false
+                    }
+                    if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
+                        stage("Deploy ${environment}") {
+                            terraform.apply()
+                            createTillerUser(environment)
+                        }
+                        stage("Execute Kubernetes Configs for ${environment}") {
+                            applyKubeConfigs(environment)
+                        }
+                        stage("Deploy tiller service for ${environment}") {
+                            scos.withEksCredentials(environment) {
+                                sh('''#!/usr/bin/env bash
+                                    set -e
+                                    helm init --service-account tiller
+                                ''')
+                            }
+                        }
+                        stage('Tag') {
+                            if (environment == 'staging') {
+                                scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
+                            }
+
+                            scos.applyAndPushGitHubTag(environment)
+                        }
                     }
                 }
             }
         }
-    }
-}
-
-def plan() {
-    dir('env') {
-        String publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
-        String publicKeyFileName = "${environment}_id_rsa.pub"
-        writeFile(file: publicKeyFileName, text: publicKey)
-
-        terraform.init()
-
-        terraform.plan(
-            'key_pair_public_key': publicKey,
-            'kube_key': publicKeyFileName,
-        )
-    }
-}
-
-def apply() {
-    dir('env') {
-        terraform.apply()
     }
 }
 
