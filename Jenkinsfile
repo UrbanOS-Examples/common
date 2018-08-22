@@ -26,6 +26,7 @@ properties(
 def environments = params.environmentsParameter.trim().split("\n").collect { environment ->
     environment.trim()
 }
+def terraform = scos.terraform(environment)
 
 node('infrastructure') {
     ansiColor('xterm') {
@@ -49,12 +50,12 @@ node('infrastructure') {
 
             environments.each { environment ->
                 stage("Plan ${environment}") {
-                    plan(environment, params.alm)
+                    plan()
                     archiveArtifacts artifacts: 'env/plan-*.txt', allowEmptyArchive: false
                 }
                 if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
                     stage("Deploy ${environment}") {
-                        apply(environment)
+                        apply()
                         createTillerUser(environment)
                     }
                     stage("Execute Kubernetes Configs for ${environment}") {
@@ -81,9 +82,8 @@ node('infrastructure') {
     }
 }
 
-def plan(environment, alm) {
+def plan() {
     dir('env') {
-        def terraform = scos.terraform(environment)
         String publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
         String publicKeyFileName = "${environment}_id_rsa.pub"
         writeFile(file: publicKeyFileName, text: publicKey)
@@ -97,9 +97,9 @@ def plan(environment, alm) {
     }
 }
 
-def apply(environment) {
+def apply() {
     dir('env') {
-        sh("terraform apply plan-${environment}.bin")
+        terraform.apply()
     }
 }
 
