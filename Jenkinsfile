@@ -84,19 +84,15 @@ node('infrastructure') {
 def plan(environment, alm) {
     dir('env') {
         def terraform = scos.terraform(environment)
+        String publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
+        String publicKeyPath = "${env.WORKSPACE}/id_rsa.pub"
+        new File(publicKeyPath) << publicKey
 
         terraform.init()
-        sh("""#!/usr/bin/env bash
-            set -e
-
-            mkdir -p ~/.ssh
-            public_key=\$(ssh-keygen -y -f ${keyfile})
-            echo "\${public_key}" > ~/.ssh/id_rsa.pub
-        """)
 
         terraform.plan(
-            key_pair_public_key: new File('~/.ssh/id_rsa.pub').text,
-            kube_key: '~/.ssh/id_rsa.pub',
+            key_pair_public_key: publicKey,
+            kube_key: publicKeyPath,
         )
     }
 }
