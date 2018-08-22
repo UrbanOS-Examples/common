@@ -13,11 +13,6 @@ properties(
                 name: 'environmentsParameter',
                 defaultValue: scos.environments().join("\n"),
                 description: 'Environments in which to deploy common/env'
-            ),
-            string(
-                name: 'alm',
-                defaultValue: 'alm',
-                description: 'The ALM to which the common/env should attach'
             )
         ])
     ]
