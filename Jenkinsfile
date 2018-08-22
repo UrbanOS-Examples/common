@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@1.3.1',
+    identifier: 'pipeline-lib@smrt-340',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -45,10 +45,6 @@ node('infrastructure') {
                 checkout scm
 
                 scos.addGitHubRemoteForTagging('SmartColumbusOS/common.git')
-            }
-
-            stage("Check Terraform against Prod") {
-
             }
 
             environments.each { environment ->
