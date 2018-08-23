@@ -69,7 +69,7 @@ node('infrastructure') {
                     }
 
                     stage('Return to current git revision') {
-                        checkout scm
+                        sh 'git checkout ${BRANCH_NAME}'
                     }
 
                     try {
