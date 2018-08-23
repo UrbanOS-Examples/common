@@ -62,12 +62,12 @@ node('infrastructure') {
                     stage('Create Ephemeral Prod In Dev') {
                         terraform.init()
 
-                        terraform.plan([
+                        terraform.plan('variables/dev.tfvars', [
                             'key_pair_public_key': publicKey,
                             'vpc_cidr': '10.201.0.0/16',
                             // The following are dead after this code makes it to prod
                             'kubernetes_cluster_name': 'streaming-kube-prod-prime'
-                        ], 'variables/dev.tfvars')
+                        ])
                         terraform.apply()
                     }
 
@@ -77,15 +77,16 @@ node('infrastructure') {
 
                     try {
                         stage('Apply to ephemeral prod') {
-                            terraform.plan([
+                            terraform.plan('variables/dev.tfvars', [
                                 'key_pair_public_key': publicKey,
                                 'vpc_cidr': '10.201.0.0/16'
-                            ], 'variables/dev.tfvars')
+                            ])
                             terraform.apply()
                         }
                     } finally {
                         stage('Destroy ephemeral prod') {
-                            terraform.destroy()
+                            terraform.planDestroy('variables/dev.tfvars')
+                            terraform.apply()
                         }
                     }
                 }
@@ -96,9 +97,9 @@ node('infrastructure') {
                     stage("Plan ${environment}") {
                         terraform.init()
 
-                        terraform.plan(
+                        terraform.plan(terraform.defaultVarFile, [
                             'key_pair_public_key': publicKey
-                        )
+                        ])
 
                         archiveArtifacts artifacts: 'plan-*.txt', allowEmptyArchive: false
                     }
