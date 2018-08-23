@@ -59,9 +59,10 @@ node('infrastructure') {
                     stage('Create Ephemeral Prod In Dev') {
                         terraform.init()
 
-                        terraform.plan(
-                            'key_pair_public_key': publicKey
-                        )
+                        terraform.plan([
+                            'key_pair_public_key': publicKey,
+                            'cidr_blocks': '10.201.0.0/16'
+                        ], 'variables/dev.tfvars')
                         terraform.apply()
                     }
 
@@ -71,9 +72,10 @@ node('infrastructure') {
 
                     try {
                         stage('Apply to ephemeral prod') {
-                            terraform.plan(
-                                'key_pair_public_key': publicKey
-                            )
+                            terraform.plan([
+                                'key_pair_public_key': publicKey,
+                                'cidr_blocks': '10.201.0.0/16'
+                            ], 'variables/dev.tfvars')
                             terraform.apply()
                         }
                     } finally {
