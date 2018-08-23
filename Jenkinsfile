@@ -61,7 +61,9 @@ node('infrastructure') {
 
                         terraform.plan([
                             'key_pair_public_key': publicKey,
-                            'cidr_blocks': '10.201.0.0/16'
+                            'vpc_cidr': '10.201.0.0/16',
+                            // The following are dead after this code makes it to prod
+                            'kubernetes_cluster_name': 'streaming-kube-prod-prime'
                         ], 'variables/dev.tfvars')
                         terraform.apply()
                     }
@@ -74,7 +76,7 @@ node('infrastructure') {
                         stage('Apply to ephemeral prod') {
                             terraform.plan([
                                 'key_pair_public_key': publicKey,
-                                'cidr_blocks': '10.201.0.0/16'
+                                'vpc_cidr': '10.201.0.0/16'
                             ], 'variables/dev.tfvars')
                             terraform.apply()
                         }
