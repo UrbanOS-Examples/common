@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@2.0.0',
+    identifier: 'pipeline-lib@2.0.1',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -59,23 +59,23 @@ node('infrastructure') {
                         sh 'git fetch github --tags && git checkout prod'
                     }
 
-                    stage('Create Ephemeral Prod In Dev') {
-                        terraform.init()
-
-                        terraform.plan('variables/dev.tfvars', [
-                            'key_pair_public_key': publicKey,
-                            'vpc_cidr': '10.201.0.0/16',
-                            // The following are dead after this code makes it to prod
-                            'kubernetes_cluster_name': 'streaming-kube-prod-prime'
-                        ])
-                        terraform.apply()
-                    }
-
-                    stage('Return to current git revision') {
-                        sh "git checkout ${gitHash}"
-                    }
-
                     try {
+                        stage('Create Ephemeral Prod In Dev') {
+                            terraform.init()
+
+                            terraform.plan('variables/dev.tfvars', [
+                                'key_pair_public_key': publicKey,
+                                'vpc_cidr': '10.201.0.0/16',
+                                // The following are dead after this code makes it to prod
+                                'kubernetes_cluster_name': 'streaming-kube-prod-prime'
+                            ])
+                            terraform.apply()
+                        }
+
+                        stage('Return to current git revision') {
+                            sh "git checkout ${gitHash}"
+                        }
+
                         stage('Apply to ephemeral prod') {
                             terraform.plan('variables/dev.tfvars', [
                                 'key_pair_public_key': publicKey,
