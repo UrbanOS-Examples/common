@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@1.2.1',
+    identifier: 'pipeline-lib@smrt-340',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -13,11 +13,6 @@ properties(
                 name: 'environmentsParameter',
                 defaultValue: scos.environments().join("\n"),
                 description: 'Environments in which to deploy common/env'
-            ),
-            string(
-                name: 'alm',
-                defaultValue: 'alm',
-                description: 'The ALM to which the common/env should attach'
             )
         ])
     ]
@@ -40,6 +35,8 @@ node('infrastructure') {
                 keyFileVariable: 'keyfile'
             )
         ]) {
+        String publicKey, publicKeyFileName
+
             stage('Checkout') {
                 deleteDir()
                 checkout scm
@@ -47,86 +44,84 @@ node('infrastructure') {
                 scos.addGitHubRemoteForTagging('SmartColumbusOS/common.git')
             }
 
-            environments.each { environment ->
-                stage("Plan ${environment}") {
-                    plan(environment, params.alm)
-                    archiveArtifacts artifacts: 'env/plan-*.txt', allowEmptyArchive: false
+            dir('env') {
+                stage('Setup SSH keys') {
+                    publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
                 }
-                if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
-                    stage("Deploy ${environment}") {
-                        apply(environment)
-                        createTillerUser(environment)
-                    }
-                    stage("Execute Kubernetes Configs for ${environment}") {
-                        applyKubeConfigs(environment)
-                    }
-                    stage("Deploy tiller service for ${environment}") {
-                        scos.withEksCredentials(environment) {
-                            sh('''#!/usr/bin/env bash
-                                set -e
-                                helm init --service-account tiller
-                            ''')
-                        }
-                    }
-                    stage('Tag') {
-                        if (environment == 'staging') {
-                            scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
-                        }
 
-                        scos.applyAndPushGitHubTag(environment)
+                if (scos.shouldDeploy('dev', env.BRANCH_NAME) || true) {
+                    def terraform = scos.terraform('prod-prime')
+
+                    stage('Checkout current prod code') {
+                        sh 'git fetch github --tags && git checkout prod'
+                    }
+
+                    stage('Create Ephemeral Prod In Dev') {
+                        terraform.init()
+
+                        terraform.plan(
+                            'key_pair_public_key': publicKey
+                        )
+                        terraform.apply()
+                    }
+
+                    stage('Return to current git revision') {
+                        checkout scm
+                    }
+
+                    try {
+                        stage('Apply to ephemeral prod') {
+                            terraform.plan(
+                                'key_pair_public_key': publicKey
+                            )
+                            terraform.apply()
+                        }
+                    } finally {
+                        stage('Destroy ephemeral prod') {
+                            terraform.destroy()
+                        }
+                    }
+                }
+
+                environments.each { environment ->
+                    def terraform = scos.terraform(environment)
+
+                    stage("Plan ${environment}") {
+                        terraform.init()
+
+                        terraform.plan(
+                            'key_pair_public_key': publicKey
+                        )
+
+                        archiveArtifacts artifacts: 'plan-*.txt', allowEmptyArchive: false
+                    }
+                    if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
+                        stage("Deploy ${environment}") {
+                            terraform.apply()
+                            createTillerUser(environment)
+                        }
+                        stage("Execute Kubernetes Configs for ${environment}") {
+                            applyKubeConfigs(environment)
+                        }
+                        stage("Deploy tiller service for ${environment}") {
+                            scos.withEksCredentials(environment) {
+                                sh('''#!/usr/bin/env bash
+                                    set -e
+                                    helm init --service-account tiller
+                                ''')
+                            }
+                        }
+                        stage('Tag') {
+                            if (environment == 'staging') {
+                                scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
+                            }
+
+                            scos.applyAndPushGitHubTag(environment)
+                        }
                     }
                 }
             }
         }
-    }
-}
-
-def plan(environment, alm) {
-    dir('env') {
-        sh("""#!/usr/bin/env bash
-            set -e
-            set -o pipefail
-
-            mkdir -p ~/.ssh
-            public_key=\$(ssh-keygen -y -f ${keyfile})
-            echo "\${public_key}" > ~/.ssh/id_rsa.pub
-
-            extra_variables=""
-
-            backend_file="../backends/${alm}.conf"
-            if [[ ! -f \${backend_file} ]]; then
-                backend_file="../backends/sandbox-alm.conf"
-                extra_variables="
-                \${extra_variables} \
-                --var=alm_workspace=${alm}
-                "
-            fi
-
-            terraform init \
-                --backend-config=\${backend_file}
-
-            terraform workspace new ${environment} || true
-            terraform workspace select ${environment}
-
-            variable_file="variables/${environment}.tfvars"
-            if [[ ! -f \${variable_file} ]]; then
-                variable_file="variables/sandbox.tfvars"
-            fi
-
-            terraform plan \
-                --var=key_pair_public_key="\${public_key}" \
-                --var=kube_key="~/.ssh/id_rsa.pub" \
-                --var-file="\${variable_file}" \
-                --out="plan-${environment}.bin" \
-                \${extra_variables} \
-                | tee -a "plan-${environment}.txt"
-        """)
-    }
-}
-
-def apply(environment) {
-    dir('env') {
-        sh("terraform apply plan-${environment}.bin")
     }
 }
 

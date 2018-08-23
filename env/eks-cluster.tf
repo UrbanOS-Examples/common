@@ -1,3 +1,7 @@
+locals {
+  kubernetes_cluster_name = "streaming-kube-${terraform.workspace}"
+}
+
 module "eks-cluster" {
   source  = "terraform-aws-modules/eks/aws"
   version = "1.3.0"
