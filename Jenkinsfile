@@ -35,7 +35,7 @@ node('infrastructure') {
                 keyFileVariable: 'keyfile'
             )
         ]) {
-        String publicKey, publicKeyFileName
+        String publicKey
 
             stage('Checkout') {
                 deleteDir()
