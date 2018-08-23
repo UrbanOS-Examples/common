@@ -51,8 +51,11 @@ node('infrastructure') {
 
                 if (scos.shouldDeploy('dev', env.BRANCH_NAME) || true) {
                     def terraform = scos.terraform('prod-prime')
+                    def gitHash
 
                     stage('Checkout current prod code') {
+                        gitHash = sh(returnStdout: true, script: 'git rev-parse HEAD')
+
                         sh 'git fetch github --tags && git checkout prod'
                     }
 
@@ -69,7 +72,7 @@ node('infrastructure') {
                     }
 
                     stage('Return to current git revision') {
-                        sh 'git checkout ${BRANCH_NAME}'
+                        sh "git checkout ${gitHash}"
                     }
 
                     try {
