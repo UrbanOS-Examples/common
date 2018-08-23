@@ -19,8 +19,7 @@ resource "aws_key_pair" "cloud_key" {
 }
 
 locals {
-  kubernetes_cluster_name = "${length(var.kubernetes_cluster_name) > 0 ? var.kubernetes_cluster_name : format("%s-kube", terraform.workspace)}"
-  vpc_name                = "${length(var.vpc_name) > 0 ? var.vpc_name : terraform.workspace}"
+  vpc_name = "${length(var.vpc_name) > 0 ? var.vpc_name : terraform.workspace}"
 }
 
 variable "region" {
@@ -28,17 +27,8 @@ variable "region" {
   default     = "us-west-2"
 }
 
-variable "public_dns_zone_id" {
-  description = "Public DNS zone ID"
-}
-
 variable "role_arn" {
   description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
-}
-
-variable "kubernetes_cluster_name" {
-  description = "The cluster name for kubernetes"
-  default     = ""
 }
 
 variable "vpc_name" {

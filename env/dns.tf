@@ -31,4 +31,5 @@ resource "aws_route53_record" "alm_ns_record" {
 
 variable "root_dns_zone" {
   description = "Name of root domain (ex. example.com)"
+  default     = "internal.smartcolumbusos.com"
 }
