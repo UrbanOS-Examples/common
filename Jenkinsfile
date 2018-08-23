@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@1.4.0',
+    identifier: 'pipeline-lib@smrt-340',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -49,7 +49,7 @@ node('infrastructure') {
                     publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
                 }
 
-                if (scos.shouldDeploy('dev', env.BRANCH_NAME)) {
+                if (scos.shouldDeploy('dev', env.BRANCH_NAME) || true) {
                     def terraform = scos.terraform('prod-prime')
 
                     stage('Checkout current prod code') {
