@@ -3,8 +3,9 @@ locals {
 }
 
 module "eks-cluster" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "1.3.0"
+  source = "github.com/SmartColumbusOS/terraform-aws-eks"
+  # source  = "terraform-aws-modules/eks/aws"
+  # version = "1.3.0"
 
   cluster_name = "${local.kubernetes_cluster_name}"
   subnets      = "${module.vpc.private_subnets}"
@@ -15,8 +16,7 @@ module "eks-cluster" {
 
   worker_groups = [{
     name                 = "Workers"
-    asg_desired_capacity = "3"
-    asg_min_size         = "1"
+    asg_min_size         = "3"
     asg_max_size         = "6"
     instance_type        = "t2.medium"
   }]
