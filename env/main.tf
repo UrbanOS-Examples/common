@@ -6,10 +6,6 @@ provider "aws" {
   }
 }
 
-# Required, but not strongly enough for terraform init's depsolving to correctly detect it.
-provider "http" {
-}
-
 terraform {
   backend "s3" {
     key     = "operating-system"
