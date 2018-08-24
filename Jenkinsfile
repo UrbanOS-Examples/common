@@ -77,6 +77,7 @@ node('infrastructure') {
                         }
 
                         stage('Apply to ephemeral prod') {
+                            terraform.init()
                             terraform.plan('variables/dev.tfvars', [
                                 'key_pair_public_key': publicKey,
                                 'vpc_cidr': '10.201.0.0/16'
