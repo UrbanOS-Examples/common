@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@2.0.1',
+    identifier: 'pipeline-lib@3.0.0',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -37,12 +37,7 @@ node('infrastructure') {
         ]) {
         String publicKey
 
-            stage('Checkout') {
-                deleteDir()
-                checkout scm
-
-                scos.addGitHubRemoteForTagging('SmartColumbusOS/common.git')
-            }
+            scos.doCheckoutStage()
 
             dir('env') {
                 stage('Setup SSH keys') {
