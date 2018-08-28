@@ -1,3 +1,7 @@
+locals {
+  public_hosted_zone_name = "${terraform.workspace}.${var.root_dns_zone}"
+}
+
 data "terraform_remote_state" "durable" {
   backend   = "s3"
   workspace = "${var.alm_workspace}"
@@ -11,7 +15,7 @@ data "terraform_remote_state" "durable" {
 }
 
 resource "aws_route53_zone" "public_hosted_zone" {
-  name          = "${terraform.workspace}.${var.root_dns_zone}"
+  name          = "${local.public_hosted_zone_name}"
   force_destroy = true
 
   tags = {
