@@ -1,5 +1,5 @@
 locals {
-  public_hosted_zone_name = "${terraform.workspace}.${var.root_dns_zone}"
+  public_hosted_zone_name = "${lower(terraform.workspace)}.${lower(var.root_dns_zone)}"
 }
 
 data "terraform_remote_state" "durable" {
