@@ -4,8 +4,8 @@ data "template_file" "ckan_external_config" {
   vars {
     DB_CKAN_PASSWORD = "${random_string.ckan_db_password_ckan.result}"
     DB_DATASTORE_PASSWORD = "${random_string.ckan_db_password_datastore.result}"
-    DB_HOST = "${aws_db_instance.ckan_internal.address}"
-    DB_PORT = "${aws_db_instance.ckan_internal.port}"
+    DB_HOST = "${aws_db_instance.ckan.address}"
+    DB_PORT = "${aws_db_instance.ckan.port}"
     DNS_ZONE = "${terraform.workspace}.${var.root_dns_zone}"
     SOLR_HOST = "127.0.0.1"
     S3_BUCKET = "${aws_s3_bucket.ckan.id}"
@@ -23,7 +23,7 @@ data "template_file" "ckan_external_nginx_config" {
 
 resource "aws_instance" "ckan_external" {
   instance_type          = "${var.ckan_external_instance_type}"
-  ami                    = "${var.ckan_external_ami}"
+  ami                    = "${var.ckan_external_backup_ami}"
   vpc_security_group_ids = ["${aws_security_group.os_servers.id}"]
   ebs_optimized          = "${var.ckan_external_instance_ebs_optimized}"
   iam_instance_profile   = "${var.ckan_external_instance_profile}"
@@ -33,7 +33,7 @@ resource "aws_instance" "ckan_external" {
 
   tags {
     Name    = "${terraform.workspace} CKAN external"
-    BaseAMI = "${var.ckan_external_ami}"
+    BaseAMI = "${var.ckan_external_backup_ami}"
   }
 
   provisioner "file" {
@@ -73,8 +73,8 @@ resource "aws_instance" "ckan_external" {
     inline = [
       <<EOF
 sudo bash /tmp/setup.sh \
-  --db-host ${aws_db_instance.ckan_internal.address} \
-  --db-port ${aws_db_instance.ckan_internal.port} \
+  --db-host ${aws_db_instance.ckan.address} \
+  --db-port ${aws_db_instance.ckan.port} \
   --db-admin-password ${random_string.ckan_db_password_sysadmin.result} \
   --db-ckan-password ${random_string.ckan_db_password_ckan.result} \
   --db-datastore-password ${random_string.ckan_db_password_datastore.result}
@@ -114,7 +114,7 @@ resource "aws_route53_record" "ckan_external_public_dns" {
   }
 }
 
-variable "ckan_external_ami" {
+variable "ckan_external_backup_ami" {
   description = "AMI of the ckan external image to restore"
 }
 

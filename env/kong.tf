@@ -1,6 +1,16 @@
+data "template_file" "kong_config" {
+  template = "${file("${path.module}/files/kong/kong.conf.tpl")}"
+
+  vars {
+    DB_HOST     = "${aws_db_instance.kong.address}"
+    DB_PORT     = "${aws_db_instance.kong.port}"
+    DB_PASSWORD = "${random_string.kong_db_password_kong.result}"
+  }
+}
+
 resource "aws_instance" "kong" {
   instance_type          = "${var.kong_instance_type}"
-  ami                    = "${var.kong_ami}"
+  ami                    = "${var.kong_backup_ami}"
   vpc_security_group_ids = ["${aws_security_group.os_servers.id}"]
   ebs_optimized          = "${var.kong_instance_ebs_optimized}"
   iam_instance_profile   = "${var.kong_instance_profile}"
@@ -9,12 +19,41 @@ resource "aws_instance" "kong" {
 
   tags {
     Name    = "${terraform.workspace} kong"
-    BaseAMI = "${var.kong_ami}"
+    BaseAMI = "${var.kong_backup_ami}"
+  }
+
+  provisioner "file" {
+    content      = "${data.template_file.kong_config.rendered}"
+    destination = "/tmp/kong.conf"
+
+    connection {
+      type = "ssh"
+      host = "${self.private_ip}"
+      user = "centos"
+    }
+  }
+
+  provisioner "file" {
+    source     = "${path.module}/files/kong/setup.sh"
+    destination = "/tmp/setup.sh"
+
+    connection {
+      type = "ssh"
+      host = "${self.private_ip}"
+      user = "centos"
+    }
   }
 
   provisioner "remote-exec" {
     inline = [
-      "sudo sed -i 's#pg_host =.*#pg_host = ${aws_db_instance.kong.address}#' /etc/kong/kong.conf"
+      <<EOF
+sudo bash /tmp/setup.sh \
+  --db-host ${aws_db_instance.kong.address} \
+  --db-port ${aws_db_instance.kong.port} \
+  --db-admin-password ${random_string.kong_db_password_sysadmin.result} \
+  --db-kong-password ${random_string.kong_db_password_kong.result} \
+  --ckan-internal-url http://${aws_route53_record.ckan_internal_ec2_record.fqdn}/
+EOF
     ]
 
     connection {
@@ -59,10 +98,10 @@ resource "aws_db_instance" "kong" {
   engine                 = "postgres"
   engine_version         = "9.6.6"
   parameter_group_name   = "${var.kong_db_parameter_group_name}"
-  allocated_storage      = "${var.kong_allocated_storage}"
+  allocated_storage      = "${var.kong_db_allocated_storage}"
   storage_type           = "gp2"
   username               = "sysadmin"
-  password               = "${random_string.kong_db_password.result}"
+  password               = "${random_string.kong_db_password_sysadmin.result}"
   snapshot_identifier    = "${var.kong_db_snapshot_id}"
   multi_az               = "${var.kong_db_multi_az}"
   storage_encrypted      = false
@@ -77,18 +116,22 @@ resource "aws_db_instance" "kong" {
   }
 }
 
-resource "random_string" "kong_db_password" {
+resource "random_string" "kong_db_password_sysadmin" {
   length = 40
   special = false
 }
 
-variable "kong_ami" {
+resource "random_string" "kong_db_password_kong" {
+  length = 40
+  special = false
+}
+
+variable "kong_backup_ami" {
   description = "The AMI to restore for kong"
 }
 
 variable "kong_db_snapshot_id" {
   description = "The snapshot to restore for the kong db"
-  default     = ""
 }
 
 variable "kong_db_multi_az" {
@@ -101,7 +144,7 @@ variable "kong_db_parameter_group_name" {
   default     = "default.postgres9.6"
 }
 
-variable "kong_allocated_storage" {
+variable "kong_db_allocated_storage" {
   description = "How much storage is allocated for the kong db"
   default     = 100
 }
@@ -123,7 +166,9 @@ variable "kong_db_instance_class" {
 
 variable "kong_instance_profile" {
   description = "Instance Profile for kong server"
-  default     = "CloudWatch_EC2"
+  default     = ""
+  //TODO: Create CloudWatch_EC2 in Terraform
+  //default     = "CloudWatch_EC2"
 }
 
 variable "kong_instance_type" {

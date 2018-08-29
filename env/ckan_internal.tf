@@ -4,8 +4,8 @@ data "template_file" "ckan_internal_config" {
   vars {
     DB_CKAN_PASSWORD = "${random_string.ckan_db_password_ckan.result}"
     DB_DATASTORE_PASSWORD = "${random_string.ckan_db_password_datastore.result}"
-    DB_HOST = "${aws_db_instance.ckan_internal.address}"
-    DB_PORT = "${aws_db_instance.ckan_internal.port}"
+    DB_HOST = "${aws_db_instance.ckan.address}"
+    DB_PORT = "${aws_db_instance.ckan.port}"
     DNS_ZONE = "${terraform.workspace}.${var.root_dns_zone}"
     SOLR_HOST = "${aws_instance.ckan_external.private_ip}"
     S3_BUCKET = "${aws_s3_bucket.ckan.id}"
@@ -23,7 +23,7 @@ resource "aws_instance" "ckan_internal" {
   key_name               = "${aws_key_pair.cloud_key.key_name}"
   iam_instance_profile   = "${aws_iam_instance_profile.ckan.name}"
 
-  depends_on = ["aws_instance.ckan_external", "aws_db_instance.ckan_internal"]
+  depends_on = ["aws_instance.ckan_external", "aws_db_instance.ckan"]
 
   tags {
     Name    = "${terraform.workspace} CKAN Internal"
@@ -67,8 +67,8 @@ resource "aws_instance" "ckan_internal" {
     inline = [
       <<EOF
 sudo bash /tmp/setup.sh \
-  --db-host ${aws_db_instance.ckan_internal.address} \
-  --db-port ${aws_db_instance.ckan_internal.port} \
+  --db-host ${aws_db_instance.ckan.address} \
+  --db-port ${aws_db_instance.ckan.port} \
   --db-admin-password ${random_string.ckan_db_password_sysadmin.result} \
   --db-ckan-password ${random_string.ckan_db_password_ckan.result} \
   --db-datastore-password ${random_string.ckan_db_password_datastore.result}

@@ -68,7 +68,7 @@ resource "aws_s3_bucket_policy" "ckan_data_public_read" {
 POLICY
 }
 
-resource "aws_db_instance" "ckan_internal" {
+resource "aws_db_instance" "ckan" {
   identifier                = "${terraform.workspace}-${var.ckan_db_identifier}"
   instance_class            = "${var.ckan_db_instance_class}"
   vpc_security_group_ids    = ["${aws_security_group.os_servers.id}"]
@@ -89,7 +89,7 @@ resource "aws_db_instance" "ckan_internal" {
   monitoring_role_arn = "${aws_iam_role.ckan_rds_monitoring.arn}"
 
   lifecycle {
-    ignore_changes = ["snapshot_identifier", "final_snapshot_identifier"]
+    ignore_changes = ["final_snapshot_identifier"]
   }
 
   tags {
@@ -143,7 +143,6 @@ variable "ckan_db_storage_encrypted" {
 
 variable "ckan_db_snapshot_id" {
   description = "The id of the ckan RDS snapshot to restore"
-  default     = ""
 }
 
 variable "ckan_db_multi_az" {

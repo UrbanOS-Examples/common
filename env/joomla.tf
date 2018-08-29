@@ -3,7 +3,7 @@ data "template_file" "joomla_unite_config" {
 
   vars {
     JOOMLA_ADMIN_EMAIL = "smartcolumbusos@columbus.gov"
-    JOOMLA_SITE_URL    = "https://www.${terraform.workspace}.${var.root_dns_zone}/"
+    JOOMLA_SITE_URL    = "https://www.smartcolumbusos.com/"
     JOOMLA_DB_HOST     = "${aws_db_instance.joomla_db.address}"
     JOOMLA_DB_USER     = "${aws_db_instance.joomla_db.username}"
     JOOMLA_DB_PASSWORD = "${random_string.joomla_db_password.result}"
@@ -297,10 +297,10 @@ variable "joomla_instance_ebs_optimized" {
   default     = true
 }
 
-//TODO: Create This in terraform
 variable "joomla_instance_profile" {
   description = "Instance Profile for Joomla server"
   default     = ""
+  //TODO: Create CloudWatch_EC2 in Terraform
   //default     = "CloudWatch_EC2"
 }
 
