@@ -44,60 +44,6 @@ server {
         proxy_redirect http://kong.${DNS_ZONE}/ckan$request_uri /api/;
     }
 
-    location /user/login {
-        #block access to the login screen unless the requests is from the internal VPN
-        set $allow false;
-        if ($http_x_forwarded_for ~ "^10.0.") { set $allow true; }
-        if ($allow = false) {
-            return 404;
-        }
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_pass http://127.0.0.1:8080/user/login;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        # In emergency comment out line to force caching proxy_ignore_headers
-        # X-Accel-Expires Expires Cache-Control; Any request that did not origin
-        if ($http_x_forwarded_proto != "https") {
-            rewrite ^(.*)$ https://$server_name$REQUEST_URI permanent;
-        }
-    }
-
-    location /user/logged_in {
-        #block access to the login screen unless the requests is from the internal VPN
-        set $allow false;
-        if ($http_x_forwarded_for ~ "^10.0.") { set $allow true; }
-        if ($allow = false) {
-            return 404;
-        }
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_pass http://127.0.0.1:8080/user/logged_in;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        # In emergency comment out line to force caching proxy_ignore_headers
-        # X-Accel-Expires Expires Cache-Control; Any request that did not origin
-        if ($http_x_forwarded_proto != "https") {
-            rewrite ^(.*)$ https://$server_name$REQUEST_URI permanent;
-        }
-    }
-
-    location /login_generic {
-        #block access to the login screen unless the requests is from the internal VPN
-        set $allow false;
-        if ($http_x_forwarded_for ~ "^10.0.") { set $allow true; }
-        if ($allow = false) {
-            return 404;
-        }
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_pass http://127.0.0.1:8080/login_generic;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        # In emergency comment out line to force caching proxy_ignore_headers
-        # X-Accel-Expires Expires Cache-Control; Any request that did not origin
-        if ($http_x_forwarded_proto != "https") {
-            rewrite ^(.*)$ https://$server_name$REQUEST_URI permanent;
-        }
-    }
-
     #allow port 80 non HTTP for health check
     location /health_check {
         proxy_pass http://127.0.0.1:8080/health_check;
