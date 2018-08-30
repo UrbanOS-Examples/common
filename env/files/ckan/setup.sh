@@ -49,14 +49,6 @@ rm -rf /etc/nginx/sites-{enabled,available}/*
 mv /tmp/nginx.conf /etc/nginx/sites-available/ckan
 ln -s /etc/nginx/sites-available/ckan /etc/nginx/sites-enabled/ckan
 
-# Turn off command trace so aws secret key doesn't get dumped to log in jenkins
-set +x
-# Inject EC2 instance AWS credentials to CKAN config
-access_key=$(curl http://169.254.169.254/latest/meta-data/iam/security-credentials/ckan_ec2/ | jq '.AccessKeyId')
-secret_key=$(curl http://169.254.169.254/latest/meta-data/iam/security-credentials/ckan_ec2/ | jq '.SecretAccessKey')
-sed -i 's|#{DRIVER_OPTIONS}|{"key":'${access_key}',"secret":'${secret_key}'}|' /tmp/production.ini
-set -x
-
 mv /tmp/production.ini /etc/ckan/default/production.ini
 
 # Turn off command trace so passwords don't get dumped to log in jenkins
@@ -68,6 +60,10 @@ psql="psql -h ${db_host} -p ${db_port} ckan_default sysadmin"
 ${psql} -c "ALTER USER ckan_default WITH PASSWORD '${db_ckan_password}';"
 ${psql} -c "ALTER USER datastore_default WITH PASSWORD '${db_datastore_password}';"
 set -x
+
+# EC2 credentials expire after 6 hours. This will ensure these credentials are always up to date
+mv /tmp/update-aws-credentials.sh /opt/update-aws-credentials.sh
+sh /opt/update-aws-credentials.sh
 
 systemctl restart apache2
 systemctl restart nginx

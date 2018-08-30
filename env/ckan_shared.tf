@@ -23,7 +23,7 @@ resource "aws_iam_role" "ckan_ec2" {
                "Service": "ec2.amazonaws.com"
             },
             "Effect": "Allow",
-            "Sid": ""
+            "Sid": "${terraform.workspace}-ckan-instance-role"
         }
     ]
 }
@@ -44,6 +44,7 @@ resource "aws_iam_role_policy" "ckan_data_s3_policy" {
       ],
       "Effect": "Allow",
       "Resource": ["${aws_s3_bucket.ckan.arn}/*", "${aws_s3_bucket.ckan.arn}"]
+      "Sid": "${terraform.workspace}-ckan-s3-bucket-access"
     }
   ]
 }

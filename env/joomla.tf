@@ -100,7 +100,7 @@ resource "aws_iam_role" "joomla_ec2" {
                "Service": "ec2.amazonaws.com"
             },
             "Effect": "Allow",
-            "Sid": ""
+            "Sid": "${terraform.workspace}-joomla-instance-role"
         }
     ]
 }
@@ -121,6 +121,7 @@ resource "aws_iam_role_policy" "joomla_s3_bucket_policy" {
         "s3:GetObject"
       ],
       "Resource": ["${aws_s3_bucket.joomla-backups.arn}/*"]
+      "Sid": "${terraform.workspace}-joomla-s3-bucket-access"
     }
   ]
 }

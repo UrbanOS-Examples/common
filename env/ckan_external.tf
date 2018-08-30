@@ -48,6 +48,17 @@ resource "aws_instance" "ckan_external" {
   }
 
   provisioner "file" {
+    source = "${path.module}/files/ckan/update-aws-credentials.sh"
+    destination = "/tmp/update-aws-credentials.sh"
+
+    connection {
+      type = "ssh"
+      host = "${self.private_ip}"
+      user = "ubuntu"
+    }
+  }
+
+  provisioner "file" {
     content = "${data.template_file.ckan_external_config.rendered}"
     destination = "/tmp/production.ini"
 
