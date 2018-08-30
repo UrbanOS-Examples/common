@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <unite scripting="02_angie">
+  <s3>
+		<accesskey>${S3_ACCESS_KEY}</accesskey>
+		<secretkey>${S3_SECRET_KEY}</secretkey>
+		<signature>v4</signature>
+		<bucket>scos-prod-joomla-backups</bucket>
+		<region>us-east-1</region>
+		<ssl>1</ssl>
+		<filename>${S3_FILE_NAME}</filename>
+	</s3>
+
   <siteInfo>
-    <package>/tmp/backup.zip</package>
+    <package from="s3"></package>
     <deletePackage>0</deletePackage>
     <localLog>test.log</localLog>
     <emailSysop>0</emailSysop>
     <name>Smart Columbus OS</name>
     <email>smartcolumbusos@columbus.gov</email>
-    <absolutepath>/home/admin/web/public_html</absolutepath>
+    <absolutepath>${JOOMLA_PATH}</absolutepath>
     <homeurl>${JOOMLA_SITE_URL}</homeurl>
     <livesite>${JOOMLA_SITE_URL}</livesite>
   </siteInfo>

@@ -1,34 +1,26 @@
 locals {
-  fqdn_suffix = "${terraform.workspace}.${var.root_dns_zone}"
+  lb_rule_env_prefix = "${terraform.workspace == "prod" ? "" : "${terraform.workspace}."}"
 
   lb_rules = [
     {
-      name                 = "Joomla"
-      condition_field      = "host-header"
-      condition_values     = "${local.fqdn_suffix}"
-      health_check_path    = "/"
-      health_check_matcher = "200"
+      name             = "Joomla"
+      condition_field  = "host-header"
+      condition_values = "${local.lb_rule_env_prefix}smartcolumbusos.com"
     },
     {
-      name                 = "CKAN"
-      condition_field      = "host-header"
-      condition_values     = "ckan.${local.fqdn_suffix}"
-      health_check_path    = "/"
-      health_check_matcher = "200"
+      name             = "CKAN"
+      condition_field  = "host-header"
+      condition_values = "ckan.${local.lb_rule_env_prefix}smartcolumbusos.com"
     },
     {
-      name                 = "Kong"
-      condition_field      = "host-header"
-      condition_values     = "api.${local.fqdn_suffix}"
-      health_check_path    = "/ckan/api"
-      health_check_matcher = "200"
+      name             = "Kong"
+      condition_field  = "host-header"
+      condition_values = "api.${local.lb_rule_env_prefix}smartcolumbusos.com"
     },
     {
-      name                 = "MaintenancePage"
-      condition_field      = "path-pattern"
-      condition_values     = "/MaintenanceMode/*"
-      health_check_path    = "/"
-      health_check_matcher = "200"
+      name             = "MaintenancePage"
+      condition_field  = "path-pattern"
+      condition_values = "/MaintenanceMode/*"
     },
   ]
 
@@ -41,12 +33,6 @@ resource "aws_alb_target_group" "all_target_groups" {
   vpc_id   = "${var.vpc_id}"
   port     = 80
   protocol = "HTTP"
-  health_check {
-    path                = "${lookup(local.lb_rules[count.index], "health_check_path")}"
-    matcher             = "${lookup(local.lb_rules[count.index], "health_check_matcher")}"
-    healthy_threshold   = 5
-    unhealthy_threshold = 2
-  }
 }
 
 resource "aws_alb" "alb" {
@@ -137,10 +123,6 @@ variable "security_group_ids" {
 variable "subnet_ids" {
   type        = "list"
   description = "list of subnet ids to associate with the load balancer"
-}
-
-variable "root_dns_zone" {
-  description = "Name of root domain (ex. example.com)"
 }
 
 output "target_group_arns" {
