@@ -32,6 +32,37 @@ resource "aws_s3_bucket_policy" "smart_os_initial_state_backups" {
 POLICY
 }
 
+resource "aws_s3_bucket" "scospy-repository" {
+  bucket = "${var.scospy_repo_name}"
+  acl    = "public-read"
+  tags {
+    Name        = "scospy-repository"
+    Environment = "${terraform.workspace}"
+  }
+}
+
+resource "aws_s3_bucket_policy" "scospy-repository-policy" {
+  bucket = "${aws_s3_bucket.scospy-repository.id}"
+  policy =<<POLICY
+{
+  "Version":"2012-10-17",
+  "Statement":[{
+      "Sid":"AddPerm",
+      "Effect":"Allow",
+      "Principal": "*",
+      "Action":["s3:GetObject"],
+      "Resource":["${aws_s3_bucket.scospy-repository.arn}/*"]
+    }
+  ]
+}
+POLICY
+}
+
+variable "scospy_repo_name" {
+  default = "scospy-repository"
+  description = "Bucket name to archive scospy build artifacts"
+}
+
 output "smart_os_initial_state_bucket_name" {
   value = "${aws_s3_bucket.smart_os_initial_state_backups.id}"
 }

@@ -9,3 +9,5 @@ root_zone_role_arn = ""
 hosted_zone_name = "sandbox"
 
 root_zone_name = "internal.smartcolumbusos.com"
+
+scospy_repo_name = "sandbox-scospy-repository"
