@@ -12,7 +12,7 @@ data "template_file" "joomla_unite_config" {
 
 resource "aws_db_instance" "joomla_db" {
   identifier             = "${var.joomla_db_identifier}-${terraform.workspace}"
-  instance_class         = "${var.joomla_db_instance_class}"
+  instance_class         = "db.t2.large"
   vpc_security_group_ids = ["${aws_security_group.os_servers.id}"]
   db_subnet_group_name   = "${aws_db_subnet_group.default.name}"
   skip_final_snapshot    = true
@@ -99,7 +99,8 @@ resource "aws_iam_role" "joomla_ec2" {
             "Principal": {
                "Service": "ec2.amazonaws.com"
             },
-            "Effect": "Allow"
+            "Effect": "Allow",
+            "Sid": "${terraform.workspace}-joomla-instance-role"
         }
     ]
 }
@@ -120,6 +121,7 @@ resource "aws_iam_role_policy" "joomla_s3_bucket_policy" {
         "s3:GetObject"
       ],
       "Resource": ["${aws_s3_bucket.joomla-backups.arn}/*"]
+      "Sid": "${terraform.workspace}-joomla-s3-bucket-access"
     }
   ]
 }
@@ -231,9 +233,8 @@ EOF
 }
 
 resource "aws_s3_bucket" "joomla-backups" {
-  bucket        = "${terraform.workspace}-os-joomla-backups"
-  acl           = "private"
-  force_destroy = true
+  bucket = "${terraform.workspace}-os-joomla-backups"
+  acl    = "private"
 
   provisioner "local-exec" {
     command = "aws s3 cp s3://${data.terraform_remote_state.durable.smart_os_initial_state_bucket_name}/${var.joomla_backup_file_name} s3://${self.id}/${var.joomla_backup_file_name}"
@@ -290,11 +291,6 @@ variable "joomla_backup_file_name" {
 variable "joomla_db_identifier" {
   description = "AWS RDS identifier for joomla db instance"
   default     = "joomla"
-}
-
-variable "joomla_db_instance_class" {
-  description = "The type of the instance for the joomla database"
-  default     = "db.t2.large"
 }
 
 variable "joomla_instance_ebs_optimized" {
