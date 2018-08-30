@@ -1,7 +1,8 @@
 
 resource "aws_s3_bucket" "ckan" {
-  bucket = "${terraform.workspace}-os-ckan-data"
-  acl    = "private"
+  bucket        = "${terraform.workspace}-os-ckan-data"
+  acl           = "private"
+  force_destroy = true
 }
 
 resource "aws_iam_instance_profile" "ckan" {
@@ -22,8 +23,7 @@ resource "aws_iam_role" "ckan_ec2" {
             "Principal": {
                "Service": "ec2.amazonaws.com"
             },
-            "Effect": "Allow",
-            "Sid": "${terraform.workspace}-ckan-instance-role"
+            "Effect": "Allow"
         }
     ]
 }
@@ -44,7 +44,6 @@ resource "aws_iam_role_policy" "ckan_data_s3_policy" {
       ],
       "Effect": "Allow",
       "Resource": ["${aws_s3_bucket.ckan.arn}/*", "${aws_s3_bucket.ckan.arn}"]
-      "Sid": "${terraform.workspace}-ckan-s3-bucket-access"
     }
   ]
 }
@@ -99,13 +98,12 @@ resource "aws_db_instance" "ckan" {
 }
 
 resource "aws_iam_role" "ckan_rds_monitoring" {
-  name="os-rds-monitoring-role"
+  name="os_rds_monitoring_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "",
       "Effect": "Allow",
       "Principal": {
         "Service": "monitoring.rds.amazonaws.com"
