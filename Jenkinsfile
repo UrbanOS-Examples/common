@@ -49,134 +49,130 @@ def environments = params.environmentsParameter.trim().split("\n").collect { env
     environment.trim()
 }
 
-node('infrastructure') {
-    ansiColor('xterm') {
-        withCredentials([
-            [
-                $class: 'AmazonWebServicesCredentialsBinding',
-                credentialsId: 'aws_jenkins_user',
-                variable: 'AWS_ACCESS_KEY_ID'
-            ],
-            sshUserPrivateKey(
-                credentialsId: "k8s-no-pass",
-                keyFileVariable: 'keyfile'
-            )
-        ]) {
-        String publicKey
+node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCredentials([
+    [
+        $class: 'AmazonWebServicesCredentialsBinding',
+        credentialsId: 'aws_jenkins_user',
+        variable: 'AWS_ACCESS_KEY_ID'
+    ],
+    sshUserPrivateKey(
+        credentialsId: "k8s-no-pass",
+        keyFileVariable: 'keyfile'
+    )
+]) {
+    String publicKey
 
-            scos.doCheckoutStage()
+    scos.doCheckoutStage()
 
-            dir('env') {
-                stage('Setup SSH keys') {
-                    publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
+    dir('env') {
+        stage('Setup SSH keys') {
+            publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
+        }
+
+        if (scos.shouldDeploy('dev', env.BRANCH_NAME)) {
+            def terraform = scos.terraform('prod-prime')
+            def gitHash
+
+            stage('Checkout current prod code') {
+                gitHash = sh(returnStdout: true, script: 'git rev-parse HEAD')
+
+                sh 'git fetch github --tags && git checkout prod'
+            }
+
+            try {
+                stage('Create Ephemeral Prod In Dev') {
+                    terraform.init()
+
+                    terraform.plan('variables/dev.tfvars', [
+                        'key_pair_public_key': publicKey,
+                        'vpc_cidr': '10.201.0.0/16',
+                        'joomla_backup_ami': params.joomlaBackupAMI,
+                        'joomla_backup_file_name': params.joomlaBackupFileName,
+                        'ckan_internal_backup_ami': params.ckanInternalBackupAMI,
+                        'ckan_external_backup_ami': params.ckanExternalBackupAMI,
+                        'ckan_db_snapshot_id': params.ckanDBSnapshotID,
+                        'kong_backup_ami': params.kongBackupAMI,
+                        'kong_db_snapshot_id': params.kongDBSnapshotID,
+
+                        // The following are dead after this code makes it to prod
+                        'kubernetes_cluster_name': 'streaming-kube-prod-prime'
+                    ])
+                    terraform.apply()
                 }
 
-                if (scos.shouldDeploy('dev', env.BRANCH_NAME)) {
-                    def terraform = scos.terraform('prod-prime')
-                    def gitHash
-
-                    stage('Checkout current prod code') {
-                        gitHash = sh(returnStdout: true, script: 'git rev-parse HEAD')
-
-                        sh 'git fetch github --tags && git checkout prod'
-                    }
-
-                    try {
-                        stage('Create Ephemeral Prod In Dev') {
-                            terraform.init()
-
-                            terraform.plan('variables/dev.tfvars', [
-                                'key_pair_public_key': publicKey,
-                                'vpc_cidr': '10.201.0.0/16',
-                                'joomla_backup_ami': params.joomlaBackupAMI,
-                                'joomla_backup_file_name': params.joomlaBackupFileName,
-                                'ckan_internal_backup_ami': params.ckanInternalBackupAMI,
-                                'ckan_external_backup_ami': params.ckanExternalBackupAMI,
-                                'ckan_db_snapshot_id': params.ckanDBSnapshotID,
-                                'kong_backup_ami': params.kongBackupAMI,
-                                'kong_db_snapshot_id': params.kongDBSnapshotID,
-
-                                // The following are dead after this code makes it to prod
-                                'kubernetes_cluster_name': 'streaming-kube-prod-prime'
-                            ])
-                            terraform.apply()
-                        }
-
-                        stage('Return to current git revision') {
-                            sh "git checkout ${gitHash}"
-                        }
-
-                        stage('Apply to ephemeral prod') {
-                            terraform.init()
-                            terraform.plan('variables/dev.tfvars', [
-                                'key_pair_public_key': publicKey,
-                                'vpc_cidr': '10.201.0.0/16',
-                                'joomla_backup_ami': params.joomlaBackupAMI,
-                                'joomla_backup_file_name': params.joomlaBackupFileName,
-                                'ckan_internal_backup_ami': params.ckanInternalBackupAMI,
-                                'ckan_external_backup_ami': params.ckanExternalBackupAMI,
-                                'ckan_db_snapshot_id': params.ckanDBSnapshotID,
-                                'kong_backup_ami': params.kongBackupAMI,
-                                'kong_db_snapshot_id': params.kongDBSnapshotID
-                            ])
-                            terraform.apply()
-                        }
-                    } finally {
-                        stage('Destroy ephemeral prod') {
-                            terraform.planDestroy('variables/dev.tfvars')
-                            terraform.apply()
-                        }
-                    }
+                stage('Return to current git revision') {
+                    sh "git checkout ${gitHash}"
                 }
 
-                environments.each { environment ->
-                    def terraform = scos.terraform(environment)
+                stage('Apply to ephemeral prod') {
+                    terraform.init()
+                    terraform.plan('variables/dev.tfvars', [
+                        'key_pair_public_key': publicKey,
+                        'vpc_cidr': '10.201.0.0/16',
+                        'joomla_backup_ami': params.joomlaBackupAMI,
+                        'joomla_backup_file_name': params.joomlaBackupFileName,
+                        'ckan_internal_backup_ami': params.ckanInternalBackupAMI,
+                        'ckan_external_backup_ami': params.ckanExternalBackupAMI,
+                        'ckan_db_snapshot_id': params.ckanDBSnapshotID,
+                        'kong_backup_ami': params.kongBackupAMI,
+                        'kong_db_snapshot_id': params.kongDBSnapshotID
+                    ])
+                    terraform.apply()
+                }
+            } finally {
+                stage('Destroy ephemeral prod') {
+                    terraform.planDestroy('variables/dev.tfvars')
+                    terraform.apply()
+                }
+            }
+        }
 
-                    stage("Plan ${environment}") {
-                        terraform.init()
+        environments.each { environment ->
+            def terraform = scos.terraform(environment)
 
-                        terraform.plan(terraform.defaultVarFile, [
-                            'key_pair_public_key': publicKey,
-                            'joomla_backup_ami': params.joomlaBackupAMI,
-                            'joomla_backup_file_name': params.joomlaBackupFileName,
-                            'ckan_internal_backup_ami': params.ckanInternalBackupAMI,
-                            'ckan_external_backup_ami': params.ckanExternalBackupAMI,
-                            'ckan_db_snapshot_id': params.ckanDBSnapshotID,
-                            'kong_backup_ami': params.kongBackupAMI,
-                            'kong_db_snapshot_id': params.kongDBSnapshotID
-                        ])
+            stage("Plan ${environment}") {
+                terraform.init()
 
-                        archiveArtifacts artifacts: 'plan-*.txt', allowEmptyArchive: false
+                terraform.plan(terraform.defaultVarFile, [
+                    'key_pair_public_key': publicKey,
+                    'joomla_backup_ami': params.joomlaBackupAMI,
+                    'joomla_backup_file_name': params.joomlaBackupFileName,
+                    'ckan_internal_backup_ami': params.ckanInternalBackupAMI,
+                    'ckan_external_backup_ami': params.ckanExternalBackupAMI,
+                    'ckan_db_snapshot_id': params.ckanDBSnapshotID,
+                    'kong_backup_ami': params.kongBackupAMI,
+                    'kong_db_snapshot_id': params.kongDBSnapshotID
+                ])
+
+                archiveArtifacts artifacts: 'plan-*.txt', allowEmptyArchive: false
+            }
+            if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
+                stage("Deploy ${environment}") {
+                    terraform.apply()
+                    createTillerUser(environment)
+                }
+                stage("Execute Kubernetes Configs for ${environment}") {
+                    applyKubeConfigs(environment)
+                }
+                stage("Deploy tiller service for ${environment}") {
+                    scos.withEksCredentials(environment) {
+                        sh('''#!/usr/bin/env bash
+                            set -e
+                            helm init --service-account tiller
+                        ''')
                     }
-                    if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
-                        stage("Deploy ${environment}") {
-                            terraform.apply()
-                            createTillerUser(environment)
-                        }
-                        stage("Execute Kubernetes Configs for ${environment}") {
-                            applyKubeConfigs(environment)
-                        }
-                        stage("Deploy tiller service for ${environment}") {
-                            scos.withEksCredentials(environment) {
-                                sh('''#!/usr/bin/env bash
-                                    set -e
-                                    helm init --service-account tiller
-                                ''')
-                            }
-                        }
-                        stage('Tag') {
-                            if (environment == 'staging') {
-                                scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
-                            }
-
-                            scos.applyAndPushGitHubTag(environment)
-                        }
+                }
+                stage('Tag') {
+                    if (environment == 'staging') {
+                        scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
                     }
+
+                    scos.applyAndPushGitHubTag(environment)
                 }
             }
         }
     }
-}
+}}}}
 
 def createTillerUser(environment) {
     scos.withEksCredentials(environment) {
