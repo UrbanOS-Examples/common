@@ -6,12 +6,12 @@ resource "aws_s3_bucket" "ckan" {
 }
 
 resource "aws_iam_instance_profile" "ckan" {
-  name = "ckan"
+  name = "${terraform.workspace}_ckan"
   role = "${aws_iam_role.ckan_ec2.name}"
 }
 
 resource "aws_iam_role" "ckan_ec2" {
-  name = "ckan_ec2"
+  name = "${terraform.workspace}_ckan_ec2"
   path = "/"
 
   assume_role_policy = <<EOF
@@ -98,7 +98,7 @@ resource "aws_db_instance" "ckan" {
 }
 
 resource "aws_iam_role" "ckan_rds_monitoring" {
-  name="os_rds_monitoring_role"
+  name="${terraform.workspace}_os_rds_monitoring_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
