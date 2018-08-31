@@ -34,11 +34,11 @@ done
 
 set -ex
 
-sudo systemctl stop apt-daily
-
-apt update && apt install -y jq postgresql-client
-
-sudo systemctl start apt-daily
+apt update
+echo "Waiting for apt lock to be free..."
+until fuser /var/lib/dpkg/lock &>/dev/null; do sleep .5; done
+echo "Apt lock is free!"
+apt install -y jq postgresql-client
 
 # Inject host nameserver into nginx config because nginx doesn't use host nameservers for resolution
 nameserver=$(cat /etc/resolv.conf | grep nameserver | cut -d ' ' -f 2)
