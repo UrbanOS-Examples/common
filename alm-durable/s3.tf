@@ -18,8 +18,11 @@ resource "aws_s3_bucket_policy" "smart_os_initial_state_backups" {
          "Principal": {
            "AWS":
             [
-              "arn:aws:iam::068920858268:role/admin_role",
-              "arn:aws:iam::199837183662:role/jenkins_role"
+              "arn:aws:iam::199837183662:role/jenkins_role",
+              "arn:aws:iam::068920858268:root",
+              "arn:aws:iam::073132350570:root",
+              "arn:aws:iam::647770347641:root",
+              "arn:aws:iam::374013108165:root"
             ]
            },
          "Action": [
