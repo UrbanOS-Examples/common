@@ -120,6 +120,13 @@ resource "aws_iam_role_policy" "joomla_s3_bucket_policy" {
         "s3:GetObject"
       ],
       "Resource": ["${aws_s3_bucket.joomla-backups.arn}/*"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": ["${data.terraform_remote_state.durable.smart_os_initial_state_bucket_arn}/*"]
     }
   ]
 }
@@ -216,7 +223,7 @@ sudo bash /tmp/setup.sh \
   --db-host ${aws_db_instance.joomla_db.address} \
   --db-password ${random_string.joomla_db_password.result} \
   --db-user ${aws_db_instance.joomla_db.username} \
-  --s3-bucket ${aws_s3_bucket.joomla-backups.id} \
+  --s3-bucket ${data.terraform_remote_state.durable.smart_os_initial_state_bucket_name} \
   --s3-path '${var.joomla_backup_file_name}' \
   --dns-zone '${terraform.workspace}.${var.root_dns_zone}'
 EOF
@@ -234,10 +241,6 @@ resource "aws_s3_bucket" "joomla-backups" {
   bucket        = "${terraform.workspace}-os-joomla-backups"
   acl           = "private"
   force_destroy = true
-
-  provisioner "local-exec" {
-    command = "aws s3 cp s3://${data.terraform_remote_state.durable.smart_os_initial_state_bucket_name}/${var.joomla_backup_file_name} s3://${self.id}/${var.joomla_backup_file_name}"
-  }
 }
 
 resource "aws_lb_target_group_attachment" "joomla_private" {
