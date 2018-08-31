@@ -82,12 +82,12 @@ resource "aws_db_subnet_group" "default" {
   }
 }
 resource "aws_iam_instance_profile" "joomla" {
-  name = "joomla"
+  name = "${terraform.workspace}_joomla"
   role = "${aws_iam_role.joomla_ec2.name}"
 }
 
 resource "aws_iam_role" "joomla_ec2" {
-  name = "joomla_ec2"
+  name = "${terraform.workspace}_joomla_ec2"
   path = "/"
 
   assume_role_policy = <<EOF
