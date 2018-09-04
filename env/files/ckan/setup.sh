@@ -35,9 +35,16 @@ done
 set -ex
 
 apt update
+set +x
 echo "Waiting for apt lock to be free..."
 until fuser /var/lib/dpkg/lock &>/dev/null; do sleep .5; done
 echo "Apt lock is free!"
+# Given the frequency of checks, there is a latency between when fuser says the lock is free
+# and when the lock actually acts free.  To compensate for this, we sleep for an additional
+# second after the lock is observed to be free
+sleep 1
+set -x
+
 apt install -y jq postgresql-client
 
 # Inject host nameserver into nginx config because nginx doesn't use host nameservers for resolution
