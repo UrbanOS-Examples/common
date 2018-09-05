@@ -11,7 +11,7 @@ reschedule() {
 trap reschedule EXIT HUP INT QUIT PIPE TERM
 
 # Inject EC2 instance AWS credentials to CKAN config
-security_credentials=$(curl http://169.254.169.254/latest/meta-data/iam/security-credentials/ckan_ec2/)
+security_credentials=$(curl http://169.254.169.254/latest/meta-data/iam/security-credentials/#{CKAN_ROLE_NAME}/)
 
 access_key=$(echo ${security_credentials} | jq '.AccessKeyId')
 secret_key=$(echo ${security_credentials} | jq '.SecretAccessKey')
