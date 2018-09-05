@@ -5,7 +5,6 @@ db_port=
 db_admin_password=
 db_ckan_password=
 db_datastore_password=
-ckan_role_name=
 
 until [ ${#} -eq 0 ]; do
     case "${1}" in
@@ -27,10 +26,6 @@ until [ ${#} -eq 0 ]; do
             ;;
         --db-datastore-password)
             db_datastore_password=${2}
-            shift
-            ;;
-        --ckan-role-name)
-            ckan_role_name=${2}
             shift
             ;;
     esac
@@ -74,7 +69,6 @@ ${psql} -c "ALTER USER datastore_default WITH PASSWORD '${db_datastore_password}
 set -x
 
 # EC2 credentials expire after 6 hours. This will ensure these credentials are always up to date
-sed -i "/#{CKAN_ROLE_NAME}/${ckan_role_name}/" /tmp/update-aws-credentials.sh
 mv /tmp/update-aws-credentials.sh /opt/update-aws-credentials.sh
 sh /opt/update-aws-credentials.sh
 
