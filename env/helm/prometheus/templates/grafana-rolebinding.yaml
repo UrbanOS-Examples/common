@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ template "prometheus.name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: "{{ .Values.prometheus.name }}"
+    component: "{{ .Values.grafana.name }}"
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
   name: {{ template "prometheus.grafana.fullname" . }}

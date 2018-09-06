@@ -110,6 +110,23 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a fully qualified grafana name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "prometheus.grafana.fullname" -}}
+{{- if .Values.grafana.fullnameOverride -}}
+{{- .Values.grafana.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" .Release.Name .Values.grafana.name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" .Release.Name $name .Values.grafana.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Return the appropriate apiVersion for networkpolicy.
 */}}
 {{- define "prometheus.networkPolicy.apiVersion" -}}
@@ -179,10 +196,10 @@ Create the name of the service account to use for the server component
 Create the name of the service account
 */}}
 {{- define "prometheus.serviceAccountName.grafana" -}}
-{{- if .Values.serviceAccount.grafana.create -}}
-    {{ default (include "prometheus.grafana.fullname" .) .Values.serviceAccount.grafana.name }}
+{{- if .Values.serviceAccounts.grafana.create -}}
+    {{ default (include "prometheus.grafana.fullname" .) .Values.serviceAccounts.grafana.name }}
 {{- else -}}
-    {{ default "default" .Values.serviceAccount.grafana.name }}
+    {{ default "default" .Values.serviceAccounts.grafana.name }}
 {{- end -}}
 {{- end -}}
 
