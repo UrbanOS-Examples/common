@@ -23,7 +23,7 @@ resource "aws_instance" "kong" {
   }
 
   provisioner "file" {
-    content      = "${data.template_file.kong_config.rendered}"
+    content     = "${data.template_file.kong_config.rendered}"
     destination = "/tmp/kong.conf"
 
     connection {
@@ -52,7 +52,8 @@ sudo bash /tmp/setup.sh \
   --db-port ${aws_db_instance.kong.port} \
   --db-admin-password ${random_string.kong_db_password_sysadmin.result} \
   --db-kong-password ${random_string.kong_db_password_kong.result} \
-  --ckan-internal-url http://${aws_route53_record.ckan_internal_ec2_record.fqdn}/
+  --ckan-internal-url http://${aws_route53_record.ckan_internal_ec2_record.fqdn}/ \
+  --kong-host ${aws_route53_record.kong_public_dns.fqdn}
 EOF
     ]
 
