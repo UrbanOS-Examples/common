@@ -40,8 +40,8 @@ server {
     location /api {
         #nginx by default does not use the system DNS - you must set the resolver here
         resolver #{NAMESERVER}; # Uses #{} so that it can be replaced at "runtime"
-        proxy_pass http://kong.${DNS_ZONE}/ckan$request_uri;
-        proxy_redirect http://kong.${DNS_ZONE}/ckan$request_uri /api/;
+        proxy_pass https://api.${DNS_ZONE}/ckan$request_uri;
+        proxy_redirect https://api.${DNS_ZONE}/ckan$request_uri /api/;
     }
 
     #allow port 80 non HTTP for health check
