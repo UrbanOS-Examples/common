@@ -88,7 +88,8 @@ sudo bash /tmp/setup.sh \
   --db-port ${aws_db_instance.ckan.port} \
   --db-admin-password ${random_string.ckan_db_password_sysadmin.result} \
   --db-ckan-password ${random_string.ckan_db_password_ckan.result} \
-  --db-datastore-password ${random_string.ckan_db_password_datastore.result}
+  --db-datastore-password ${random_string.ckan_db_password_datastore.result} \
+  --external
 EOF
     ]
 

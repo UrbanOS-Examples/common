@@ -5,6 +5,7 @@ db_port=
 db_admin_password=
 db_kong_password=
 ckan_internal_url=
+kong_host=
 
 until [ ${#} -eq 0 ]; do
     case "${1}" in
@@ -28,6 +29,10 @@ until [ ${#} -eq 0 ]; do
             ckan_internal_url=${2}
             shift
             ;;
+        --kong-host)
+            kong_host=${2}
+            shift
+            ;;
     esac
     shift
 done
@@ -46,7 +51,7 @@ ${psql} sysadmin -c "ALTER USER kong WITH PASSWORD '${db_kong_password}';"
 
 # Set CKAN url in config stored in DB
 export PGPASSWORD=${db_kong_password}
-${psql} kong -c "UPDATE apis SET upstream_url = '${ckan_internal_url}' WHERE name = 'ckan_api';"
+${psql} kong -c "UPDATE apis SET upstream_url = '${ckan_internal_url}', hosts = '[\"localhost\",\"api.smartcolumbusos.com\",\"${kong_host}\"]';"
 set -x
 
 mv /tmp/kong.conf /etc/kong/kong.conf

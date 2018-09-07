@@ -69,7 +69,7 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
             publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
         }
 
-        if (scos.shouldDeploy('dev', env.BRANCH_NAME)) {
+        if (false && scos.shouldDeploy('dev', env.BRANCH_NAME)) {
             def terraform = scos.terraform('prod-prime')
             def gitHash
 
