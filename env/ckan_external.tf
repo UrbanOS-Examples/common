@@ -8,8 +8,9 @@ data "template_file" "ckan_external_config" {
     DB_PORT = "${aws_db_instance.ckan.port}"
     DNS_ZONE = "${terraform.workspace}.${var.root_dns_zone}"
     SOLR_HOST = "127.0.0.1"
+    REDIS_HOST = "127.0.0.1"
     S3_BUCKET = "${aws_s3_bucket.ckan.id}"
-    EXTRA_PLUGINS = "scos_theme recline_map_view"
+    EXTRA_PLUGINS = "scos_theme"
   }
 }
 
@@ -39,6 +40,17 @@ resource "aws_instance" "ckan_external" {
   provisioner "file" {
     source     = "${path.module}/files/ckan/setup.sh"
     destination = "/tmp/setup.sh"
+
+    connection {
+      type = "ssh"
+      host = "${self.private_ip}"
+      user = "ubuntu"
+    }
+  }
+
+    provisioner "file" {
+    source     = "${path.module}/files/ckan/ckan-2.8.sh"
+    destination = "/tmp/upgrade.sh"
 
     connection {
       type = "ssh"
