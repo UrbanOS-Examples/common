@@ -213,9 +213,13 @@ def applyKubeConfigs(environment) {
             for manifest in k8s/alb-ingress-controller/*; do
                 cat \$manifest | envsubst | kubectl apply -f -
             done
+
             kubectl apply -f k8s/tiller-role/
             kubectl apply -f k8s/persistent-storage/
-            kubectl apply -f k8s/external-dns/
+
+            for manifest in k8s/external-dns/*; do
+                cat \$manifest | envsubst | kubectl apply -f -
+            done
         """.trim())
     }
 }
