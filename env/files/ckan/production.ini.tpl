@@ -97,6 +97,9 @@ ckan.cors.origin_allow_all = False
 #		same origin policy
 ckan.plugins = stats text_view image_view recline_view datastore datapusher cloudstorage harvest ckan_harvester dcat dcat_rdf_harvester dcat_json_harvester dcat_json_interface odata hidegroups ags_fs_view ags_ms_view officedocs_view SCOSMetadata scos_pod_harvester ${EXTRA_PLUGINS}
 
+ckan.base_public_folder = public-bs2
+ckan.base_templates_folder = templates-bs2
+
 # Define which views should be created by default
 # (plugins must be loaded in ckan.plugins)
 ckan.views.default_views = image_view text_view recline_view
@@ -121,6 +124,9 @@ ckanext.cloudstorage.driver_options = #{DRIVER_OPTIONS}
 
 ##CKAN Harvester Settings
 ckan.harvest.mq.type = redis
+ckan.harvest.mq.hostname = ${REDIS_HOST}
+ckan.harvest.mq.port = 6379
+ckan.harvest.mq.redis_db = 0
 
 ## Front-End Settings
 ckan.site_title = CKAN
@@ -158,8 +164,8 @@ ckan.feeds.author_link =
 ## Storage Settings
 
 ckan.storage_path = /var/lib/ckan
-ckan.max_resource_size = 300
-ckan.max_image_size = 20
+ckan.max_resource_size = 500
+ckan.max_image_size = 2
 
 ## Datapusher settings
 
@@ -188,8 +194,8 @@ ckan.hide_activity_from_users = %(ckan.site_id)s
 #error_email_from = ckan-errors@example.com
 #smtp.server = email-smtp.us-east-1.amazonaws.com
 #smtp.starttls = True
-#smtp.user = 
-#smtp.password = 
+#smtp.user =
+#smtp.password =
 #smtp.mail_from = scideadmin@hntb.com
 
 

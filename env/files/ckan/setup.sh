@@ -70,10 +70,15 @@ ${psql} -c "ALTER USER ckan_default WITH PASSWORD '${db_ckan_password}';"
 ${psql} -c "ALTER USER datastore_default WITH PASSWORD '${db_datastore_password}';"
 set -x
 
+bash -ex /tmp/upgrade.sh
+
 # Reindex the database
 [ -n "${external}" ] && (
     source /usr/lib/ckan/default/bin/activate
     paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
+
+    # restart solr server
+    service jetty8 restart
 )
 
 # EC2 credentials expire after 6 hours. This will ensure these credentials are always up to date
