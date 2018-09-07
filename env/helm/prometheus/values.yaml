@@ -58,43 +58,23 @@ alertmanager:
     enabled: false
 
     annotations: {}
-    #   kubernetes.io/ingress.class: nginx
-    #   kubernetes.io/tls-acme: 'true'
 
     extraLabels: {}
 
-    ## alertmanager Ingress hostnames with optional path
-    ## Must be provided if Ingress is enabled
     hosts: []
-    #   - alertmanager.domain.com
-    #   - domain.com/alertmanager
 
-    ## alertmanager Ingress TLS configuration
-    ## Secrets must be manually created in the namespace
     tls: []
-    #   - secretName: prometheus-alerts-tls
-    #     hosts:
-    #       - alertmanager.domain.com
 
   ## Alertmanager Deployment Strategy type
   # strategy:
   #   type: Recreate
 
-  ## Node tolerations for alertmanager scheduling to nodes with taints
   tolerations: []
-    # - key: "key"
-    #   operator: "Equal|Exists"
-    #   value: "value"
-    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
-  ## Node labels for alertmanager pod assignment
   nodeSelector: {}
 
-  ## Pod affinity
   affinity: {}
 
-  ## Use an alternate scheduler, e.g. "stork".
-  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
   # schedulerName:
 
   persistentVolume:
@@ -128,18 +108,11 @@ alertmanager:
     ## Useful if the volume's root directory is not empty
     subPath: ""
 
-  ## Annotations to be added to alertmanager pods
   podAnnotations: {}
 
   replicaCount: 1
 
   resources: {}
-    # limits:
-    #   cpu: 10m
-    #   memory: 32Mi
-    # requests:
-    #   cpu: 10m
-    #   memory: 32Mi
 
   securityContext: {}
 
@@ -210,10 +183,6 @@ kubeStateMetrics:
   args: {}
 
   tolerations: []
-    # - key: "key"
-    #   operator: "Equal|Exists"
-    #   value: "value"
-    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
   nodeSelector: {}
 
@@ -225,12 +194,6 @@ kubeStateMetrics:
   replicaCount: 1
 
   resources: {}
-    # limits:
-    #   cpu: 10m
-    #   memory: 16Mi
-    # requests:
-    #   cpu: 10m
-    #   memory: 16Mi
 
   securityContext: {}
 
@@ -279,10 +242,6 @@ nodeExporter:
     #   readOnly: true
 
   tolerations: []
-    # - key: "key"
-    #   operator: "Equal|Exists"
-    #   value: "value"
-    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
   nodeSelector: {}
 
@@ -292,12 +251,6 @@ nodeExporter:
     labels: {}
 
   resources: {}
-    # limits:
-    #   cpu: 200m
-    #   memory: 50Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 30Mi
 
   securityContext: {}
 
@@ -341,14 +294,8 @@ server:
   enableAdminApi: false
 
   global:
-    ## How frequently to scrape targets by default
-    ##
     scrape_interval: 1m
-    ## How long until a scrape request times out
-    ##
     scrape_timeout: 10s
-    ## How frequently to evaluate rules
-    ##
     evaluation_interval: 1m
 
   extraArgs: {}
@@ -384,40 +331,22 @@ server:
     enabled: false
 
     annotations: {}
-    #   kubernetes.io/ingress.class: nginx
-    #   kubernetes.io/tls-acme: 'true'
 
     extraLabels: {}
 
     hosts: []
-    #   - prometheus.domain.com
-    #   - domain.com/prometheus
 
-    ## Prometheus server Ingress TLS configuration
-    ## Secrets must be manually created in the namespace
-    ##
     tls: []
-    #   - secretName: prometheus-server-tls
-    #     hosts:
-    #       - prometheus.domain.com
 
-  ## Server Deployment Strategy type
   # strategy:
   #   type: Recreate
 
   tolerations: []
-    # - key: "key"
-    #   operator: "Equal|Exists"
-    #   value: "value"
-    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
   nodeSelector: {}
 
   affinity: {}
 
-  ## Use an alternate scheduler, e.g. "stork".
-  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
-  ##
   # schedulerName:
 
   persistentVolume:
@@ -455,17 +384,10 @@ server:
     subPath: ""
 
   podAnnotations: {}
-    # iam.amazonaws.com/role: prometheus
 
   replicaCount: 1
 
   resources: {}
-    # limits:
-    #   cpu: 500m
-    #   memory: 512Mi
-    # requests:
-    #   cpu: 500m
-    #   memory: 512Mi
 
   securityContext: {}
 
@@ -505,26 +427,12 @@ pushgateway:
     enabled: false
 
     annotations: {}
-    #   kubernetes.io/ingress.class: nginx
-    #   kubernetes.io/tls-acme: 'true'
 
     hosts: []
-    #   - pushgateway.domain.com
-    #   - domain.com/pushgateway
 
-    ## pushgateway Ingress TLS configuration
-    ## Secrets must be manually created in the namespace
-    ##
     tls: []
-    #   - secretName: prometheus-alerts-tls
-    #     hosts:
-    #       - pushgateway.domain.com
 
   tolerations: []
-    # - key: "key"
-    #   operator: "Equal|Exists"
-    #   value: "value"
-    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
   nodeSelector: {}
 
@@ -534,12 +442,6 @@ pushgateway:
 
 
   resources: {}
-    # limits:
-    #   cpu: 10m
-    #   memory: 32Mi
-    # requests:
-    #   cpu: 10m
-    #   memory: 32Mi
 
   securityContext: {}
 
@@ -570,7 +472,6 @@ grafana:
     # pullSecrets:
     #   - myRegistrKeySecretName
 
-  ## Server Deployment Strategy type
   # strategy:
   #   type: Recreate
 
@@ -583,11 +484,9 @@ grafana:
     tag: latest
     pullPolicy: IfNotPresent
 
-  ## Pod Annotations
-  # podAnnotations: {}
+  podAnnotations: {}
 
-  ## Deployment annotations
-  # annotations: {}
+  annotations: {}
 
   service:
     type: ClusterIP
@@ -598,24 +497,14 @@ grafana:
   ingress:
     enabled: false
     annotations: {}
-      # kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
+ 
     labels: {}
     path: /
     hosts:
       - chart-example.local
     tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
 
   resources: {}
-  #  limits:
-  #    cpu: 100m
-  #    memory: 128Mi
-  #  requests:
-  #    cpu: 100m
-  #    memory: 128Mi
 
   nodeSelector: {}
 
@@ -636,9 +525,6 @@ grafana:
   adminUser: admin
   # adminPassword: strongpassword
 
-  ## Use an alternate scheduler, e.g. "stork".
-  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
-  ##
   # schedulerName:
 
   ## Extra environment variables that will be pass onto deployment pods
@@ -726,12 +612,6 @@ grafana:
     image: kiwigrid/k8s-sidecar:0.0.3
     imagePullPolicy: IfNotPresent
     resources:
-  #   limits:
-  #     cpu: 100m
-  #     memory: 100Mi
-  #   requests:
-  #     cpu: 50m
-  #     memory: 50Mi
     dashboards:
       enabled: false
       # label that the configmaps with dashboards are marked with
@@ -1081,3 +961,4 @@ serverFiles:
 
 networkPolicy:
   enabled: false
+
