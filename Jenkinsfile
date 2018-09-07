@@ -208,12 +208,14 @@ def applyKubeConfigs(environment) {
         sh("""#!/bin/bash
             export EKS_CLUSTER_NAME='${eks_cluster_name}'
             export AWS_REGION='${aws_region}'
+            export DNS_ZONE='${environment}.internal.smartcolumbusos.com'
 
             for manifest in k8s/alb-ingress-controller/*; do
                 cat \$manifest | envsubst | kubectl apply -f -
             done
             kubectl apply -f k8s/tiller-role/
             kubectl apply -f k8s/persistent-storage/
+            kubectl apply -f k8s/external-dns/
         """.trim())
     }
 }
