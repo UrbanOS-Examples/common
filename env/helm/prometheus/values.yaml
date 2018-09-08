@@ -21,84 +21,59 @@ serviceAccounts:
   grafana:
     create: true
     name:
-  external-dns:
+  externalDns:
     create: true
     name:
 
 alertmanager:
   enabled: true
-
   name: alertmanager
-
   image:
     repository: prom/alertmanager
     tag: v0.15.2
     pullPolicy: IfNotPresent
-
   priorityClassName: ""
-
   extraArgs: {}
-
   ## The URL prefix at which the container can be accessed. Useful in the case the '-web.external-url' includes a slug
   ## so that the various internal URLs are still able to access as they are in the default case.
   ## (Optional)
   prefixURL: ""
-
   ## External URL which can access alertmanager
   ## Maybe same with Ingress host name
   baseURL: "/"
-
   ## Additional alertmanager container environment variable
   ## For instance to add a http_proxy
   extraEnv: {}
-
   ## ConfigMap override where fullname is {{.Release.Name}}-{{.Values.alertmanager.configMapOverrideName}}
   ## Defining configMapOverrideName will cause templates/alertmanager-configmap.yaml
   ## to NOT generate a ConfigMap resource
   configMapOverrideName: ""
-
   ingress:
     enabled: false
-
     annotations: {}
-
     extraLabels: {}
-
     hosts: []
-
     tls: []
-
   ## Alertmanager Deployment Strategy type
   # strategy:
   #   type: Recreate
-
   tolerations: []
-
   nodeSelector: {}
-
   affinity: {}
-
   # schedulerName:
-
   persistentVolume:
     ## If true, alertmanager will create/use a Persistent Volume Claim
     ## If false, use emptyDir
     enabled: true
-
     accessModes:
       - ReadWriteOnce
-
     annotations: {}
-
     ## alertmanager data Persistent Volume existing claim name
     ## Requires alertmanager.persistentVolume.enabled: true
     ## If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
-
     mountPath: /data
-
     size: 2Gi
-
     ## alertmanager data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -106,30 +81,21 @@ alertmanager:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     # storageClass: "-"
-
     ## Subdirectory of alertmanager data Persistent Volume to mount
     ## Useful if the volume's root directory is not empty
     subPath: ""
-
   podAnnotations: {}
-
   replicaCount: 1
-
   resources: {}
-
   securityContext: {}
-
   service:
     annotations: {}
     labels: {}
     clusterIP: ""
-
     ## Enabling peer mesh service end points for enabling the HA alert manager
     ## Ref: https://github.com/prometheus/alertmanager/blob/master/README.md
     # enableMeshPeer : true
-
     externalIPs: []
-
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
     servicePort: 80
@@ -139,133 +105,90 @@ alertmanager:
 ## Monitors ConfigMap changes and POSTs to a URL
 ## Ref: https://github.com/jimmidyson/configmap-reload
 configmapReload:
-
   name: configmap-reload
-
   image:
     repository: jimmidyson/configmap-reload
     tag: v0.2.2
     pullPolicy: IfNotPresent
-
   extraArgs: {}
-
   extraConfigmapMounts: []
     # - name: prometheus-alerts
     #   mountPath: /etc/alerts.d
     #   configMap: prometheus-alerts
     #   readOnly: true
-
   resources: {}
 
 initChownData:
-  
   enabled: true
-
   name: init-chown-data
-
   image:
     repository: busybox
     tag: latest
     pullPolicy: IfNotPresent
-
   resources: {}
 
 kubeStateMetrics:
-  
   enabled: true
-
   name: kube-state-metrics
-
   image:
     repository: quay.io/coreos/kube-state-metrics
     tag: v1.4.0
     pullPolicy: IfNotPresent
-
   priorityClassName: ""
-
   args: {}
-
   tolerations: []
-
   nodeSelector: {}
-
   podAnnotations: {}
-
   pod:
     labels: {}
-
   replicaCount: 1
-
   resources: {}
-
   securityContext: {}
-
   service:
     annotations:
       prometheus.io/scrape: "true"
     labels: {}
-
     clusterIP: None
-
     externalIPs: []
-
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
     servicePort: 80
     type: ClusterIP
 
 nodeExporter:
-
   enabled: true
-
   name: node-exporter
-
   image:
     repository: prom/node-exporter
     tag: v0.16.0
     pullPolicy: IfNotPresent
-
   priorityClassName: ""
-
   updateStrategy:
     type: OnDelete
-
   extraArgs: {}
-
   extraHostPathMounts: []
     # - name: textfile-dir
     #   mountPath: /srv/txt_collector
     #   hostPath: /var/lib/node-exporter
     #   readOnly: true
-
   extraConfigmapMounts: []
     # - name: certs-configmap
     #   mountPath: /prometheus
     #   configMap: certs-configmap
     #   readOnly: true
-
   tolerations: []
-
   nodeSelector: {}
-
   podAnnotations: {}
-
   pod:
     labels: {}
-
   resources: {}
-
   securityContext: {}
-
   service:
     annotations:
       prometheus.io/scrape: "true"
     labels: {}
-
     clusterIP: None
-
     externalIPs: []
-
     hostPort: 9100
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
@@ -273,48 +196,37 @@ nodeExporter:
     type: ClusterIP
 
 server:
-
   name: server
-
   image:
     repository: prom/prometheus
     tag: v2.3.2
     pullPolicy: IfNotPresent
-
   priorityClassName: ""
-
   ## The URL prefix at which the container can be accessed. Useful in the case the '-web.external-url' includes a slug
   ## so that the various internal URLs are still able to access as they are in the default case.
   ## (Optional)
   prefixURL: ""
-
   ## External URL which can access alertmanager
   ## Maybe same with Ingress host name
   baseURL: ""
-
   ## This flag controls access to the administrative HTTP API which includes functionality such as deleting time
   ## series. This is disabled by default.
   enableAdminApi: false
-
   global:
     scrape_interval: 1m
     scrape_timeout: 10s
     evaluation_interval: 1m
-
   extraArgs: {}
-
   extraHostPathMounts: []
     # - name: certs-dir
     #   mountPath: /etc/kubernetes/certs
     #   hostPath: /etc/kubernetes/certs
     #   readOnly: true
-
   extraConfigmapMounts: []
     # - name: certs-configmap
     #   mountPath: /prometheus
     #   configMap: certs-configmap
     #   readOnly: true
-
   ## Additional Prometheus server Secret mounts
   # Defines additional mounts with secrets. Secrets must be manually created in the namespace.
   extraSecretMounts: []
@@ -322,56 +234,37 @@ server:
     #   mountPath: /etc/secrets
     #   secretName: prom-secret-files
     #   readOnly: true
-
   ## ConfigMap override where fullname is {{.Release.Name}}-{{.Values.server.configMapOverrideName}}
   ## Defining configMapOverrideName will cause templates/server-configmap.yaml
   ## to NOT generate a ConfigMap resource
   ##
   configMapOverrideName: ""
-
   ingress:
-
     enabled: false
-
     annotations: {}
-
     extraLabels: {}
-
     hosts: []
-
     tls: []
-
   # strategy:
   #   type: Recreate
-
   tolerations: []
-
   nodeSelector: {}
-
   affinity: {}
-
   # schedulerName:
-
   persistentVolume:
     ## If true, Prometheus server will create/use a Persistent Volume Claim
     ## If false, use emptyDir
     ##
     enabled: true
-
     accessModes:
       - ReadWriteOnce
-
     annotations: {}
-
     ## Prometheus server data Persistent Volume existing claim name
     ## Requires server.persistentVolume.enabled: true
     ## If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
-
     mountPath: /data
-
     size: 8Gi
-
     ## Prometheus server data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -385,136 +278,91 @@ server:
     ## Useful if the volume's root directory is not empty
     ##
     subPath: ""
-
   podAnnotations: {}
-
   replicaCount: 1
-
   resources: {}
-
   securityContext: {}
-
   service:
     annotations: {}
     labels: {}
     clusterIP: ""
-
     externalIPs: []
-
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
     servicePort: 80
     type: ClusterIP
-
   terminationGracePeriodSeconds: 300
-
   retention: ""
 
 pushgateway:
-
   enabled: true
-
   name: pushgateway
-
   image:
     repository: prom/pushgateway
     tag: v0.5.2
     pullPolicy: IfNotPresent
-
   priorityClassName: ""
-
   extraArgs: {}
-
   ingress:
-
     enabled: false
-
     annotations: {}
-
     hosts: []
-
     tls: []
-
   tolerations: []
-
   nodeSelector: {}
-
   podAnnotations: {}
-
   replicaCount: 1
-
-
   resources: {}
-
   securityContext: {}
-
   service:
     annotations:
       prometheus.io/probe: pushgateway
     labels: {}
     clusterIP: ""
-
     externalIPs: []
-
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
     servicePort: 9091
     type: ClusterIP
 
 grafana:
-
   replicaCount: 1
-
   image:
     repository: grafana/grafana
     tag: 5.2.3
     pullPolicy: IfNotPresent
-
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
     # pullSecrets:
     #   - myRegistrKeySecretName
-
   # strategy:
   #   type: Recreate
-
   securityContext:
     runAsUser: 472
     fsGroup: 472
-
   downloadDashboardsImage:
     repository: appropriate/curl
     tag: latest
     pullPolicy: IfNotPresent
-
   podAnnotations: {}
-
   annotations: {}
-
   service:
     type: ClusterIP
     port: 80
     annotations: {}
     labels: {}
-
   ingress:
     enabled: false
     annotations: {}
- 
     labels: {}
     path: /
     hosts:
       - chart-example.local
     tls: []
-
   resources: {}
-
   nodeSelector: {}
-
   tolerations: []
-
   affinity: {}
-
   persistentVolume:
     enabled: false
     # storageClassName: default
@@ -524,19 +372,14 @@ grafana:
     # annotations: {}
     # subPath: ""
     # existingClaim:
-
   adminUser: admin
   # adminPassword: strongpassword
-
   # schedulerName:
-
   ## Extra environment variables that will be pass onto deployment pods
   env: {}
-
   ## The name of a secret in the same kubernetes namespace which contain values to be added to the environment
   ## This can be useful for auth tokens, etc
   envFromSecret: ""
-
   ## Additional grafana server secret mounts
   # Defines additional mounts with secrets. Secrets must be manually created in the namespace.
   extraSecretMounts: []
@@ -544,11 +387,9 @@ grafana:
     #   mountPath: /etc/secrets
     #   secretName: grafana-secret-files
     #   readOnly: true
-
   # Pass the plugins you want installed as a comma separated list.
   # plugins: "digrich-bubblechart-panel,grafana-clock-panel"
   plugins: ""
-
   ## Configure grafana datasources
   ## ref: http://docs.grafana.org/administration/provisioning/#datasources
   ##
@@ -663,7 +504,6 @@ ldap:
   config: ""
   # config: |-
   #   verbose_logging = true
-
   #   [[servers]]
   #   host = "my-ldap-server"
   #   port = 636
@@ -686,13 +526,11 @@ alertmanagerFiles:
   alertmanager.yml:
     global: {}
       # slack_api_url: ''
-
     receivers:
       - name: default-receiver
         # slack_configs:
         #  - channel: '@you'
         #    send_resolved: true
-
     route:
       group_wait: 10s
       group_interval: 5m
@@ -704,18 +542,15 @@ alertmanagerFiles:
 serverFiles:
   alerts: {}
   rules: {}
-
   prometheus.yml:
     rule_files:
       - /etc/config/rules
       - /etc/config/alerts
-
     scrape_configs:
       - job_name: prometheus
         static_configs:
           - targets:
             - localhost:9090
-
       # A scrape configuration for running Prometheus on a Kubernetes cluster.
       # This uses separate scrape configs for cluster components (i.e. API server, node)
       # and services to allow each to use different authentication configs.
@@ -731,14 +566,11 @@ serverFiles:
       # default named port `https`. This works for single API server deployments as
       # well as HA API server deployments.
       - job_name: 'kubernetes-apiservers'
-
         kubernetes_sd_configs:
           - role: endpoints
-
         # Default to scraping over https. If required, just disable this or change to
         # `http`.
         scheme: https
-
         # This TLS & bearer token file config is used to connect to the actual scrape
         # endpoints for cluster components. This is separate to discovery auth
         # configuration because discovery & scraping are two separate concerns in
@@ -755,7 +587,6 @@ serverFiles:
           #
           insecure_skip_verify: true
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
         # Keep only the default/kubernetes service endpoints for the https port. This
         # will add targets for each API server which Kubernetes adds an endpoint to
         # the default/kubernetes service.
@@ -763,13 +594,10 @@ serverFiles:
           - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
             action: keep
             regex: default;kubernetes;https
-
       - job_name: 'kubernetes-nodes'
-
         # Default to scraping over https. If required, just disable this or change to
         # `http`.
         scheme: https
-
         # This TLS & bearer token file config is used to connect to the actual scrape
         # endpoints for cluster components. This is separate to discovery auth
         # configuration because discovery & scraping are two separate concerns in
@@ -786,10 +614,8 @@ serverFiles:
           #
           insecure_skip_verify: true
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
         kubernetes_sd_configs:
           - role: node
-
         relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
@@ -799,14 +625,10 @@ serverFiles:
             regex: (.+)
             target_label: __metrics_path__
             replacement: /api/v1/nodes/${1}/proxy/metrics
-
-
       - job_name: 'kubernetes-nodes-cadvisor'
-
         # Default to scraping over https. If required, just disable this or change to
         # `http`.
         scheme: https
-
         # This TLS & bearer token file config is used to connect to the actual scrape
         # endpoints for cluster components. This is separate to discovery auth
         # configuration because discovery & scraping are two separate concerns in
@@ -823,10 +645,8 @@ serverFiles:
           #
           insecure_skip_verify: true
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
         kubernetes_sd_configs:
           - role: node
-
         # This configuration will work only on kubelet 1.7.3+
         # As the scrape endpoints for cAdvisor have changed
         # if you are using older version you need to change the replacement to
@@ -841,7 +661,6 @@ serverFiles:
             regex: (.+)
             target_label: __metrics_path__
             replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
-
       # Scrape config for service endpoints.
       #
       # The relabeling allows the actual service scrape endpoint to be configured
@@ -854,10 +673,8 @@ serverFiles:
       # * `prometheus.io/port`: If the metrics are exposed on a different port to the
       # service then set this appropriately.
       - job_name: 'kubernetes-service-endpoints'
-
         kubernetes_sd_configs:
           - role: endpoints
-
         relabel_configs:
           - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
             action: keep
@@ -883,18 +700,14 @@ serverFiles:
           - source_labels: [__meta_kubernetes_service_name]
             action: replace
             target_label: kubernetes_name
-
       - job_name: 'prometheus-pushgateway'
         honor_labels: true
-
         kubernetes_sd_configs:
           - role: service
-
         relabel_configs:
           - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_probe]
             action: keep
             regex: pushgateway
-
       # Example scrape config for probing services via the Blackbox Exporter.
       #
       # The relabeling allows the actual service scrape endpoint to be configured
@@ -902,14 +715,11 @@ serverFiles:
       #
       # * `prometheus.io/probe`: Only probe services that have a value of `true`
       - job_name: 'kubernetes-services'
-
         metrics_path: /probe
         params:
           module: [http_2xx]
-
         kubernetes_sd_configs:
           - role: service
-
         relabel_configs:
           - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_probe]
             action: keep
@@ -926,7 +736,6 @@ serverFiles:
             target_label: kubernetes_namespace
           - source_labels: [__meta_kubernetes_service_name]
             target_label: kubernetes_name
-
       # Example scrape config for pods
       #
       # The relabeling allows the actual pod scrape endpoint to be configured via the
@@ -936,10 +745,8 @@ serverFiles:
       # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
       # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the default of `9102`.
       - job_name: 'kubernetes-pods'
-
         kubernetes_sd_configs:
           - role: pod
-
         relabel_configs:
           - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
             action: keep
@@ -962,31 +769,21 @@ serverFiles:
             action: replace
             target_label: kubernetes_pod_name
 
-external-dns:
-
+externalDns:
   enabled: false
-
   name: external-dns
-
   image:
     repository: registry.opensource.zalan.do/teapot/external-dns
     tag: v0.5.5
     pullPolicy: IfNotPresent
-
   priorityClassName: ""
-
+  args: {}
   extraArgs: {}
-
   tolerations: []
-
   nodeSelector: {}
-
   podAnnotations: {}
-
   replicaCount: 1
-
   resources: {}
-
   securityContext: {}
 
 networkPolicy:
