@@ -326,6 +326,7 @@ pushgateway:
     type: ClusterIP
 
 grafana:
+  name: grafana
   replicaCount: 1
   image:
     repository: grafana/grafana
@@ -348,7 +349,7 @@ grafana:
   annotations: {}
   service:
     type: ClusterIP
-    port: 80
+    servicePort: 80
     annotations: {}
     labels: {}
   ingress:
@@ -788,3 +789,5 @@ externalDns:
 
 networkPolicy:
   enabled: false
+
+global: {}

@@ -14,10 +14,19 @@ metadata:
     release: {{ .Release.Name }}
   name: {{ template "prometheus.externalDns.fullname" . }}
 spec:
+  selector:
+    matchLabels:
+      app: {{ template "prometheus.name" . }}
+      component: "{{ .Values.externalDns.name }}"
+      release: {{ .Release.Name }}
+{{- if .Values.externalDns.pod.labels }}
+{{ toYaml .Values.externalDns.pod.labels | indent 6 }}
+{{- end }}
   replicas: {{ .Values.externalDns.replicaCount }}
   {{- if .Values.externalDns.strategy }}
   strategy:
 {{ toYaml .Values.externalDns.strategy | indent 4 }}
+  {{- end }}
   template:
     metadata:
     {{- if .Values.externalDns.podAnnotations }}

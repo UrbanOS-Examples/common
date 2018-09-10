@@ -11,9 +11,13 @@ metadata:
   name: {{ template "prometheus.grafana.fullname" . }}
 {{- if .Values.rbac.pspEnabled }}
 rules:
-- apiGroups:      ['extensions']
-  resources:      ['podsecuritypolicies']
-  verbs:          ['use']
-  resourceNames:  [{{ template "prometheus.grafana.fullname" . }}]
+- apiGroups:
+  - extensions
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+  resourceNames:
+  - {{ template "prometheus.grafana.fullname" . }}
 {{- end }}
 {{- end }}

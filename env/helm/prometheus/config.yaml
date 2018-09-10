@@ -7,3 +7,90 @@ externalDns:
   - --registry=txt
   - --txt-owner-id=scos
   # - --domain-filter=${DNS_ZONE} # will make ExternalDNS see only the hosted zones matching provided domain, omit to process all available hosted zones
+
+grafana:
+  service:
+    type: NodePort
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/tags: scos.delete.on.teardown=true
+      alb.ingress.kubernetes.io/healthcheck-path: /api/health
+      # alb.ingress.kubernetes.io/scheme: ${INGRESS_SCHEME}
+      # alb.ingress.kubernetes.io/subnets: ${SUBNETS}
+      # alb.ingress.kubernetes.io/security-groups: ${SECURITY_GROUPS}
+    # hosts:
+    # - grafana.{DNS_ZONE}
+  persistentVolume:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+  datasources: 
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-server.prometheus.svc.cluster.local:9090
+        access: proxy
+        isDefault: true
+  dashboards:
+    default:
+      kube-dash:
+        gnetId: 6663
+        revision: 1
+        datasource: Prometheus
+      kube-official-dash:
+        gnetId: 2
+        revision: 1
+        datasource: Prometheus
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards
+
+alertmanager:
+  service:
+    type: NodePort
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/tags: scos.delete.on.teardown=true
+      alb.ingress.kubernetes.io/healthcheck-path: /-/healthy
+      # alb.ingress.kubernetes.io/scheme: ${INGRESS_SCHEME}
+      # alb.ingress.kubernetes.io/subnets: ${SUBNETS}
+      # alb.ingress.kubernetes.io/security-groups: ${SECURITY_GROUPS}
+    # hosts:
+    # - alertmanager.{dns_zone}
+
+server:
+  service:
+    type: NodePort
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/tags: scos.delete.on.teardown=true
+      alb.ingress.kubernetes.io/healthcheck-path: /-/healthy
+      # alb.ingress.kubernetes.io/scheme: ${INGRESS_SCHEME}
+      # alb.ingress.kubernetes.io/subnets: ${SUBNETS}
+      # alb.ingress.kubernetes.io/security-groups: ${SECURITY_GROUPS}
+    # hosts:
+    # - prometheus.{dns_zone}
+
+global:
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/tags: scos.delete.on.teardown=true

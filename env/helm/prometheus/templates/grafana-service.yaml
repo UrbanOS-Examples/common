@@ -16,24 +16,6 @@ metadata:
 {{- end }}
   name: {{ template "prometheus.grafana.fullname" . }}
 spec:
-apiVersion: v1
-kind: Service
-metadata:
-{{- if .Values.grafana.service.annotations }}
-  annotations:
-{{ toYaml .Values.grafana.service.annotations | indent 4 }}
-{{- end }}
-  labels:
-    app: {{ template "prometheus.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: "{{ .Values.grafana.name }}"
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
-{{- if .Values.grafana.service.labels }}
-{{ toYaml .Values.grafana.service.labels | indent 4 }}
-{{- end }}
-  name: {{ template "prometheus.grafana.fullname" . }}
-spec:
 {{- if .Values.grafana.service.clusterIP }}
   clusterIP: {{ .Values.grafana.service.clusterIP }}
 {{- end }}
