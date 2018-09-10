@@ -72,7 +72,7 @@ spec:
       {{- end }}
       containers:
 {{- if .Values.grafana.sidecar.dashboards.enabled }}
-        - name: {{ template "prometheus.name" . }}-sc-dashboard
+        - name: {{ .Values.grafana.name }}-sc-dashboard
           image: "{{ .Values.grafana.sidecar.image }}"
           imagePullPolicy: {{ .Values.grafana.sidecar.imagePullPolicy }}
           env:
@@ -87,7 +87,7 @@ spec:
               mountPath: {{ .Values.grafana.sidecar.dashboards.folder | quote }}
 {{- end}}
 {{- if .Values.grafana.sidecar.datasources.enabled }}
-        - name: {{ template "prometheus.name" . }}-sc-datasources
+        - name: {{ .Values.grafana.name }}-sc-datasources
           image: "{{ .Values.grafana.sidecar.image }}"
           imagePullPolicy: {{ .Values.grafana.sidecar.imagePullPolicy }}
           env:
@@ -101,7 +101,7 @@ spec:
             - name: sc-datasources-volume
               mountPath: "/etc/grafana/provisioning/datasources"
 {{- end}}
-        - name: {{ .Chart.Name }}
+        - name: {{ .Values.grafana.name }}
           image: "{{ .Values.grafana.image.repository }}:{{ .Values.grafana.image.tag }}"
           imagePullPolicy: {{ .Values.grafana.image.pullPolicy }}
           volumeMounts:

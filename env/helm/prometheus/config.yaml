@@ -14,14 +14,7 @@ grafana:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: alb
-      alb.ingress.kubernetes.io/tags: scos.delete.on.teardown=true
       alb.ingress.kubernetes.io/healthcheck-path: /api/health
-      # alb.ingress.kubernetes.io/scheme: ${INGRESS_SCHEME}
-      # alb.ingress.kubernetes.io/subnets: ${SUBNETS}
-      # alb.ingress.kubernetes.io/security-groups: ${SECURITY_GROUPS}
-    # hosts:
-    # - grafana.{DNS_ZONE}
   persistentVolume:
     enabled: true
     accessModes:
@@ -33,7 +26,7 @@ grafana:
       datasources:
       - name: Prometheus
         type: prometheus
-        url: http://prometheus-server.prometheus.svc.cluster.local:9090
+        url: http://prometheus-server.prometheus.svc.cluster.local
         access: proxy
         isDefault: true
   dashboards:
@@ -57,7 +50,7 @@ grafana:
         disableDeletion: false
         editable: true
         options:
-          path: /var/lib/grafana/dashboards
+          path: /var/lib/grafana/dashboards/default
 
 alertmanager:
   service:
@@ -65,14 +58,7 @@ alertmanager:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: alb
-      alb.ingress.kubernetes.io/tags: scos.delete.on.teardown=true
       alb.ingress.kubernetes.io/healthcheck-path: /-/healthy
-      # alb.ingress.kubernetes.io/scheme: ${INGRESS_SCHEME}
-      # alb.ingress.kubernetes.io/subnets: ${SUBNETS}
-      # alb.ingress.kubernetes.io/security-groups: ${SECURITY_GROUPS}
-    # hosts:
-    # - alertmanager.{dns_zone}
 
 server:
   service:
@@ -80,17 +66,22 @@ server:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: alb
-      alb.ingress.kubernetes.io/tags: scos.delete.on.teardown=true
       alb.ingress.kubernetes.io/healthcheck-path: /-/healthy
-      # alb.ingress.kubernetes.io/scheme: ${INGRESS_SCHEME}
-      # alb.ingress.kubernetes.io/subnets: ${SUBNETS}
-      # alb.ingress.kubernetes.io/security-groups: ${SECURITY_GROUPS}
-    # hosts:
-    # - prometheus.{dns_zone}
 
 global:
   ingress:
     annotations:
       kubernetes.io/ingress.class: alb
       alb.ingress.kubernetes.io/tags: scos.delete.on.teardown=true
+      alb.ingress.kubernetes.io/scheme: internal
+
+# helm install --name=prometheus --namespace=prometheus \
+#   --set global.ingress.annotations."alb\.ingress\.kubernetes\.io\/subnets"="subnet\-0e04386292fb9fffb\,subnet\-06089432186a62490\,subnet\-04086391514d8f07e" \
+#   --set global.ingress.annotations."alb\.ingress\.kubernetes\.io\/security\-groups"="sg-0b2973314f6d4fa57" \
+#   --set grafana.ingress.annotations."alb\.ingress\.kubernetes\.io\/healthcheck\-path"="/api/health" \
+#   --set grafana.ingress.hosts[0]="grafana\.smrt\-284\.sandbox\.internal\.smartcolumbusos\.com" \
+#   --set alertmanager.ingress.annotations."alb\.ingress\.kubernetes\.in\/healthcheck\-path"="\/\-\/healthy" \
+#   --set alertmanager.ingress.hosts[0]="alertmanager\.smrt\-284\.sandbox\.internal\.smartcolumbusos\.com" \
+#   --set server.ingress.annotations."alb\.ingress\.kubernetes\.io\/healthcheck\-path"="\/\-\/healthy" \
+#   --set server.ingress.hosts[0]="prometheus\.smrt\-284\.sandbox\.internal\.smartcolumbusos\.com" \
+#   -f prometheus/config.yaml prometheus
