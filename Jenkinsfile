@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@3.0.1',
+    identifier: 'pipeline-lib@smrt-507-deployment-conditions',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -69,7 +69,7 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
             publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
         }
 
-        if (false && scos.shouldDeploy('dev', env.BRANCH_NAME)) {
+        if (false && scos.changeset.shouldDeploy('dev')) {
             def terraform = scos.terraform('prod-prime')
             def gitHash
 
@@ -130,30 +130,23 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
         environments.each { environment ->
             def terraform = scos.terraform(environment)
 
-            stage("Plan ${environment}") {
-                terraform.init()
+            def isReleaseToProd = (scos.changeset.isRelease && environment == 'prod')
+            def isNotReleaseToLowerEnvironment = (!scos.changeset.isRelease || isReleaseToProd)
 
-                terraform.plan(terraform.defaultVarFile, [
-                    'key_pair_public_key': publicKey,
-                    'joomla_backup_ami': params.joomlaBackupAMI,
-                    'joomla_backup_file_name': params.joomlaBackupFileName,
-                    'ckan_internal_backup_ami': params.ckanInternalBackupAMI,
-                    'ckan_external_backup_ami': params.ckanExternalBackupAMI,
-                    'ckan_db_snapshot_id': params.ckanDBSnapshotID,
-                    'kong_backup_ami': params.kongBackupAMI,
-                    'kong_db_snapshot_id': params.kongDBSnapshotID
-                ])
-
-                archiveArtifacts artifacts: 'plan-*.txt', allowEmptyArchive: false
+            if(isNotReleaseToLowerEnvironment) {
+                doPlan(terraform)
             }
-            if (scos.shouldDeploy(environment, env.BRANCH_NAME)) {
+
+            if (scos.changeset.shouldDeploy(environment)) {
                 stage("Deploy ${environment}") {
                     terraform.apply()
                     createTillerUser(environment)
                 }
+
                 stage("Execute Kubernetes Configs for ${environment}") {
                     applyKubeConfigs(environment)
                 }
+
                 stage("Deploy tiller service for ${environment}") {
                     scos.withEksCredentials(environment) {
                         sh('''#!/usr/bin/env bash
@@ -162,6 +155,7 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
                         ''')
                     }
                 }
+
                 stage('Tag') {
                     if (environment == 'staging') {
                         scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
@@ -173,6 +167,25 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
         }
     }
 }}}}
+
+def doPlan(terraform) {
+    stage("Plan ${environment}") {
+        terraform.init()
+
+        terraform.plan(terraform.defaultVarFile, [
+            'key_pair_public_key': publicKey,
+            'joomla_backup_ami': params.joomlaBackupAMI,
+            'joomla_backup_file_name': params.joomlaBackupFileName,
+            'ckan_internal_backup_ami': params.ckanInternalBackupAMI,
+            'ckan_external_backup_ami': params.ckanExternalBackupAMI,
+            'ckan_db_snapshot_id': params.ckanDBSnapshotID,
+            'kong_backup_ami': params.kongBackupAMI,
+            'kong_db_snapshot_id': params.kongDBSnapshotID
+        ])
+
+        archiveArtifacts artifacts: 'plan-*.txt', allowEmptyArchive: false
+    }
+}
 
 def createTillerUser(environment) {
     scos.withEksCredentials(environment) {
