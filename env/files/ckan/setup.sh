@@ -96,6 +96,7 @@ bash -ex /tmp/upgrade.sh
 
 # EC2 credentials expire after 6 hours. This will ensure these credentials are always up to date
 mv /tmp/update-aws-credentials.sh /opt/update-aws-credentials.sh
+chmod +x /opt/update-aws-credentials.sh # For some reason, permissions are not copied
 sh /opt/update-aws-credentials.sh
 
 systemctl restart apache2
