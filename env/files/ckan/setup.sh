@@ -5,7 +5,13 @@ db_port=
 db_admin_password=
 db_ckan_password=
 db_datastore_password=
+s3_bucket_region=
 external=
+
+# CKAN uses libcloud for S3 storage drivers. The value is based on region
+# https://libcloud.readthedocs.io/en/latest/storage/supported_providers.html
+declare -A DRIVER_MAP
+DRIVER_MAP=( [us-east-1]=S3 [us-east-2]=S3_US_EAST2 [us-west-1]=S3_US_WEST [us-west-2]=S3_US_WEST_OREGON )
 
 until [ ${#} -eq 0 ]; do
     case "${1}" in
@@ -27,6 +33,10 @@ until [ ${#} -eq 0 ]; do
             ;;
         --db-datastore-password)
             db_datastore_password=${2}
+            shift
+            ;;
+        --s3-bucket-region)
+            s3_bucket_region=${2}
             shift
             ;;
         --external)
@@ -58,6 +68,9 @@ rm -rf /etc/nginx/sites-{enabled,available}/*
 mv /tmp/nginx.conf /etc/nginx/sites-available/ckan
 ln -s /etc/nginx/sites-available/ckan /etc/nginx/sites-enabled/ckan
 
+# Add appropriate driver based on region
+bucket_region=${DRIVER_MAP[$s3_bucket_region]}
+sed -i "s/#{S3_BUCKET_REGION}/${bucket_region}/" /tmp/production.ini
 mv /tmp/production.ini /etc/ckan/default/production.ini
 
 # Turn off command trace so passwords don't get dumped to log in jenkins

@@ -109,7 +109,7 @@ ckanext.agsview.default_basemap_url = Topographic
 #ckanext.agsview.default_basemap_url = http://example.com/MapServer/tile//{z}/{x}/{y}
 
 ##Cloudstorage Settings
-ckanext.cloudstorage.driver = S3
+ckanext.cloudstorage.driver = #{S3_BUCKET_REGION}
 ckanext.cloudstorage.container_name = ${S3_BUCKET}
 ckanext.cloudstorage.use_secure_urls = 0
 ckanext.cloudstorage.driver_options = #{DRIVER_OPTIONS}
