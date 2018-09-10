@@ -134,7 +134,7 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
             def isNotReleaseToLowerEnvironment = (!scos.changeset.isRelease || isReleaseToProd)
 
             if(isNotReleaseToLowerEnvironment) {
-                doPlan(terraform)
+                doPlan(terraform, environment, publicKey)
             }
 
             if (scos.changeset.shouldDeploy(environment)) {
@@ -149,10 +149,7 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
 
                 stage("Deploy tiller service for ${environment}") {
                     scos.withEksCredentials(environment) {
-                        sh('''#!/usr/bin/env bash
-                            set -e
-                            helm init --service-account tiller
-                        ''')
+                        sh('helm init --service-account tiller')
                     }
                 }
 
@@ -168,7 +165,7 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
     }
 }}}}
 
-def doPlan(terraform) {
+def doPlan(terraform, environment, publicKey) {
     stage("Plan ${environment}") {
         terraform.init()
 
