@@ -100,4 +100,4 @@ global:
 #   --set alertmanager.ingress.hosts[0]="alertmanager\.smrt\-284\.sandbox\.internal\.smartcolumbusos\.com" \
 #   --set server.ingress.annotations."alb\.ingress\.kubernetes\.io\/healthcheck\-path"="\/\-\/healthy" \
 #   --set server.ingress.hosts[0]="prometheus\.smrt\-284\.sandbox\.internal\.smartcolumbusos\.com" \
-#   -f prometheus/config.yaml prometheus
+#   -f prometheus/run-config.yaml prometheus
