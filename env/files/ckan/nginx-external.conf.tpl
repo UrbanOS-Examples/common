@@ -62,7 +62,7 @@ server {
     #block access to the ckan-admin screen unless the request is from the internal VPN
     location /ckan-admin {
         set $allow false;
-        if ($http_x_forwarded_for ~ "^10.0.") { set $allow true; }
+        if ($http_x_forwarded_for ~ "(^| |,)10\.0\.\d+\.\d+$") { set $allow true; }
         if ($allow = false) {
             return 404;
         }
