@@ -37,6 +37,22 @@ grafana:
         datasource: Prometheus
       kube-official-dash:
         gnetId: 2
+        revision: 2
+        datasource: Prometheus
+      kube-nodes:
+        gnetId: 7692
+        revision: 1
+        datasource: Prometheus
+      kube-namespace:
+        gnetId: 6876
+        revision: 2
+        datasource: Prometheus
+      kube-cluster:
+        gnetId: 6873
+        revision: 2
+        datasource: Prometheus
+      kube-pods:
+        gnetId: 6879
         revision: 1
         datasource: Prometheus
   dashboardProviders:
