@@ -61,6 +61,20 @@ resource "aws_s3_bucket_policy" "scospy-repository-policy" {
 POLICY
 }
 
+resource "aws_s3_bucket" "build-artifacts-repository" {
+  bucket = "${var.build_artifacts_repo_name}"
+  acl    = "private"
+  tags {
+    Name        = "build-artifacts-repository"
+    Environment = "${terraform.workspace}"
+  }
+}
+
+variable "build_artifacts_repo_name" {
+  default = "os-build-artifacts-repository"
+  description = "Bucket name to archive build artifacts"
+}
+
 variable "scospy_repo_name" {
   default = "scospy-repository"
   description = "Bucket name to archive scospy build artifacts"
