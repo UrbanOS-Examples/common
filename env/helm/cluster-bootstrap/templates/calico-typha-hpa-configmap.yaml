@@ -1,8 +1,11 @@
-kind: ConfigMap
+{{- $name := .Values.calico.name -}}
+{{- if .Values.calico.enabled -}}
 apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: calico-typha-horizontal-autoscaler
-  namespace: kube-system
+  labels:
+{{ include "bootstrap.labels" . | indent 4 }}
+  name: {{ $name }}-typha-horizontal-autoscaler
 data:
   ladder: |-
     {
@@ -19,3 +22,4 @@ data:
         [2000, 8]
       ]
     }
+{{- end }}

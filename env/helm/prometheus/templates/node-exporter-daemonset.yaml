@@ -24,20 +24,20 @@ spec:
 {{- end }}
   {{- if .Values.nodeExporter.updateStrategy }}
   updateStrategy:
-{{ toYaml .Values.nodeExporter.updateStrategy | indent 4 }}
+{{ toYaml .Values.nodeExporter.updateStrategy | trim | indent 4 }}
   {{- end }}
   template:
     metadata:
     {{- if .Values.nodeExporter.podAnnotations }}
       annotations:
-{{ toYaml .Values.nodeExporter.podAnnotations | indent 8 }}
+{{ toYaml .Values.nodeExporter.podAnnotations | trim | indent 8 }}
     {{- end }}
       labels:
         app: {{ template "prometheus.name" . }}
         component: "{{ .Values.nodeExporter.name }}"
         release: {{ .Release.Name }}
 {{- if .Values.nodeExporter.pod.labels }}
-{{ toYaml .Values.nodeExporter.pod.labels | indent 8 }}
+{{ toYaml .Values.nodeExporter.pod.labels | trim | indent 8 }}
 {{- end }}
     spec:
       serviceAccountName: {{ template "prometheus.serviceAccountName.nodeExporter" . }}
@@ -112,5 +112,4 @@ spec:
           configMap:
             name: {{ .configMap }}
       {{- end }}
-
 {{- end -}}

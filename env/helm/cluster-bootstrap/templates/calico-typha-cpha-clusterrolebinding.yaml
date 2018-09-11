@@ -1,12 +1,17 @@
-apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- $name := .Values.calico.name -}}
+{{- if .Values.calico.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: typha-cpha
+  labels:
+{{ include "bootstrap.labels" . | indent 4 }}
+  name: {{ $name }}-typha-cpha
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: typha-cpha
+  name: {{ $name }}-typha-cpha
 subjects:
-  - kind: ServiceAccount
-    name: typha-cpha
-    namespace: kube-system
+- kind: ServiceAccount
+  name: {{ $name }}-typha-cpha
+  namespace: {{ .Release.Namespace }}
+{{- end }}

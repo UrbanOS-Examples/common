@@ -1,15 +1,23 @@
+{{- $name := .Values.calico.name -}}
+{{- if .Values.calico.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: calico-typha
-  namespace: kube-system
+{{- if .Values.calico.service.annotations }}
+  annotations:
+{{ toYaml .Values.calico.service.annotations | indent 4 }}
+{{- end }}
   labels:
-    k8s-app: calico-typha
+    k8s-app: {{ $name }}-typha
+{{ include "bootstrap.labels" . | indent 4 }}
+  name: {{ $name }}-typha
 spec:
   ports:
-    - port: 5473
+    - port: {{ .Values.calico.typha.port }}
       protocol: TCP
-      targetPort: calico-typha
-      name: calico-typha
+      targetPort: {{ $name }}-typha
+      name: {{ $name }}-typha
   selector:
-    k8s-app: calico-typha
+    k8s-app: {{ $name }}-typha
+{{ include "bootstrap.labels" . | indent 4 }}
+{{- end }}
