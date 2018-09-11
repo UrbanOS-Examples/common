@@ -61,7 +61,7 @@ resource "aws_s3_bucket_policy" "scospy-repository-policy" {
 POLICY
 }
 
-resource "aws_s3_bucket" "build-artifacts-repository" {
+resource "aws_s3_bucket" "build_artifacts_repository" {
   bucket = "${var.build_artifacts_repo_name}"
   acl    = "private"
   tags {
