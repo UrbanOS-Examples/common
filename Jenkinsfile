@@ -130,10 +130,10 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
         environments.each { environment ->
             def terraform = scos.terraform(environment)
 
-            def isReleaseToProd = (scos.changeset.isRelease && environment == 'prod')
-            def isNotReleaseToLowerEnvironment = (!scos.changeset.isRelease || isReleaseToProd)
+            def isGoingToProd = (scos.changeset.isRelease && environment == 'prod')
+            def shouldBePlanned = (!scos.changeset.isRelease || isGoingToProd)
 
-            if(isNotReleaseToLowerEnvironment) {
+            if(shouldBePlanned) {
                 doPlan(terraform, environment, publicKey)
             }
 
