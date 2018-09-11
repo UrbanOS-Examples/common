@@ -58,4 +58,14 @@ server {
         access_log off;
         break;
     }
+
+    #block access to the ckan-admin screen unless the request is from the internal VPN
+    location /ckan-admin {
+        set $allow false;
+        if ($http_x_forwarded_for ~ "^10.0.") { set $allow true; }
+        if ($allow = false) {
+            return 404;
+        }
+        proxy_pass http://localhost:8080;
+    }
 }
