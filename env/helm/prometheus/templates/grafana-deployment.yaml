@@ -216,18 +216,18 @@ spec:
             failureThreshold: 10
             periodSeconds: 10
           resources:
-{{ toYaml .Values.grafana.resources | indent 12 }}
+{{ toYaml .Values.grafana.resources | trim | indent 12 }}
     {{- if .Values.grafana.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.grafana.nodeSelector | indent 8 }}
+{{ toYaml .Values.grafana.nodeSelector | trim | indent 8 }}
     {{- end }}
     {{- if .Values.grafana.securityContext }}
       securityContext:
-{{ toYaml .Values.grafana.securityContext | indent 8 }}
+{{ toYaml .Values.grafana.securityContext | trim | indent 8 }}
     {{- end }}
     {{- if .Values.grafana.tolerations }}
       tolerations:
-{{ toYaml .Values.grafana.tolerations | indent 8 }}
+{{ toYaml .Values.grafana.tolerations | trim | indent 8 }}
     {{- end }}
       volumes:
         - name: config

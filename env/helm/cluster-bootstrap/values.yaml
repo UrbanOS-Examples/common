@@ -1,0 +1,44 @@
+global:
+  environment: sandbox
+
+albIngress:
+  enabled: true
+  name: alb-ingress
+  image:
+    repository: quay.io/coreos/alb-ingress-controller
+    tag: 1.0-beta.5
+    pullPolicy: Always
+  args: {}
+  extraEnv:
+    AWS_DEBUG: "false"
+    AWS_MAX_RETRIES: "20"
+  pod:
+    labels: {}
+  resources: {}
+  strategy: {}
+
+externalDns:
+  enabled: true
+  name: external-dns
+  image:
+    repository: registry.opensource.zalan.do/teapot/external-dns
+    tag: v0.5.5
+    pullPolicy: IfNotPresent
+  args: {}
+  resources: {}
+  strategy:
+    type: Recreate
+  pod:
+    labels: {}
+
+storageClass:
+  enabled: true
+  classes:
+  - name: standard-ssd
+    annotations:
+      storageclass.kubernetes.io/is-default-class: "true"
+    provisioner: kubernetes.io/aws-ebs
+    type: gp2
+    reclaimPolicy: Retain
+    mountOptions:
+    - debug

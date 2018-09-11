@@ -4,7 +4,7 @@ kind: Service
 metadata:
 {{- if .Values.pushgateway.service.annotations }}
   annotations:
-{{ toYaml .Values.pushgateway.service.annotations | indent 4}}
+{{ toYaml .Values.pushgateway.service.annotations | trim | indent 4}}
 {{- end }}
   labels:
     app: {{ template "prometheus.name" . }}

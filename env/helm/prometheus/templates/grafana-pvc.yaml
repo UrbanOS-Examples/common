@@ -16,7 +16,7 @@ metadata:
   name: {{ template "prometheus.grafana.fullname" . }}
 spec:
   accessModes:
-{{ toYaml .Values.grafana.persistentVolume.accessModes | indent 4 }}
+{{ toYaml .Values.grafana.persistentVolume.accessModes | trim | indent 4 }}
 {{- if .Values.grafana.persistentVolume.storageClass }}
 {{- if (eq "-" .Values.grafana.persistentVolume.storageClass) }}
   storageClassName: ""

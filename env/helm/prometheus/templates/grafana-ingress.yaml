@@ -7,10 +7,10 @@ kind: Ingress
 metadata:
 {{- if .Values.global.ingress.annotations }}
   annotations:
-{{ toYaml .Values.global.ingress.annotations | indent 4 }}
+{{ toYaml .Values.global.ingress.annotations | trim | indent 4 }}
 {{- end }}
 {{- if .Values.grafana.ingress.annotations }}
-{{ toYaml .Values.grafana.ingress.annotations | indent 4 }}
+{{ toYaml .Values.grafana.ingress.annotations | trim | indent 4 }}
 {{- end }}
   labels:
     app: {{ template "prometheus.name" . }}

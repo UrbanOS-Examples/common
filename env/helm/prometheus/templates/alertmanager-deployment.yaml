@@ -60,7 +60,6 @@ spec:
           {{- if .Values.alertmanager.baseURL }}
             - --web.external-url={{ .Values.alertmanager.baseURL }}
           {{- end }}
-
           ports:
             - containerPort: 9093
           readinessProbe:
@@ -70,14 +69,13 @@ spec:
             initialDelaySeconds: 30
             timeoutSeconds: 30
           resources:
-{{ toYaml .Values.alertmanager.resources | indent 12 }}
+{{ toYaml .Values.alertmanager.resources | trim | indent 12 }}
           volumeMounts:
             - name: config-volume
               mountPath: /etc/config
             - name: storage-volume
               mountPath: "{{ .Values.alertmanager.persistentVolume.mountPath }}"
               subPath: "{{ .Values.alertmanager.persistentVolume.subPath }}"
-
         - name: {{ template "prometheus.name" . }}-{{ .Values.alertmanager.name }}-{{ .Values.configmapReload.name }}
           image: "{{ .Values.configmapReload.image.repository }}:{{ .Values.configmapReload.image.tag }}"
           imagePullPolicy: "{{ .Values.configmapReload.image.pullPolicy }}"
@@ -92,15 +90,15 @@ spec:
               readOnly: true
     {{- if .Values.alertmanager.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.alertmanager.nodeSelector | indent 8 }}
+{{ toYaml .Values.alertmanager.nodeSelector | trim | indent 8 }}
     {{- end }}
     {{- if .Values.alertmanager.securityContext }}
       securityContext:
-{{ toYaml .Values.alertmanager.securityContext | indent 8 }}
+{{ toYaml .Values.alertmanager.securityContext | trim | indent 8 }}
     {{- end }}
     {{- if .Values.alertmanager.tolerations }}
       tolerations:
-{{ toYaml .Values.alertmanager.tolerations | indent 8 }}
+{{ toYaml .Values.alertmanager.tolerations | trim | indent 8 }}
     {{- end }}
       volumes:
         - name: config-volume

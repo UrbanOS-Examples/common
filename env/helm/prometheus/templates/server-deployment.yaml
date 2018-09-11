@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
 {{- if .Values.server.deploymentAnnotations }}
   annotations:
-{{ toYaml .Values.server.deploymentAnnotations | indent 4 }}
+{{ toYaml .Values.server.deploymentAnnotations | trim | indent 4 }}
 {{- end }}
   labels:
     app: {{ template "prometheus.name" . }}
@@ -21,13 +21,13 @@ spec:
   replicas: {{ .Values.server.replicaCount }}
   {{- if .Values.server.strategy }}
   strategy:
-{{ toYaml .Values.server.strategy | indent 4 }}
+{{ toYaml .Values.server.strategy | trim | indent 4 }}
   {{- end }}
   template:
     metadata:
     {{- if .Values.server.podAnnotations }}
       annotations:
-{{ toYaml .Values.server.podAnnotations | indent 8 }}
+{{ toYaml .Values.server.podAnnotations | trim | indent 8 }}
     {{- end }}
       labels:
         app: {{ template "prometheus.name" . }}
@@ -36,7 +36,7 @@ spec:
     spec:
 {{- if .Values.server.affinity }}
       affinity:
-{{ toYaml .Values.server.affinity | indent 8 }}
+{{ toYaml .Values.server.affinity | trim | indent 8 }}
 {{- end }}
 {{- if .Values.server.priorityClassName }}
       priorityClassName: "{{ .Values.server.priorityClassName }}"
@@ -51,7 +51,7 @@ spec:
         image: "{{ .Values.initChownData.image.repository }}:{{ .Values.initChownData.image.tag }}"
         imagePullPolicy: "{{ .Values.initChownData.image.pullPolicy }}"
         resources:
-{{ toYaml .Values.initChownData.resources | indent 12 }}
+{{ toYaml .Values.initChownData.resources | trim | indent 12 }}
         # 65534 is the nobody user that prometheus uses.
         command: ["chown", "-R", "65534:65534", "{{ .Values.server.persistentVolume.mountPath }}"]
         volumeMounts:
@@ -70,7 +70,7 @@ spec:
             - --{{ $key }}={{ $value }}
           {{- end }}
           resources:
-{{ toYaml .Values.configmapReload.resources | indent 12 }}
+{{ toYaml .Values.configmapReload.resources | trim | indent 12 }}
           volumeMounts:
             - name: config-volume
               mountPath: /etc/config
@@ -80,7 +80,6 @@ spec:
               mountPath: {{ .mountPath }}
               readOnly: {{ .readOnly }}
           {{- end }}
-
         - name: {{ template "prometheus.name" . }}-{{ .Values.server.name }}
           image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
           imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
@@ -117,7 +116,7 @@ spec:
             initialDelaySeconds: 30
             timeoutSeconds: 30
           resources:
-{{ toYaml .Values.server.resources | indent 12 }}
+{{ toYaml .Values.server.resources | trim | indent 12 }}
           volumeMounts:
             - name: config-volume
               mountPath: /etc/config
@@ -141,19 +140,19 @@ spec:
           {{- end }}
     {{- if .Values.server.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.server.nodeSelector | indent 8 }}
+{{ toYaml .Values.server.nodeSelector | trim | indent 8 }}
     {{- end }}
     {{- if .Values.server.securityContext }}
       securityContext:
-{{ toYaml .Values.server.securityContext | indent 8 }}
+{{ toYaml .Values.server.securityContext | trim | indent 8 }}
     {{- end }}
     {{- if .Values.server.tolerations }}
       tolerations:
-{{ toYaml .Values.server.tolerations | indent 8 }}
+{{ toYaml .Values.server.tolerations | trim | indent 8 }}
     {{- end }}
     {{- if .Values.server.affinity }}
       affinity:
-{{ toYaml .Values.server.affinity | indent 8 }}
+{{ toYaml .Values.server.affinity | trim | indent 8 }}
     {{- end }}
       terminationGracePeriodSeconds: {{ .Values.server.terminationGracePeriodSeconds }}
       volumes:

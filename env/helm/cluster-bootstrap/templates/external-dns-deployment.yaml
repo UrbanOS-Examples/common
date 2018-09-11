@@ -7,16 +7,12 @@ metadata:
 {{ toYaml .Values.externalDns.deploymentAnnotations | trim | indent 4 }}
 {{- end }}
   labels:
-    app: {{ template "prometheus.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: "{{ .Values.externalDns.name }}"
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
-  name: {{ template "prometheus.externalDns.fullname" . }}
+{{ include "bootstrap.labels" . | indent 4 }}
+  name: {{ .Values.externalDns.name }}
 spec:
   selector:
     matchLabels:
-      app: {{ template "prometheus.name" . }}
+      app: {{ .Chart.Name }}
       component: "{{ .Values.externalDns.name }}"
       release: {{ .Release.Name }}
 {{- if .Values.externalDns.pod.labels }}
@@ -34,19 +30,19 @@ spec:
 {{ toYaml .Values.externalDns.podAnnotations | trim | indent 8 }}
     {{- end }}
       labels:
-        app: {{ template "prometheus.name" . }}
+        app: {{ .Chart.Name }}
         component: "{{ .Values.externalDns.name }}"
         release: {{ .Release.Name }}
 {{- if .Values.externalDns.pod.labels }}
 {{ toYaml .Values.externalDns.pod.labels | trim | indent 8 }}
 {{- end }}
     spec:
-      serviceAccountName: {{ template "prometheus.serviceAccountName.externalDns" . }}
+      serviceAccountName: {{ .Values.externalDns.name }}
 {{- if .Values.externalDns.priorityClassName }}
       priorityClassName: "{{ .Values.externalDns.priorityClassName }}"
 {{- end }}
       containers:
-        - name: {{ template "prometheus.name" . }}-{{ .Values.externalDns.name }}
+        - name: {{ .Chart.Name }}-{{ .Values.externalDns.name }}
           image: "{{ .Values.externalDns.image.repository }}:{{ .Values.externalDns.image.tag }}"
           imagePullPolicy: "{{ .Values.externalDns.image.pullPolicy }}"
         {{- if .Values.externalDns.args }}

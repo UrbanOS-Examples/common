@@ -16,7 +16,7 @@ metadata:
   name: {{ template "prometheus.server.fullname" . }}
 spec:
   accessModes:
-{{ toYaml .Values.server.persistentVolume.accessModes | indent 4 }}
+{{ toYaml .Values.server.persistentVolume.accessModes | trim | indent 4 }}
 {{- if .Values.server.persistentVolume.storageClass }}
 {{- if (eq "-" .Values.server.persistentVolume.storageClass) }}
   storageClassName: ""

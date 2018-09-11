@@ -7,10 +7,10 @@ kind: Ingress
 metadata:
 {{- if .Values.global.ingress.annotations }}
   annotations:
-{{ toYaml .Values.global.ingress.annotations | indent 4}}
+{{ toYaml .Values.global.ingress.annotations | trim | indent 4}}
 {{- end }}
 {{- if .Values.pushgateway.ingress.annotations }}
-{{ toYaml .Values.pushgateway.ingress.annotations | indent 4}}
+{{ toYaml .Values.pushgateway.ingress.annotations | trim | indent 4}}
 {{- end }}
   labels:
     app: {{ template "prometheus.name" . }}
@@ -33,6 +33,6 @@ spec:
   {{- end -}}
 {{- if .Values.pushgateway.ingress.tls }}
   tls:
-{{ toYaml .Values.pushgateway.ingress.tls | indent 4 }}
+{{ toYaml .Values.pushgateway.ingress.tls | trim | indent 4 }}
   {{- end -}}
 {{- end -}}

@@ -16,7 +16,7 @@ metadata:
   name: {{ template "prometheus.alertmanager.fullname" . }}
 spec:
   accessModes:
-{{ toYaml .Values.alertmanager.persistentVolume.accessModes | indent 4 }}
+{{ toYaml .Values.alertmanager.persistentVolume.accessModes | trim | indent 4 }}
 {{- if .Values.alertmanager.persistentVolume.storageClass }}
 {{- if (eq "-" .Values.alertmanager.persistentVolume.storageClass) }}
   storageClassName: ""
