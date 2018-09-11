@@ -89,6 +89,7 @@ bash -ex /tmp/upgrade.sh
 [ -n "${external}" ] && (
     source /usr/lib/ckan/default/bin/activate
     paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
+    paster --plugin=ckan datastore set-permissions --config=/etc/ckan/default/production.ini | ${psql}
 
     # restart solr server
     service jetty8 restart
