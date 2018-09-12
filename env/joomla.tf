@@ -186,7 +186,7 @@ sudo bash /tmp/setup.sh \
   --db-user ${aws_db_instance.joomla_db.username} \
   --s3-bucket ${data.terraform_remote_state.durable.smart_os_initial_state_bucket_name} \
   --s3-path '${var.joomla_backup_file_name}' \
-  --dns-zone '${coalesce("${var.prod_dns_zone}","${terraform.workspace}.${var.root_dns_zone}")'
+  --dns-zone '${coalesce("${var.prod_dns_zone}","${terraform.workspace}.${var.root_dns_zone}")}'
 EOF
     ]
 
