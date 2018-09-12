@@ -31,6 +31,10 @@ resource "aws_instance" "ckan_internal" {
     BaseAMI = "${var.ckan_internal_backup_ami}"
   }
 
+  lifecycle {
+    ignore_changes = ["ami"]
+  }
+
   provisioner "file" {
     source     = "${path.module}/files/ckan/setup.sh"
     destination = "/tmp/setup.sh"

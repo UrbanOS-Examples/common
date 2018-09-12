@@ -29,49 +29,6 @@ resource "aws_db_instance" "joomla_db" {
   }
 }
 
-resource "aws_security_group" "os_servers" {
-  name   = "OS Servers"
-  vpc_id = "${module.vpc.vpc_id}"
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    self        = true
-    description = "Allow traffic from self"
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
-    description = "Allow all traffic from admin VPC"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_security_group" "os_external_access" {
-  name   = "SCOS External Access"
-  vpc_id = "${module.vpc.vpc_id}"
-}
-
-resource "aws_security_group_rule" "os_external_access_egress_rule" {
-  type = "egress"
-  from_port=0
-  to_port=0
-  protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
-  ipv6_cidr_blocks = ["::/0"]
-  security_group_id = "${aws_security_group.os_external_access.id}"
-}
-
 resource "aws_db_subnet_group" "default" {
   name        = "environment db ${terraform.workspace} subnet group"
   description = "DB Subnet Group"
@@ -146,6 +103,10 @@ resource "aws_instance" "joomla" {
   tags {
     Name    = "${terraform.workspace} Joomla"
     BaseAMI = "${var.joomla_backup_ami}"
+  }
+
+  lifecycle {
+    ignore_changes = ["ami"]
   }
 
   provisioner "file" {
@@ -225,7 +186,7 @@ sudo bash /tmp/setup.sh \
   --db-user ${aws_db_instance.joomla_db.username} \
   --s3-bucket ${data.terraform_remote_state.durable.smart_os_initial_state_bucket_name} \
   --s3-path '${var.joomla_backup_file_name}' \
-  --dns-zone '${terraform.workspace}.${var.root_dns_zone}'
+  --dns-zone '${coalesce("${var.prod_dns_zone}","${terraform.workspace}.${var.root_dns_zone}")}'
 EOF
     ]
 
@@ -245,12 +206,6 @@ resource "aws_s3_bucket" "joomla-backups" {
 
 resource "aws_lb_target_group_attachment" "joomla_private" {
   target_group_arn = "${module.load_balancer_private.target_group_arns["${terraform.workspace}-Int-Joomla"]}"
-  target_id        = "${aws_instance.joomla.id}"
-  port             = 80
-}
-
-resource "aws_lb_target_group_attachment" "joomla_public" {
-  target_group_arn = "${module.load_balancer_public.target_group_arns["${terraform.workspace}-Joomla"]}"
   target_id        = "${aws_instance.joomla.id}"
   port             = 80
 }
@@ -319,4 +274,8 @@ variable "joomla_instance_type" {
 
 variable "joomla_backup_ami" {
   description = "AMI to restore Joomla from"
+}
+
+output "joomla_instance_id" {
+  value = "${aws_instance.joomla.id}"
 }

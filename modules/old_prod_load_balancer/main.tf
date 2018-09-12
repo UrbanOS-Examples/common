@@ -1,25 +1,23 @@
 locals {
-  fqdn_suffix = "${terraform.workspace}.${var.root_dns_zone}"
-
   lb_rules = [
     {
       name                 = "Joomla"
       condition_field      = "host-header"
-      condition_values     = "${local.fqdn_suffix}"
+      condition_values     = "${var.dns_zone}"
       health_check_path    = "/"
       health_check_matcher = "200"
     },
     {
       name                 = "CKAN"
       condition_field      = "host-header"
-      condition_values     = "ckan.${local.fqdn_suffix}"
+      condition_values     = "ckan.${var.dns_zone}"
       health_check_path    = "/"
       health_check_matcher = "200"
     },
     {
       name                 = "Kong"
       condition_field      = "host-header"
-      condition_values     = "api.${local.fqdn_suffix}"
+      condition_values     = "api.${var.dns_zone}"
       health_check_path    = "/ckan/api"
       health_check_matcher = "200"
     },
@@ -139,7 +137,7 @@ variable "subnet_ids" {
   description = "list of subnet ids to associate with the load balancer"
 }
 
-variable "root_dns_zone" {
+variable "dns_zone" {
   description = "Name of root domain (ex. example.com)"
 }
 

@@ -96,7 +96,7 @@ resource "aws_db_instance" "ckan" {
   monitoring_role_arn = "${aws_iam_role.ckan_rds_monitoring.arn}"
 
   lifecycle {
-    ignore_changes = ["final_snapshot_identifier", "storage_encrypted"]
+    ignore_changes = ["final_snapshot_identifier", "storage_encrypted", "snapshot_identifier"]
   }
 
   tags {
