@@ -221,17 +221,17 @@ def applyInfraHelmCharts(environment) {
             done
 
             helm install --name=cluster-infra --namespace=kube-system \
-                --set externalDns.args."domain\-filter"="\${DNS_ZONE}" \
-                --set albIngress.extraEnv."AWS\_REGION"="\${AWS_REGION}" \
-                --set albIngress.extraEnv."CLUSTER\_NAME"="\${EKS_CLUSTER_NAME}" \
+                --set externalDns.args."domain\\-filter"="\${DNS_ZONE}" \
+                --set albIngress.extraEnv."AWS\\_REGION"="\${AWS_REGION}" \
+                --set albIngress.extraEnv."CLUSTER\\_NAME"="\${EKS_CLUSTER_NAME}" \
                 --values helm/cluster-bootstrap/run-config.yaml helm/cluster-bootstrap
 
             helm install --name=prometheus --namespace=prometheus \
-                --set global.ingress.annotations."alb\.ingress\.kubernetes\.io\/subnets"="\${SUBNETS//,/\\,}" \
-                --set global.ingress.annotations."alb\.ingress\.kubernetes\.io\/security\-groups"="\${SECURITY_GROUPS}" \
-                --set grafana.ingress.hosts[0]="grafana\.\${DNS_ZONE}" \
-                --set alertmanager.ingress.hosts[0]="alertmanager\.\${DNS_ZONE}" \
-                --set server.ingress.hosts[0]="prometheus\.\${DNS_ZONE}" \
+                --set global.ingress.annotations."alb\\.ingress\\.kubernetes\\.io\\/subnets"="\${SUBNETS//,/\\,}" \
+                --set global.ingress.annotations."alb\\.ingress\\.kubernetes\\.io\\/security\\-groups"="\${SECURITY_GROUPS}" \
+                --set grafana.ingress.hosts[0]="grafana\\.\${DNS_ZONE}" \
+                --set alertmanager.ingress.hosts[0]="alertmanager\\.\${DNS_ZONE}" \
+                --set server.ingress.hosts[0]="prometheus\\.\${DNS_ZONE}" \
                 --values helm/prometheus/run-config.yaml helm/prometheus
         """.trim())
     }
