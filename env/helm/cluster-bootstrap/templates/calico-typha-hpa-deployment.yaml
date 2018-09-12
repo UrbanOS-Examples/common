@@ -9,12 +9,12 @@ metadata:
 {{- end }}
   name: {{ $name }}-typha-horizontal-autoscaler
   labels:
-    k8s-app: {{ $name }}-typha-autoscaler
+    component: {{ $name }}-typha-autoscaler
 {{ include "bootstrap.labels" . | indent 4 }}
 spec:
   selector:
     matchLabels:
-      k8s-app: {{ $name }}-typha-autoscaler
+      component: {{ $name }}-typha-autoscaler
   {{- if .Values.calico.typhaHpa.updateStrategy }}
   updateStrategy:
 {{ toYaml .Values.calico.typhaHpa.updateStrategy | trim | indent 4 }}
@@ -26,10 +26,10 @@ spec:
 {{ toYaml .Values.calico.typhaHpa.podAnnotations | trim | indent 8 }}
       {{- end }}
       labels:
-        k8s-app: {{ $name }}-typha-autoscaler
+        component: {{ $name }}-typha-autoscaler
     spec:
       containers:
-        - name: {{ $name }-autoscaler
+        - name: {{ $name }}-autoscaler
           image: {{ .Values.calico.typhaHpa.image.repository }}:{{ .Values.calico.typhaHpa.image.tag }}
           imagePullPolicy: "{{ .Values.calico.typhaHpa.image.pullPolicy }}"
           command:

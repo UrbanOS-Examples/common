@@ -5,6 +5,8 @@ calico:
   enabled: true
   name: calico
   crdGroup: crd.projectcalico.org
+  service:
+    annotations: {}
   node:
     image:
       repository: quay.io/calico/node

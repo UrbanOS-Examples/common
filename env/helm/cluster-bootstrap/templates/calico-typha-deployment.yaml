@@ -9,12 +9,12 @@ metadata:
 {{- end }}
   name: {{ $name }}-typha
   labels:
-    k8s-app: {{ $name }}-typha
+    component: {{ $name }}-typha
 {{ include "bootstrap.labels" . | indent 4 }}
 spec:
   selector:
     matchLabels:
-      k8s-app: {{ $name }}-node
+      component: {{ $name }}-node
   {{- if .Values.calico.typha.updateStrategy }}
   updateStrategy:
 {{ toYaml .Values.calico.typha.updateStrategy | trim | indent 4 }}
@@ -27,7 +27,7 @@ spec:
 {{ toYaml .Values.calico.typha.podAnnotations | trim | indent 8 }}
       {{- end }}
       labels:
-        k8s-app: {{ $name }}-typha
+        component: {{ $name }}-typha
     spec:
       hostNetwork: true
       serviceAccountName: {{ $name }}-node

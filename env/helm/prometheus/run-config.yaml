@@ -92,12 +92,9 @@ global:
       alb.ingress.kubernetes.io/scheme: internal
 
 # helm install --name=prometheus --namespace=prometheus \
-#   --set global.ingress.annotations."alb\.ingress\.kubernetes\.io\/subnets"="subnet\-0e04386292fb9fffb\,subnet\-06089432186a62490\,subnet\-04086391514d8f07e" \
-#   --set global.ingress.annotations."alb\.ingress\.kubernetes\.io\/security\-groups"="sg-0b2973314f6d4fa57" \
-#   --set grafana.ingress.annotations."alb\.ingress\.kubernetes\.io\/healthcheck\-path"="/api/health" \
-#   --set grafana.ingress.hosts[0]="grafana\.smrt\-284\.sandbox\.internal\.smartcolumbusos\.com" \
-#   --set alertmanager.ingress.annotations."alb\.ingress\.kubernetes\.in\/healthcheck\-path"="\/\-\/healthy" \
-#   --set alertmanager.ingress.hosts[0]="alertmanager\.smrt\-284\.sandbox\.internal\.smartcolumbusos\.com" \
-#   --set server.ingress.annotations."alb\.ingress\.kubernetes\.io\/healthcheck\-path"="\/\-\/healthy" \
-#   --set server.ingress.hosts[0]="prometheus\.smrt\-284\.sandbox\.internal\.smartcolumbusos\.com" \
-#   -f prometheus/run-config.yaml prometheus
+#   --set global.ingress.annotations."alb\.ingress\.kubernetes\.io\/subnets"="${SUBNETS//,/\\,}" \
+#   --set global.ingress.annotations."alb\.ingress\.kubernetes\.io\/security\-groups"="${SECURITY_GROUPS}" \
+#   --set grafana.ingress.hosts[0]="grafana\.${DNS_ZONE}" \
+#   --set alertmanager.ingress.hosts[0]="alertmanager\.${DNS_ZONE}" \
+#   --set server.ingress.hosts[0]="prometheus\.${DNS_ZONE}" \
+#   --values prometheus/run-config.yaml prometheus

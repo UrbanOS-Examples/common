@@ -8,7 +8,7 @@ metadata:
 {{ toYaml .Values.calico.service.annotations | indent 4 }}
 {{- end }}
   labels:
-    k8s-app: {{ $name }}-typha
+    component: {{ $name }}-typha
 {{ include "bootstrap.labels" . | indent 4 }}
   name: {{ $name }}-typha
 spec:
@@ -18,6 +18,6 @@ spec:
       targetPort: {{ $name }}-typha
       name: {{ $name }}-typha
   selector:
-    k8s-app: {{ $name }}-typha
+    component: {{ $name }}-typha
 {{ include "bootstrap.labels" . | indent 4 }}
 {{- end }}

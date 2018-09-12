@@ -9,12 +9,12 @@ metadata:
 {{- end }}
   name: {{ $name }}-node
   labels:
-    k8s-app: {{ $name }}-node
+    component: {{ $name }}-node
 {{ include "bootstrap.labels" . | indent 4 }}
 spec:
   selector:
     matchLabels:
-      k8s-app: {{ $name }}-node
+      component: {{ $name }}-node
   {{- if .Values.calico.node.updateStrategy }}
   updateStrategy:
 {{ toYaml .Values.calico.node.updateStrategy | trim | indent 4 }}
@@ -26,7 +26,7 @@ spec:
 {{ toYaml .Values.calico.node.podAnnotations | trim | indent 8 }}
       {{- end }}
       labels:
-        k8s-app: {{ $name }}-node
+        component: {{ $name }}-node
     spec:
       hostNetwork: true
       serviceAccountName: {{ $name }}-node
