@@ -134,25 +134,19 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
             def shouldBePlanned = (!scos.changeset.isRelease || isGoingToProd)
 
             if(shouldBePlanned) {
-                doPlan(terraform, environment, publicKey)
+-               doPlan(terraform, environment, publicKey)
             }
 
             if (scos.changeset.shouldDeploy(environment)) {
                 stage("Deploy ${environment}") {
                     terraform.apply()
-                    createTillerUser(environment)
                 }
-
-                stage("Execute Kubernetes Configs for ${environment}") {
-                    applyKubeConfigs(environment)
-                }
-
                 stage("Deploy tiller service for ${environment}") {
-                    scos.withEksCredentials(environment) {
-                        sh('helm init --service-account tiller')
-                    }
+                    createTillerService(environment)
                 }
-
+                stage("Execute infrastructure Helm charts for ${environment}") {
+                    applyInfraHelmCharts(environment)
+                }
                 stage('Tag') {
                     if (environment == 'staging') {
                         scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
@@ -184,52 +178,54 @@ def doPlan(terraform, environment, publicKey) {
     }
 }
 
-def createTillerUser(environment) {
+def createTillerService(environment) {
     scos.withEksCredentials(environment) {
         /* Assumes this is running on the infrastructure node */
         sh('''#!/usr/bin/env bash
             set -e
 
-            if [ $(kubectl get serviceaccount \
-                    --namespace kube-system \
-                    | grep -wc tiller) -eq 0 ]; then
+            kubectl apply -f k8s/tiller-role/
 
-                kubectl create serviceaccount tiller \
-                    --namespace kube-system
-            fi
-            if [ $(kubectl get clusterrolebinding \
-                    --namespace kube-system \
-                    | grep -wc tiller) -eq 0 ]; then
-
-                kubectl create clusterrolebinding tiller \
-                    --clusterrole cluster-admin \
-                    --serviceaccount=kube-system:tiller
-            fi
+            helm init --service-account tiller
         ''')
     }
 }
 
-def applyKubeConfigs(environment) {
+def applyInfraHelmCharts(environment) {
     scos.withEksCredentials(environment) {
         def terraformOutputs = scos.terraformOutput(environment)
         def eks_cluster_name = terraformOutputs.eks_cluster_name.value
         def aws_region = terraformOutputs.aws_region.value
+        def subnets = terraformOutputs.public_subnets.value.join(', ')
+        def albToClusterSG = terraformOutputs.allow_all_security_group.value
 
         sh("""#!/bin/bash
-            export EKS_CLUSTER_NAME='${eks_cluster_name}'
-            export AWS_REGION='${aws_region}'
-            export DNS_ZONE='${environment}.internal.smartcolumbusos.com'
+            export EKS_CLUSTER_NAME="${eks_cluster_name}"
+            export AWS_REGION="${aws_region}"
+            export DNS_ZONE="${environment}.internal.smartcolumbusos.com"
+            export SUBNETS="${subnets}"
+            export SECURITY_GROUPS="${albToClusterSG}"
 
-            for manifest in k8s/alb-ingress-controller/*; do
-                cat \$manifest | envsubst | kubectl apply -f -
+            for i in $(seq 1 5); do
+                [ $i -gt 1 ] && sleep 15
+                [ $(kubectl get pods --namespace kube-system -l name='tiller' | grep -ic Running | wc -l) -gt 0 ] && break
+                echo "Running Tiller Pod not found"
+                [ $i -eq 5 ] && exit 1
             done
 
-            kubectl apply -f k8s/tiller-role/
-            kubectl apply -f k8s/persistent-storage/
+            helm install --name=cluster-infra --namespace=kube-system \
+                --set externalDns.args."domain\-filter"="${DNS_ZONE}" \
+                --set albIngress.extraEnv."AWS\_REGION"="${AWS_REGION}" \
+                --set albIngress.extraEnv."CLUSTER\_NAME"="${EKS_CLUSTER_NAME}" \
+                --values helm/cluster-bootstrap/run-config.yaml helm/cluster-bootstrap
 
-            for manifest in k8s/external-dns/*; do
-                cat \$manifest | envsubst | kubectl apply -f -
-            done
+            helm install --name=prometheus --namespace=prometheus \
+                --set global.ingress.annotations."alb\.ingress\.kubernetes\.io\/subnets"="${SUBNETS//,/\\,}" \
+                --set global.ingress.annotations."alb\.ingress\.kubernetes\.io\/security\-groups"="${SECURITY_GROUPS}" \
+                --set grafana.ingress.hosts[0]="grafana\.${DNS_ZONE}" \
+                --set alertmanager.ingress.hosts[0]="alertmanager\.${DNS_ZONE}" \
+                --set server.ingress.hosts[0]="prometheus\.${DNS_ZONE}" \
+                --values helm/prometheus/run-config.yaml helm/prometheus
         """.trim())
     }
 }
