@@ -37,6 +37,10 @@ resource "aws_instance" "ckan_external" {
     BaseAMI = "${var.ckan_external_backup_ami}"
   }
 
+  lifecycle {
+    ignore_changes = ["ami"]
+  }
+
   provisioner "file" {
     source     = "${path.module}/files/ckan/setup.sh"
     destination = "/tmp/setup.sh"
@@ -120,12 +124,6 @@ resource "aws_alb_target_group_attachment" "ckan_external_private" {
   port             = 80
 }
 
-resource "aws_alb_target_group_attachment" "ckan_external" {
-  target_group_arn = "${module.load_balancer_public.target_group_arns["${terraform.workspace}-CKAN"]}"
-  target_id        = "${aws_instance.ckan_external.id}"
-  port             = 80
-}
-
 resource "aws_route53_record" "ckan_external_public_dns" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
   name    = "ckan"
@@ -156,4 +154,8 @@ variable "ckan_external_instance_profile" {
 variable "ckan_external_instance_type" {
   description = "Instance type for ckan_external server"
   default     = "m4.xlarge"
+}
+
+output "ckan_external_instance_id" {
+  value = "${aws_instance.ckan_external.id}"
 }
