@@ -14,7 +14,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      component: {{ $name }}-node
+      component: {{ $name }}-typha
   {{- if .Values.calico.typha.updateStrategy }}
   updateStrategy:
 {{ toYaml .Values.calico.typha.updateStrategy | trim | indent 4 }}

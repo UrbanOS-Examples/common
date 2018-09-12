@@ -8,7 +8,7 @@ metadata:
 {{- end }}
   labels:
 {{ include "bootstrap.labels" . | indent 4 }}
-  name: {{ .Values.externalDns.name }}
+  name: {{ .Values.albIngress.name }}
 spec:
   selector:
     matchLabels:
@@ -65,7 +65,7 @@ spec:
               fieldPath: metadata.namespace
         {{- range $key, $value := .Values.albIngress.extraEnv }}
         - name: {{ $key }}
-          value: {{ $value }}
+          value: {{ $value | quote }}
         {{- end }}
         resources:
 {{ toYaml .Values.albIngress.resources | trim | indent 10 }}

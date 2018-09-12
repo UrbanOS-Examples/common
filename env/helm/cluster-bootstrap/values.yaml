@@ -46,41 +46,49 @@ calico:
         cpu: 10m
   customResources:
   - name: bgpconfiguration
+    plural: bgpconfigurations
     desc: Calico BGP Configuration
     kind: BGPConfiguration
     scope: Cluster
     version: v1
   - name: clusterinformation
+    plural: clusterinformations
     desc: Calico Cluster Information
     kind: ClusterInformation
     scope: Cluster
     version: v1
   - name: felixconfiguration
+    plural: felixconfigurations
     desc: Calico Felix Configuration
     kind: FelixConfiguration
     scope: Cluster
     version: v1
   - name: globalnetworkpolicy
+    plural: globalnetworkpolicies
     desc: Calico Global Network Policies
     kind: GlobalNetworkPolicy
     scope: Cluster
     version: v1
   - name: globalnetworkset
+    plural: globalnetworksets
     desc: Calico Global Network Sets
     kind: GlobalNetworkSet
     scope: Cluster
     version: v1
   - name: hostendpoint
+    plural: hostendpoints
     desc: Calico Host Endpoints
     kind: HostEndpoint
     scope: Cluster
     version: v1
   - name: ippool
+    plural: ippools
     desc: Calico IP Pools
     kind: IPPool
     scope: Cluster
     version: v1
   - name: networkpolicy
+    plural: networkpolicies
     desc: Calico Network Policies
     kind: NetworkPolicy
     scope: Namespaced

@@ -8,14 +8,14 @@ kind: CustomResourceDefinition
 metadata:
   labels:
 {{ include "bootstrap.labels" $ | indent 4 }}
-  name: {{ .name }}.{{ $group }}
+  name: {{ .plural }}.{{ $group }}
 spec:
   scope: {{ .scope }}
   group: {{ $group }}
   version: {{ .version }}
   names:
     kind: {{ .kind }} 
-    plural: {{ .name }}s
+    plural: {{ .plural }}
     singular: {{ .name }}
 {{- end }}
 {{- end }}
