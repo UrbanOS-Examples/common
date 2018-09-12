@@ -37,3 +37,5 @@ variable "root_dns_zone" {
   description = "Name of root domain (ex. example.com)"
   default     = "internal.smartcolumbusos.com"
 }
+
+variable "prod_dns_zone" {}
