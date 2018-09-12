@@ -6,7 +6,7 @@ data "template_file" "ckan_external_config" {
     DB_DATASTORE_PASSWORD = "${random_string.ckan_db_password_datastore.result}"
     DB_HOST = "${aws_db_instance.ckan.address}"
     DB_PORT = "${aws_db_instance.ckan.port}"
-    DNS_ZONE = "${terraform.workspace}.${var.root_dns_zone}"
+    DNS_ZONE = "${coalesce("${var.prod_dns_zone}","${terraform.workspace}.${var.root_dns_zone}")}"
     SOLR_HOST = "127.0.0.1"
     REDIS_HOST = "127.0.0.1"
     S3_BUCKET = "${aws_s3_bucket.ckan.id}"
@@ -35,6 +35,10 @@ resource "aws_instance" "ckan_external" {
   tags {
     Name    = "${terraform.workspace} CKAN external"
     BaseAMI = "${var.ckan_external_backup_ami}"
+  }
+
+  lifecycle {
+    ignore_changes = ["ami"]
   }
 
   provisioner "file" {
@@ -120,12 +124,6 @@ resource "aws_alb_target_group_attachment" "ckan_external_private" {
   port             = 80
 }
 
-resource "aws_alb_target_group_attachment" "ckan_external" {
-  target_group_arn = "${module.load_balancer_public.target_group_arns["${terraform.workspace}-CKAN"]}"
-  target_id        = "${aws_instance.ckan_external.id}"
-  port             = 80
-}
-
 resource "aws_route53_record" "ckan_external_public_dns" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
   name    = "ckan"
@@ -156,4 +154,8 @@ variable "ckan_external_instance_profile" {
 variable "ckan_external_instance_type" {
   description = "Instance type for ckan_external server"
   default     = "m4.xlarge"
+}
+
+output "ckan_external_instance_id" {
+  value = "${aws_instance.ckan_external.id}"
 }

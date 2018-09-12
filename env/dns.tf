@@ -37,3 +37,8 @@ variable "root_dns_zone" {
   description = "Name of root domain (ex. example.com)"
   default     = "internal.smartcolumbusos.com"
 }
+
+variable "prod_dns_zone" {
+  description = "Set this when deploying to prod environments to override the default internal.smartcolumbusos.com zones for application configs"
+  default     = ""
+}
