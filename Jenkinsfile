@@ -220,6 +220,12 @@ def applyInfraHelmCharts(environment) {
                 [ \$i -eq 5 ] && exit 1
             done
 
+            helm template --name=cluster-infra --namespace=kube-system \
+                --set externalDns.args."domain\\-filter"="\${DNS_ZONE}" \
+                --set albIngress.extraEnv."AWS\\_REGION"="\${AWS_REGION}" \
+                --set albIngress.extraEnv."CLUSTER\\_NAME"="\${EKS_CLUSTER_NAME}" \
+                --values helm/cluster-bootstrap/run-config.yaml helm/cluster-bootstrap
+
             helm install --name=cluster-infra --namespace=kube-system \
                 --set externalDns.args."domain\\-filter"="\${DNS_ZONE}" \
                 --set albIngress.extraEnv."AWS\\_REGION"="\${AWS_REGION}" \
