@@ -163,13 +163,11 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
             }
         }
     }
-    if(scos.changeset.shouldDeploy('prod')) {
-        stage('Apply Prod specific infrastructure') {
-            dir('prod') {
-                def terraform = scos.terraform('prod')
-                terraform.plan(terraform.defaultVarFile, [])
-                terraform.apply()
-            }
+    scos.doStageIf(scos.changeset.shouldDeploy('prod'), 'Apply Prod specific infrastructure') {
+        dir('prod') {
+            def terraform = scos.terraform('prod')
+            terraform.plan(terraform.defaultVarFile, [])
+            terraform.apply()
         }
     }
 }}}}
