@@ -11,6 +11,8 @@ data "template_file" "ckan_internal_config" {
     REDIS_HOST = "${aws_instance.ckan_external.private_ip}"
     S3_BUCKET = "${aws_s3_bucket.ckan.id}"
     EXTRA_PLUGINS = ""
+    AWS_ACCESS_KEY_ID = "${aws_iam_access_key.s3_serviceaccount_credentials.id}"
+    AWS_SECRET_ACCESS_KEY = "${aws_iam_access_key.s3_serviceaccount_credentials.secret}"
   }
 }
 
@@ -49,17 +51,6 @@ resource "aws_instance" "ckan_internal" {
   provisioner "file" {
     content     = "${data.template_file.ckan_upgrade.rendered}"
     destination = "/tmp/upgrade.sh"
-
-    connection {
-      type = "ssh"
-      host = "${self.private_ip}"
-      user = "ubuntu"
-    }
-  }
-
-  provisioner "file" {
-    source = "${path.module}/files/ckan/update-aws-credentials.sh"
-    destination = "/tmp/update-aws-credentials.sh"
 
     connection {
       type = "ssh"
