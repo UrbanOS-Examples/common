@@ -163,7 +163,7 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
             }
         }
     }
-    if(environments.contains('prod') && scos.changeset.shouldDeploy('prod')) {
+    if(scos.changeset.shouldDeploy('prod')) {
         stage('Apply Prod specific infrastructure') {
             dir('prod') {
                 def terraform = scos.terraform('prod')
