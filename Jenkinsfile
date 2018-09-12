@@ -163,6 +163,15 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
             }
         }
     }
+    if(environments.contains('prod') && scos.changeset.shouldDeploy('prod')) {
+        stage('Apply Prod specific infrastructure') {
+            dir('prod') {
+                def terraform = scos.terraform('prod')
+                terraform.plan(terraform.defaultVarFile, [])
+                terraform.apply()
+            }
+        }
+    }
 }}}}
 
 def doPlan(terraform, environment, publicKey) {
