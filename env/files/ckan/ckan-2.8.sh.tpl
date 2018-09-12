@@ -13,10 +13,7 @@ pip install --upgrade -r requirements.txt
 python setup.py develop
 
 # upgrade to latest scos theme
-pip uninstall ckanext-scos-theme
-pip install https://s3.us-east-2.amazonaws.com/os-build-artifacts-repository/scos-theme/ckanext-scos_theme-1.0.1.tar.gz
+pip install https://s3.us-east-2.amazonaws.com/os-build-artifacts-repository/scos-theme/ckanext-scos_theme-${THEME_VERSION}.tar.gz
 
 # upgrade ckan database schema
 paster db upgrade -c /etc/ckan/default/production.ini
-
-sudo systemctl restart apache2

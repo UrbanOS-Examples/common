@@ -48,8 +48,8 @@ resource "aws_instance" "ckan_external" {
     }
   }
 
-    provisioner "file" {
-    source     = "${path.module}/files/ckan/ckan-2.8.sh"
+  provisioner "file" {
+    content     = "${data.template_file.ckan_upgrade.rendered}"
     destination = "/tmp/upgrade.sh"
 
     connection {
