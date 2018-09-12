@@ -12,5 +12,8 @@ git reset --hard ckan-2.8.1
 pip install --upgrade -r requirements.txt
 python setup.py develop
 
+# upgrade to latest scos theme
+pip install https://s3.us-east-2.amazonaws.com/os-build-artifacts-repository/scos-theme/ckanext-scos_theme-${THEME_VERSION}.tar.gz
+
 # upgrade ckan database schema
 paster db upgrade -c /etc/ckan/default/production.ini
