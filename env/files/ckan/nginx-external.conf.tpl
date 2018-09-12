@@ -28,7 +28,7 @@ server {
         proxy_cache_valid 30m;
         proxy_cache_key $host$scheme$proxy_host$request_uri;
         proxy_set_header X-Forwarded-Proto $scheme;
-        # In emergency comment out line to force caching proxy_ignore_headers X-Accel-Expires 
+        # In emergency comment out line to force caching proxy_ignore_headers X-Accel-Expires
         # Expires Cache-Control; Any request that did not originally come in to the ELB over
         # HTTPS gets redirected.
         if ($http_x_forwarded_proto != "https") {

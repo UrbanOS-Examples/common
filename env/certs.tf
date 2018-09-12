@@ -1,4 +1,3 @@
-
 module "tls_certificate" {
   source = "github.com/azavea/terraform-aws-acm-certificate?ref=0.1.0"
 

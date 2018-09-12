@@ -22,6 +22,10 @@ resource "aws_instance" "kong" {
     BaseAMI = "${var.kong_backup_ami}"
   }
 
+  lifecycle {
+    ignore_changes = ["ami"]
+  }
+
   provisioner "file" {
     content     = "${data.template_file.kong_config.rendered}"
     destination = "/tmp/kong.conf"
@@ -71,12 +75,6 @@ resource "aws_alb_target_group_attachment" "kong_private" {
   port             = 80
 }
 
-resource "aws_alb_target_group_attachment" "kong_public" {
-  target_group_arn = "${module.load_balancer_public.target_group_arns["${terraform.workspace}-Kong"]}"
-  target_id        = "${aws_instance.kong.id}"
-  port             = 80
-}
-
 resource "aws_route53_record" "kong_public_dns" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
   name    = "api"
@@ -113,7 +111,7 @@ resource "aws_db_instance" "kong" {
   }
 
   lifecycle {
-    ignore_changes = ["snapshot_identifier"]
+    ignore_changes = ["final_snapshot_identifier", "storage_encrypted", "snapshot_identifier"]
   }
 }
 
@@ -175,4 +173,8 @@ variable "kong_instance_profile" {
 variable "kong_instance_type" {
   description = "Instance type for kong server"
   default     = "m4.2xlarge"
+}
+
+output "kong_instance_id" {
+  value = "${aws_instance.kong.id}"
 }
