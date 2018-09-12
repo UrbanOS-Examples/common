@@ -1,3 +1,10 @@
+data "template_file" "ckan_upgrade" {
+  template = "${file("${path.module}/files/ckan/ckan-2.8.sh.tpl")}"
+
+  vars {
+    THEME_VERSION = "${var.ckan_theme_version}"
+  }
+}
 
 resource "aws_s3_bucket" "ckan" {
   bucket        = "${terraform.workspace}-os-ckan-data"
@@ -167,4 +174,9 @@ variable "ckan_db_parameter_group_name" {
 variable "ckan_db_engine_version" {
   description = "The version of postgresql used for ckan"
   default     = "9.6.6"
+}
+
+variable "ckan_theme_version" {
+  description = "The version of the custom ckan theme to install"
+  default     = "1.0.4"
 }
