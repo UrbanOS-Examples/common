@@ -85,20 +85,20 @@ set -x
 
 bash -ex /tmp/upgrade.sh
 
-# Reindex the database
-[ -n "${external}" ] && (
+(
     source /usr/lib/ckan/default/bin/activate
-    paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
-    paster --plugin=ckan datastore set-permissions --config=/etc/ckan/default/production.ini | ${psql}
+    # pip install boto
+    # pip uninstall -y ckanext-cloudstorage
+    # pip install -U -e git+https://github.com/TkTech/ckanext-cloudstorage.git@ee26eedc66f7fd52cac01162043de6362366a147#egg=ckanext_cloudstorage-master
 
-    # restart solr server
-    service jetty8 restart
+    if [ -n "${external}" ]; then
+        paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
+        paster --plugin=ckan datastore set-permissions --config=/etc/ckan/default/production.ini | ${psql}
+
+        # restart solr server
+        service jetty8 restart
+    fi
 )
-
-# EC2 credentials expire after 6 hours. This will ensure these credentials are always up to date
-mv /tmp/update-aws-credentials.sh /opt/update-aws-credentials.sh
-chmod +x /opt/update-aws-credentials.sh # For some reason, permissions are not copied
-sh /opt/update-aws-credentials.sh
 
 systemctl restart apache2
 systemctl restart nginx
