@@ -220,6 +220,9 @@ def applyInfraHelmCharts(environment) {
                 [ \$i -eq 5 ] && exit 1
             done
 
+            # label the dns namespace to later select for network policy rules; overwrite = no-op
+            kubectl label namespace kube-system name=kube-system --overwrite
+
             helm upgrade --install cluster-infra helm/cluster-bootstrap \
                 --namespace=kube-system \
                 --set externalDns.args."domain\\-filter"="\${DNS_ZONE}" \
