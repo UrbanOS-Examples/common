@@ -134,7 +134,7 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
             def shouldBePlanned = (!scos.changeset.isRelease || isGoingToProd)
 
             if(shouldBePlanned) {
--               doPlan(terraform, environment, publicKey)
+                doPlan(terraform, environment, publicKey)
             }
 
             if (scos.changeset.shouldDeploy(environment)) {
@@ -220,25 +220,29 @@ def applyInfraHelmCharts(environment) {
                 [ \$i -eq 5 ] && exit 1
             done
 
-            helm template --name=cluster-infra --namespace=kube-system \
+            helm template --name=cluster-infra \
+                --namespace=kube-system \
                 --set externalDns.args."domain\\-filter"="\${DNS_ZONE}" \
                 --set albIngress.extraEnv."AWS\\_REGION"="\${AWS_REGION}" \
                 --set albIngress.extraEnv."CLUSTER\\_NAME"="\${EKS_CLUSTER_NAME}" \
-                --values helm/cluster-bootstrap/run-config.yaml helm/cluster-bootstrap
+                --values helm/cluster-bootstrap/run-config.yaml \
+                helm/cluster-bootstrap
 
-            helm install --name=cluster-infra --namespace=kube-system \
+            helm upgrade --install cluster-infra helm/cluster-bootstrap \
+                --namespace=kube-system \
                 --set externalDns.args."domain\\-filter"="\${DNS_ZONE}" \
                 --set albIngress.extraEnv."AWS\\_REGION"="\${AWS_REGION}" \
                 --set albIngress.extraEnv."CLUSTER\\_NAME"="\${EKS_CLUSTER_NAME}" \
-                --values helm/cluster-bootstrap/run-config.yaml helm/cluster-bootstrap
+                --values helm/cluster-bootstrap/run-config.yaml
 
-            helm install --name=prometheus --namespace=prometheus \
+            helm upgrade --install prometheus helm/prometheus \
+                --namespace=prometheus \
                 --set global.ingress.annotations."alb\\.ingress\\.kubernetes\\.io\\/subnets"="\${SUBNETS//,/\\,}" \
                 --set global.ingress.annotations."alb\\.ingress\\.kubernetes\\.io\\/security\\-groups"="\${SECURITY_GROUPS}" \
                 --set grafana.ingress.hosts[0]="grafana\\.\${DNS_ZONE}" \
                 --set alertmanager.ingress.hosts[0]="alertmanager\\.\${DNS_ZONE}" \
                 --set server.ingress.hosts[0]="prometheus\\.\${DNS_ZONE}" \
-                --values helm/prometheus/run-config.yaml helm/prometheus
+                --values helm/prometheus/run-config.yaml
         """.trim())
     }
 }

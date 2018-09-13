@@ -19,5 +19,4 @@ spec:
       name: {{ $name }}-typha
   selector:
     component: {{ $name }}-typha
-{{ include "bootstrap.labels" . | indent 4 }}
 {{- end }}
