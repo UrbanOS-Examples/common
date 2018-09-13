@@ -122,3 +122,8 @@ variable "hosted_zone_name" {
   description = "The name of the hosted zone (smartcolumbusos.com)"
   default     = "smartcolumbusos.com"
 }
+
+output "tls_certificate_arn" {
+  description = "ARN of the generated TLS certificate for the environment."
+  value = "${module.tls_certificate.arn}"
+}
