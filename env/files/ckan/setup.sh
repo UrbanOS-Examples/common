@@ -113,6 +113,26 @@ EOF
 
         # restart solr server
         service jetty8 restart
+
+    fi
+)
+
+(
+    if [ -n "${external}" ]; then
+        rm -rf /usr/lib/ckan/datapusher
+        virtualenv /usr/lib/ckan/datapusher
+
+        #create a source directory and switch to it
+        mkdir /usr/lib/ckan/datapusher/src
+        cd /usr/lib/ckan/datapusher/src
+
+        #clone the source (this should target the latest tagged version)
+        git clone -b 0.0.14 https://github.com/ckan/datapusher.git
+
+        #install the DataPusher and its requirements
+        cd datapusher
+        /usr/lib/ckan/datapusher/bin/pip install -r requirements.txt
+        /usr/lib/ckan/datapusher/bin/python setup.py develop
     fi
 )
 
