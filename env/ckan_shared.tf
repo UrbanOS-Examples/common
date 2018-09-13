@@ -71,25 +71,6 @@ resource "aws_iam_role_policy" "ckan_data_s3_policy" {
 EOF
 }
 
-# FIXME: Remove this as soon as we have secure urls enabled SMRT-510
-resource "aws_s3_bucket_policy" "ckan_data_public_read" {
-  bucket = "${aws_s3_bucket.ckan.id}"
-  policy =<<POLICY
-{
-  "Version": "2012-10-17",
-  "Id": "CkanDataPublicRead",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "s3:GetObject",
-      "Resource": "${aws_s3_bucket.ckan.arn}/*"
-    }
-  ]
-}
-POLICY
-}
-
 resource "aws_db_instance" "ckan" {
   identifier                = "${terraform.workspace}-${var.ckan_db_identifier}"
   instance_class            = "${var.ckan_db_instance_class}"
