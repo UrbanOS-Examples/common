@@ -87,9 +87,25 @@ bash -ex /tmp/upgrade.sh
 
 (
     source /usr/lib/ckan/default/bin/activate
-    # pip install boto
-    # pip uninstall -y ckanext-cloudstorage
-    # pip install -U -e git+https://github.com/TkTech/ckanext-cloudstorage.git@ee26eedc66f7fd52cac01162043de6362366a147#egg=ckanext_cloudstorage-master
+    chown -R ubuntu:ubuntu /usr/lib/ckan/default/
+
+    RUNAS=$(mktemp)
+    cat <<EOF >"${RUNAS}"
+#!/bin/bash
+
+source /usr/lib/ckan/default/bin/activate
+
+pip install boto ckanapi docopt || exit 1
+pip uninstall -y ckanext-cloudstorage
+pip uninstall -y ckanext-cloudstorage-master
+rm -rf /usr/lib/ckan/default/src/ckanext-cloudstorage
+pip install -U -e git+https://github.com/SmartColumbusOS/ckanext-cloudstorage.git@63f4f03f0c33b8725fe1eb7e9bc92587de90e8cf#egg=ckanext_cloudstorage || exit 1
+
+cd /usr/lib/ckan/default/src/ckanext-cloudstorage || exit 1
+paster cloudstorage initdb -c /etc/ckan/default/production.ini || exit 1
+EOF
+    chmod 644 "${RUNAS}"
+    su -c "bash ${RUNAS}" ubuntu
 
     if [ -n "${external}" ]; then
         paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
