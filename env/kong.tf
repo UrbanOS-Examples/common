@@ -172,7 +172,7 @@ variable "kong_instance_profile" {
 
 variable "kong_instance_type" {
   description = "Instance type for kong server"
-  default     = "m4.2xlarge"
+  default     =  "t2.small"
 }
 
 output "kong_instance_id" {
