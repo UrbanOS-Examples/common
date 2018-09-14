@@ -50,8 +50,6 @@ ckan_db_storage_encrypted = false
 
 kong_backup_ami = "ami-0acc9642a39710355"
 
-kong_instance_type = "t2.small"
-
 kong_instance_ebs_optimized = false
 
 # Kong database
