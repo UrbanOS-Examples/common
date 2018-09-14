@@ -85,20 +85,56 @@ set -x
 
 bash -ex /tmp/upgrade.sh
 
-# Reindex the database
-[ -n "${external}" ] && (
+(
     source /usr/lib/ckan/default/bin/activate
-    paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
-    paster --plugin=ckan datastore set-permissions --config=/etc/ckan/default/production.ini | ${psql}
+    chown -R ubuntu:ubuntu /usr/lib/ckan/default/
 
-    # restart solr server
-    service jetty8 restart
+    RUNAS=$(mktemp)
+    cat <<EOF >"${RUNAS}"
+#!/bin/bash
+
+source /usr/lib/ckan/default/bin/activate
+
+pip install boto ckanapi docopt || exit 1
+pip uninstall -y ckanext-cloudstorage
+pip uninstall -y ckanext-cloudstorage-master
+rm -rf /usr/lib/ckan/default/src/ckanext-cloudstorage
+pip install -U -e git+https://github.com/SmartColumbusOS/ckanext-cloudstorage.git@63f4f03f0c33b8725fe1eb7e9bc92587de90e8cf#egg=ckanext_cloudstorage || exit 1
+
+cd /usr/lib/ckan/default/src/ckanext-cloudstorage || exit 1
+paster cloudstorage initdb -c /etc/ckan/default/production.ini || exit 1
+EOF
+    chmod 644 "${RUNAS}"
+    su -c "bash ${RUNAS}" ubuntu
+
+    if [ -n "${external}" ]; then
+        paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
+        paster --plugin=ckan datastore set-permissions --config=/etc/ckan/default/production.ini | ${psql}
+
+        # restart solr server
+        service jetty8 restart
+
+    fi
 )
 
-# EC2 credentials expire after 6 hours. This will ensure these credentials are always up to date
-mv /tmp/update-aws-credentials.sh /opt/update-aws-credentials.sh
-chmod +x /opt/update-aws-credentials.sh # For some reason, permissions are not copied
-sh /opt/update-aws-credentials.sh
+(
+    if [ -n "${external}" ]; then
+        rm -rf /usr/lib/ckan/datapusher
+        virtualenv /usr/lib/ckan/datapusher
+
+        #create a source directory and switch to it
+        mkdir /usr/lib/ckan/datapusher/src
+        cd /usr/lib/ckan/datapusher/src
+
+        #clone the source (this should target the latest tagged version)
+        git clone -b 0.0.14 https://github.com/ckan/datapusher.git
+
+        #install the DataPusher and its requirements
+        cd datapusher
+        /usr/lib/ckan/datapusher/bin/pip install -r requirements.txt
+        /usr/lib/ckan/datapusher/bin/python setup.py develop
+    fi
+)
 
 systemctl restart apache2
 systemctl restart nginx

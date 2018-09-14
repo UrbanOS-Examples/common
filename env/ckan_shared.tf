@@ -12,6 +12,20 @@ resource "aws_s3_bucket" "ckan" {
   force_destroy = true
 }
 
+resource "aws_iam_user" "s3_serviceaccount" {
+  name          = "${terraform.workspace}-s3-serviceaccount"
+  force_destroy = true
+}
+
+resource "aws_iam_user_policy_attachment" "s3_serviceaccount_policy_attachment" {
+  user       = "${aws_iam_user.s3_serviceaccount.name}"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_access_key" "s3_serviceaccount_credentials" {
+  user       = "${aws_iam_user.s3_serviceaccount.name}"
+}
+
 resource "aws_iam_instance_profile" "ckan" {
   name = "${terraform.workspace}_ckan"
   role = "${aws_iam_role.ckan_ec2.name}"
@@ -55,24 +69,6 @@ resource "aws_iam_role_policy" "ckan_data_s3_policy" {
   ]
 }
 EOF
-}
-
-resource "aws_s3_bucket_policy" "ckan_data_public_read" {
-  bucket = "${aws_s3_bucket.ckan.id}"
-  policy =<<POLICY
-{
-  "Version": "2012-10-17",
-  "Id": "CkanDataPublicRead",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "s3:GetObject",
-      "Resource": "${aws_s3_bucket.ckan.arn}/*"
-    }
-  ]
-}
-POLICY
 }
 
 resource "aws_db_instance" "ckan" {

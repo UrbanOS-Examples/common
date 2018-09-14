@@ -111,8 +111,8 @@ ckanext.agsview.default_basemap_url = Topographic
 ##Cloudstorage Settings
 ckanext.cloudstorage.driver = #{S3_BUCKET_REGION}
 ckanext.cloudstorage.container_name = ${S3_BUCKET}
-ckanext.cloudstorage.use_secure_urls = 0
-ckanext.cloudstorage.driver_options = #{DRIVER_OPTIONS}
+ckanext.cloudstorage.use_secure_urls = 1
+ckanext.cloudstorage.driver_options = {"key":'${AWS_ACCESS_KEY_ID}',"secret":'${AWS_SECRET_ACCESS_KEY}'}
 #ckanext.cloudstorage.driver_options = {"key":"AWS_ACCESS_KEY","secret":"AWS_SECRET_KEY"}
 
 ##Discourse Settings
