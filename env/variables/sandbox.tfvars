@@ -58,5 +58,4 @@ kong_db_instance_class = "db.t2.2xlarge"
 kong_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:prod-kong-0-13-1-2018-08-29-07-20"
 
 # Cloudwatch monitoring
-slack_path = "/services/T7LRETX4G/BA0EW8W6R/vRbX198LKBkhAEK64OnHCUXH"
 slack_channel_name = "#pre_prod_alerts"
