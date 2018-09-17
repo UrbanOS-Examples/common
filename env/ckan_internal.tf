@@ -21,7 +21,6 @@ resource "aws_instance" "ckan_internal" {
   ami                    = "${var.ckan_internal_backup_ami}"
   vpc_security_group_ids = ["${aws_security_group.os_servers.id}"]
   ebs_optimized          = "${var.ckan_internal_instance_ebs_optimized}"
-  iam_instance_profile   = "${var.ckan_internal_instance_profile}"
   subnet_id              = "${module.vpc.public_subnets[0]}"
   key_name               = "${aws_key_pair.cloud_key.key_name}"
   iam_instance_profile   = "${aws_iam_instance_profile.ckan.name}"
@@ -120,11 +119,6 @@ resource "aws_route53_record" "ckan_internal_ec2_record" {
 variable "ckan_internal_instance_ebs_optimized" {
   description = "Whether or not the CKAN internal server is EBS optimized"
   default     = true
-}
-
-variable "ckan_internal_instance_profile" {
-  description = "Instance Profile for ckan_internal server"
-  default     = "CloudWatch_EC2"
 }
 
 variable "ckan_internal_instance_type" {

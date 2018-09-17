@@ -100,7 +100,9 @@ resource "aws_cloudwatch_metric_alarm" "joomla_high_mem" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.joomla.id}"
+  }
   treat_missing_data                    = "breaching"
 }
 
@@ -114,7 +116,9 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_cpu" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.ckan_internal.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -128,7 +132,9 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_mem" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.ckan_internal.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -142,7 +148,9 @@ resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_high_cpu_util" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    DBInstanceIdentifier                = "${aws_db_instance.ckan.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -156,7 +164,9 @@ resource "aws_cloudwatch_metric_alarm" "ckan_instance_status_check_failed" {
   statistic                             = "Average"
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.ckan_external.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -170,7 +180,9 @@ resource "aws_cloudwatch_metric_alarm" "ckan_high_mem" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.ckan_external.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -184,7 +196,9 @@ resource "aws_cloudwatch_metric_alarm" "ckan_high_cpu" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.ckan_external.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -198,7 +212,9 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_instance_status_check_fail
   statistic                             = "Average"
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.ckan_internal.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -212,7 +228,9 @@ resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_free_storage_space_low" {
   statistic                             = "Average"
   threshold                             = "15000000000"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    DBInstanceIdentifier                = "${aws_db_instance.kong.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -226,7 +244,9 @@ resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_high_cpu_util" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    DBInstanceIdentifier                = "${aws_db_instance.kong.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -240,7 +260,9 @@ resource "aws_cloudwatch_metric_alarm" "kong_high_mem" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.kong.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -254,7 +276,9 @@ resource "aws_cloudwatch_metric_alarm" "kong_instance_status_check_failed" {
   statistic                             = "Average"
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.kong.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -268,7 +292,9 @@ resource "aws_cloudwatch_metric_alarm" "kong_high_cpu" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.kong.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -282,7 +308,9 @@ resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_free_storage_space_low" 
   statistic                             = "Average"
   threshold                             = "15000000000"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    DBInstanceIdentifier                = "${aws_db_instance.joomla_db.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -296,21 +324,9 @@ resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_high_cpu_util" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
-  treat_missing_data                    = "breaching" 
-}
-
-resource "aws_cloudwatch_metric_alarm" "maint_page_high_mem" {
-  alarm_name                            = "Maintenance Page - High Memory Utilization"
-  comparison_operator                   = "GreaterThanOrEqualToThreshold"
-  evaluation_periods                    = "2"
-  metric_name                           = "MemoryUtilization"
-  namespace                             = "System/Linux"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "100"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    DBInstanceIdentifier                = "${aws_db_instance.joomla_db.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -324,7 +340,10 @@ resource "aws_cloudwatch_metric_alarm" "prod_scos_elb_no_healthy_hosts" {
   statistic                             = "Average"
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    TargetGroup                         = "${module.load_balancer_private.target_group_arn_suffix["${terraform.workspace}-Int-Joomla"]}",
+    LoadBalancer                        = "${module.load_balancer_private.lb_arn_suffix}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -338,38 +357,11 @@ resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_free_storage_space_low" {
   statistic                             = "Average"
   threshold                             = "15000000000"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    DBInstanceIdentifier                = "${aws_db_instance.ckan.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
-
-resource "aws_cloudwatch_metric_alarm" "maint_page_instance_status_check_failed" {
-  alarm_name                            = "Maintenance Page - Instance Status Check Failed"
-  comparison_operator                   = "GreaterThanThreshold"
-  evaluation_periods                    = "1"
-  metric_name                           = "StatusCheckFailed_Instance"
-  namespace                             = "AWS/EC2"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "0"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
-  treat_missing_data                    = "breaching" 
-}
-
-resource "aws_cloudwatch_metric_alarm" "maint_page_high_cpu" {
-  alarm_name                            = "Maintenance Page - High CPU Utilization"
-  comparison_operator                   = "GreaterThanOrEqualToThreshold"
-  evaluation_periods                    = "2"
-  metric_name                           = "CPUUtilization"
-  namespace                             = "AWS/EC2"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "90"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
-  treat_missing_data                    = "breaching" 
-}
-
 resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
   alarm_name                            = "Joomla - High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
@@ -380,7 +372,9 @@ resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
   statistic                             = "Average"
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.joomla.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 
@@ -394,11 +388,12 @@ resource "aws_cloudwatch_metric_alarm" "joomla_instance_status_check_failed" {
   statistic                             = "Average"
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  # dimensions                            = ""
+  dimensions {
+    InstanceId                          = "${aws_instance.joomla.id}"
+  }
   treat_missing_data                    = "breaching" 
 }
 //-----------------------//
-
 
 variable "slack_path" {
   description = "Path to the Slack channel"

@@ -13,7 +13,7 @@ resource "aws_instance" "kong" {
   ami                    = "${var.kong_backup_ami}"
   vpc_security_group_ids = ["${aws_security_group.os_servers.id}"]
   ebs_optimized          = "${var.kong_instance_ebs_optimized}"
-  iam_instance_profile   = "${var.kong_instance_profile}"
+  iam_instance_profile   = "${aws_iam_instance_profile.kong.name}"
   subnet_id              = "${module.vpc.public_subnets[0]}"
   key_name               = "${aws_key_pair.cloud_key.key_name}"
 
@@ -113,6 +113,53 @@ resource "aws_db_instance" "kong" {
   lifecycle {
     ignore_changes = ["final_snapshot_identifier", "storage_encrypted", "snapshot_identifier"]
   }
+}
+
+resource "aws_iam_instance_profile" "kong" {
+  name = "${terraform.workspace}_kong"
+  role = "${aws_iam_role.kong_ec2.name}"
+}
+
+resource "aws_iam_role" "kong_ec2" {
+  name = "${terraform.workspace}_kong_ec2"
+  path = "/"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "kong_cloudwatch_policy" {
+  name = "kong_cloudwatch_policy"
+  role = "${aws_iam_role.kong_ec2.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "ec2:DescribeTags"
+      ],
+      "Resource":"*" 
+    }
+  ]
+}
+EOF
 }
 
 resource "random_string" "kong_db_password_sysadmin" {

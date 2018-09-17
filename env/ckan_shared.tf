@@ -39,13 +39,13 @@ resource "aws_iam_role" "ckan_ec2" {
 {
     "Version": "2012-10-17",
     "Statement": [
-        {
-            "Action": "sts:AssumeRole",
-            "Principal": {
-               "Service": "ec2.amazonaws.com"
-            },
-            "Effect": "Allow"
-        }
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "ec2.amazonaws.com"
+        },
+        "Effect": "Allow"
+      }
     ]
 }
 EOF
@@ -65,6 +65,16 @@ resource "aws_iam_role_policy" "ckan_data_s3_policy" {
       ],
       "Effect": "Allow",
       "Resource": ["${aws_s3_bucket.ckan.arn}/*", "${aws_s3_bucket.ckan.arn}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "ec2:DescribeTags"
+      ],
+      "Resource":"*"
     }
   ]
 }
