@@ -14,7 +14,7 @@ server {
 
     add_header Content-Security-Policy "frame-ancestors *.smartcolumbusos.com smartcolumbusos.com";
     add_header X-XSS-Protection "1; mode=block";
-    add_header x-frame-options "ALLOW-FROM https://${DNS_ZONE}";
+    add_header x-frame-options "ALLOW-FROM https://www.${DNS_ZONE}";
     server_tokens off; #disable nginx version headers
     add_header X-Content-Type-Options nosniff;
 
