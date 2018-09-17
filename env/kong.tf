@@ -150,7 +150,7 @@ variable "kong_db_allocated_storage" {
 
 variable "kong_instance_ebs_optimized" {
   description = "Whether or not the kong external server is EBS optimized"
-  default     = true
+  default     = false
 }
 
 variable "kong_db_identifier" {
@@ -166,13 +166,14 @@ variable "kong_db_instance_class" {
 variable "kong_instance_profile" {
   description = "Instance Profile for kong server"
   default     = ""
+
   //TODO: Create CloudWatch_EC2 in Terraform
   //default     = "CloudWatch_EC2"
 }
 
 variable "kong_instance_type" {
   description = "Instance type for kong server"
-  default     = "m4.2xlarge"
+  default     = "t2.small"
 }
 
 output "kong_instance_id" {
