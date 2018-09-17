@@ -71,6 +71,335 @@ resource "aws_lambda_function" "alert_handler_lambda" {
   }
 }
 
+resource "aws_lambda_permission" "with_sns" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.alert_handler_lambda.function_name}"
+  principal     = "sns.amazonaws.com"
+  source_arn    = "${aws_sns_topic.alert_handler_sns_topic.arn}"
+}
+
+resource "aws_sns_topic" "alert_handler_sns_topic" {
+  name = "lambda_alert_topic"
+}
+
+resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
+  topic_arn = "${aws_sns_topic.alert_handler_sns_topic.arn}"
+  protocol  = "lambda"
+  endpoint  = "${aws_lambda_function.alert_handler_lambda.arn}"
+}
+
+//---------ALARMS---------//
+resource "aws_cloudwatch_metric_alarm" "joomla_high_mem" {
+  alarm_name                            = "Joomla - High Memory Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "MemoryUtilization"
+  namespace                             = "System/Linux"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching"
+}
+
+resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_cpu" {
+  alarm_name                            = "CKAN Internal - High CPU Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "CPUUtilization"
+  namespace                             = "AWS/EC2"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_mem" {
+  alarm_name                            = "CKAN Internal - High Memory Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "MemoryUtilization"
+  namespace                             = "System/Linux"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_high_cpu_util" {
+  alarm_name                            = "Production CKAN - RDS High CPU Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "CPUUtilization"
+  namespace                             = "AWS/RDS"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "ckan_instance_status_check_failed" {
+  alarm_name                            = "CKAN - Instance Status Check Failed"
+  comparison_operator                   = "GreaterThanThreshold"
+  evaluation_periods                    = "1"
+  metric_name                           = "StatusCheckFailed_Instance"
+  namespace                             = "AWS/EC2"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "0"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "ckan_high_mem" {
+  alarm_name                            = "CKAN - High Memory Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "MemoryUtilization"
+  namespace                             = "System/Linux"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "ckan_high_cpu" {
+  alarm_name                            = "CKAN - High CPU Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "CPUUtilization"
+  namespace                             = "AWS/EC2"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "ckan_internal_instance_status_check_failed" {
+  alarm_name                            = "CKAN Internal - Instance Status Check Failed"
+  comparison_operator                   = "GreaterThanThreshold"
+  evaluation_periods                    = "1"
+  metric_name                           = "StatusCheckFailed_Instance"
+  namespace                             = "AWS/EC2"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "0"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_free_storage_space_low" {
+  alarm_name                            = "Production Kong - RDS Free Storage Space Low"
+  comparison_operator                   = "LessThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "FreeStorageSpace"
+  namespace                             = "AWS/RDS"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "15000000000"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_high_cpu_util" {
+  alarm_name                            = "Production Kong - RDS High CPU Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "CPUUtilization"
+  namespace                             = "AWS/RDS"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "kong_high_mem" {
+  alarm_name                            = "Kong - High Memory Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "MemoryUtilization"
+  namespace                             = "System/Linux"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "kong_instance_status_check_failed" {
+  alarm_name                            = "Kong - Instance Status Check Failed"
+  comparison_operator                   = "GreaterThanThreshold"
+  evaluation_periods                    = "1"
+  metric_name                           = "StatusCheckFailed_Instance"
+  namespace                             = "AWS/EC2"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "0"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "kong_high_cpu" {
+  alarm_name                            = "Kong - High CPU Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "CPUUtilization"
+  namespace                             = "AWS/EC2"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_free_storage_space_low" {
+  alarm_name                            = "Production Joomla - RDS Free Storage Space Low"
+  comparison_operator                   = "LessThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "FreeStorageSpace"
+  namespace                             = "AWS/RDS"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "15000000000"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_high_cpu_util" {
+  alarm_name                            = "Production Joomla - RDS High CPU Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "CPUUtilization"
+  namespace                             = "AWS/RDS"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "maint_page_high_mem" {
+  alarm_name                            = "Maintenance Page - High Memory Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "MemoryUtilization"
+  namespace                             = "System/Linux"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "100"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "prod_scos_elb_no_healthy_hosts" {
+  alarm_name                            = "Prod SCOS Elb - No Healthy Hosts"
+  comparison_operator                   = "LessThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "HealthyHostCount"
+  namespace                             = "AWS/ApplicationELB"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "0"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_free_storage_space_low" {
+  alarm_name                            = "Production CKAN - RDS Free Storage Space Low"
+  comparison_operator                   = "LessThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "FreeStorageSpace"
+  namespace                             = "AWS/RDS"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "15000000000"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "maint_page_instance_status_check_failed" {
+  alarm_name                            = "Maintenance Page - Instance Status Check Failed"
+  comparison_operator                   = "GreaterThanThreshold"
+  evaluation_periods                    = "1"
+  metric_name                           = "StatusCheckFailed_Instance"
+  namespace                             = "AWS/EC2"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "0"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "maint_page_high_cpu" {
+  alarm_name                            = "Maintenance Page - High CPU Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "CPUUtilization"
+  namespace                             = "AWS/EC2"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
+  alarm_name                            = "Joomla - High CPU Utilization"
+  comparison_operator                   = "GreaterThanOrEqualToThreshold"
+  evaluation_periods                    = "2"
+  metric_name                           = "CPUUtilization"
+  namespace                             = "AWS/EC2"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "90"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+
+resource "aws_cloudwatch_metric_alarm" "joomla_instance_status_check_failed" {
+  alarm_name                            = "Joomla - Instance Status Check Failed"
+  comparison_operator                   = "GreaterThanThreshold"
+  evaluation_periods                    = "1"
+  metric_name                           = "StatusCheckFailed_Instance"
+  namespace                             = "AWS/EC2"
+  period                                = "300"
+  statistic                             = "Average"
+  threshold                             = "0"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  # dimensions                            = ""
+  treat_missing_data                    = "breaching" 
+}
+//-----------------------//
+
+
 variable "slack_path" {
   description = "Path to the Slack channel"
   default = "/services/T7LRETX4G/BA0EW8W6R/vRbX198LKBkhAEK64OnHCUXH"
