@@ -186,3 +186,7 @@ variable "ckan_theme_version" {
   description = "The version of the custom ckan theme to install"
   default     = "1.0.7"
 }
+
+output "ckan_db_instance_id" {
+  value = "${aws_db_instance.ckan.id}"
+}

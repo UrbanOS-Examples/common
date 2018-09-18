@@ -288,3 +288,7 @@ variable "joomla_backup_ami" {
 output "joomla_instance_id" {
   value = "${aws_instance.joomla.id}"
 }
+
+output "joomla_db_instance_id" {
+  value = "${aws_db_instance.joomla_db.id}"
+}

@@ -226,3 +226,7 @@ variable "kong_instance_type" {
 output "kong_instance_id" {
   value = "${aws_instance.kong.id}"
 }
+
+output "kong_db_instance_id" {
+  value = "${aws_db_instance.kong.id}"
+}

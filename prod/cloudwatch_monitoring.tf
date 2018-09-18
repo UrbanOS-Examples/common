@@ -101,7 +101,7 @@ resource "aws_cloudwatch_metric_alarm" "joomla_high_mem" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.joomla.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.joomla_instance_id}"
   }
   treat_missing_data                    = "breaching"
 }
@@ -117,7 +117,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_cpu" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.ckan_internal.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_internal_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -133,7 +133,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_mem" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.ckan_internal.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_internal_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -149,7 +149,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_high_cpu_util" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${aws_db_instance.ckan.id}"
+    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.ckan_db_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -165,7 +165,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_instance_status_check_failed" {
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.ckan_external.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_external_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -181,7 +181,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_high_mem" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.ckan_external.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_external_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -197,7 +197,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_high_cpu" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.ckan_external.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_external_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -213,7 +213,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_instance_status_check_fail
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.ckan_internal.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_internal_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -229,7 +229,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_free_storage_space_low" {
   threshold                             = "15000000000"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${aws_db_instance.kong.id}"
+    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.kong_db_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -245,7 +245,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_high_cpu_util" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${aws_db_instance.kong.id}"
+    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.kong_db_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -261,7 +261,7 @@ resource "aws_cloudwatch_metric_alarm" "kong_high_mem" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.kong.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.kong_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -277,7 +277,7 @@ resource "aws_cloudwatch_metric_alarm" "kong_instance_status_check_failed" {
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.kong.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.kong_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -293,7 +293,7 @@ resource "aws_cloudwatch_metric_alarm" "kong_high_cpu" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.kong.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.kong_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -309,7 +309,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_free_storage_space_low" 
   threshold                             = "15000000000"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${aws_db_instance.joomla_db.id}"
+    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.joomla_db_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -325,7 +325,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_high_cpu_util" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${aws_db_instance.joomla_db.id}"
+    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.joomla_db_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -341,8 +341,8 @@ resource "aws_cloudwatch_metric_alarm" "prod_scos_elb_no_healthy_hosts" {
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    TargetGroup                         = "${module.load_balancer_private.target_group_arn_suffix["${terraform.workspace}-Int-Joomla"]}",
-    LoadBalancer                        = "${module.load_balancer_private.lb_arn_suffix}"
+    TargetGroup                         = "${module.load_balancer_public.target_group_arn_suffix["${terraform.workspace}-Int-Joomla"]}",
+    LoadBalancer                        = "${module.load_balancer_public.lb_arn_suffix}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -358,7 +358,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_free_storage_space_low" {
   threshold                             = "15000000000"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${aws_db_instance.ckan.id}"
+    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.ckan_db_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -373,7 +373,7 @@ resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.joomla.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.joomla_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }
@@ -389,7 +389,7 @@ resource "aws_cloudwatch_metric_alarm" "joomla_instance_status_check_failed" {
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${aws_instance.joomla.id}"
+    InstanceId                          = "${data.terraform_remote_state.env_remote_state.joomla_instance_id}"
   }
   treat_missing_data                    = "breaching" 
 }

@@ -130,3 +130,6 @@ variable "ckan_internal_backup_ami" {
   description = "AMI to restore ckan_internal from"
 }
 
+output "ckan_internal_instance_id" {
+  value = "${aws_instance.ckan_internal.id}"
+}
