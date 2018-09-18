@@ -134,7 +134,7 @@ variable "kong_db_snapshot_id" {
 }
 
 variable "kong_db_multi_az" {
-  description = "is ckan rds db multi az?"
+  description = "is kong rds db multi az?"
   default = false
 }
 
