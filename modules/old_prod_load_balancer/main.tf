@@ -31,6 +31,7 @@ locals {
   ]
 
   target_group_arns = "${zipmap(aws_alb_target_group.all_target_groups.*.name, aws_alb_target_group.all_target_groups.*.arn)}"
+  target_group_arn_suffix = "${zipmap(aws_alb_target_group.all_target_groups.*.name, aws_alb_target_group.all_target_groups.*.arn_suffix)}"
 }
 
 resource "aws_alb_target_group" "all_target_groups" {
@@ -143,6 +144,14 @@ variable "dns_zone" {
 
 output "target_group_arns" {
   value = "${local.target_group_arns}"
+}
+
+output "target_group_arn_suffix" {
+  value = "${local.target_group_arn_suffix}"
+}
+
+output "lb_arn_suffix" {
+  value = "${aws_alb.alb.arn_suffix}"
 }
 
 output "dns_name" {

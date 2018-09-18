@@ -13,7 +13,7 @@ resource "aws_instance" "kong" {
   ami                    = "${var.kong_backup_ami}"
   vpc_security_group_ids = ["${aws_security_group.os_servers.id}"]
   ebs_optimized          = "${var.kong_instance_ebs_optimized}"
-  iam_instance_profile   = "${var.kong_instance_profile}"
+  iam_instance_profile   = "${aws_iam_instance_profile.kong.name}"
   subnet_id              = "${module.vpc.public_subnets[0]}"
   key_name               = "${aws_key_pair.cloud_key.key_name}"
 
@@ -115,6 +115,53 @@ resource "aws_db_instance" "kong" {
   }
 }
 
+resource "aws_iam_instance_profile" "kong" {
+  name = "${terraform.workspace}_kong"
+  role = "${aws_iam_role.kong_ec2.name}"
+}
+
+resource "aws_iam_role" "kong_ec2" {
+  name = "${terraform.workspace}_kong_ec2"
+  path = "/"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "kong_cloudwatch_policy" {
+  name = "kong_cloudwatch_policy"
+  role = "${aws_iam_role.kong_ec2.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "ec2:DescribeTags"
+      ],
+      "Resource":"*" 
+    }
+  ]
+}
+EOF
+}
+
 resource "random_string" "kong_db_password_sysadmin" {
   length = 40
   special = false
@@ -163,14 +210,6 @@ variable "kong_db_instance_class" {
   default     = "db.m4.large"
 }
 
-variable "kong_instance_profile" {
-  description = "Instance Profile for kong server"
-  default     = ""
-
-  //TODO: Create CloudWatch_EC2 in Terraform
-  //default     = "CloudWatch_EC2"
-}
-
 variable "kong_instance_type" {
   description = "Instance type for kong server"
   default     = "t2.small"
@@ -178,4 +217,8 @@ variable "kong_instance_type" {
 
 output "kong_instance_id" {
   value = "${aws_instance.kong.id}"
+}
+
+output "kong_db_instance_id" {
+  value = "${aws_db_instance.kong.id}"
 }
