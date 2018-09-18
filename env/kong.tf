@@ -210,14 +210,6 @@ variable "kong_db_instance_class" {
   default     = "db.m4.large"
 }
 
-variable "kong_instance_profile" {
-  description = "Instance Profile for kong server"
-  default     = ""
-
-  //TODO: Create CloudWatch_EC2 in Terraform
-  //default     = "CloudWatch_EC2"
-}
-
 variable "kong_instance_type" {
   description = "Instance type for kong server"
   default     = "t2.small"
