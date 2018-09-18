@@ -9,3 +9,5 @@ hosted_zone_id = "Z2WKSQADHJ3BCV"
 hosted_zone_name = "sandbox.internal.smartcolumbusos.com"
 
 dns_entries_enabled = 1
+
+slack_channel_name = "#pre_prod_alerts"
