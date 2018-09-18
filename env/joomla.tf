@@ -23,6 +23,7 @@ resource "aws_db_instance" "joomla_db" {
   storage_type           = "gp2"
   username               = "joomla"
   password               = "${random_string.joomla_db_password.result}"
+  multi_az               = "${var.joomla_db_multi_az}"
 
   tags {
     workload-type = "other"
@@ -38,6 +39,7 @@ resource "aws_db_subnet_group" "default" {
     Name = "Subnet Group for Environment ${terraform.workspace} VPC"
   }
 }
+
 resource "aws_iam_instance_profile" "joomla" {
   name = "${terraform.workspace}_joomla"
   role = "${aws_iam_role.joomla_ec2.name}"
@@ -253,6 +255,11 @@ variable "joomla_db_identifier" {
 variable "joomla_db_instance_class" {
   description = "The type of the instance for the joomla database"
   default     = "db.t2.large"
+}
+
+variable "joomla_db_multi_az" {
+  description = "is joomla rds db multi az?"
+  default = false
 }
 
 variable "joomla_instance_ebs_optimized" {
