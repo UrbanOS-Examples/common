@@ -233,7 +233,7 @@ def applyInfraHelmCharts(environment) {
 
             helm upgrade --install prometheus helm/prometheus \
                 --namespace=prometheus \
-                --set global.ingress.annotations."alb\\.ingress\\.kubernetes\\.io\\/subnets"="\${SUBNETS//,/\\,}" \
+                --set global.ingress.annotations."alb\\.ingress\\.kubernetes\\.io\\/subnets"="\${SUBNETS//,/\\\\,}" \
                 --set global.ingress.annotations."alb\\.ingress\\.kubernetes\\.io\\/security\\-groups"="\${SECURITY_GROUPS}" \
                 --set grafana.ingress.hosts[0]="grafana\\.\${DNS_ZONE}" \
                 --set alertmanager.ingress.hosts[0]="alertmanager\\.\${DNS_ZONE}" \
