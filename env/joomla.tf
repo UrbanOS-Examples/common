@@ -86,6 +86,16 @@ resource "aws_iam_role_policy" "joomla_s3_bucket_policy" {
         "s3:GetObject"
       ],
       "Resource": ["${data.terraform_remote_state.durable.smart_os_initial_state_bucket_arn}/*"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "ec2:DescribeTags"
+      ],
+      "Resource":"*" 
     }
   ]
 }
@@ -97,7 +107,6 @@ resource "aws_instance" "joomla" {
   ami                    = "${var.joomla_backup_ami}"
   vpc_security_group_ids = ["${aws_security_group.os_servers.id}"]
   ebs_optimized          = "${var.joomla_instance_ebs_optimized}"
-  iam_instance_profile   = "${var.joomla_instance_profile}"
   subnet_id              = "${module.vpc.public_subnets[0]}"
   key_name               = "${aws_key_pair.cloud_key.key_name}"
   iam_instance_profile   = "${aws_iam_instance_profile.joomla.name}"
@@ -267,13 +276,6 @@ variable "joomla_instance_ebs_optimized" {
   default     = true
 }
 
-variable "joomla_instance_profile" {
-  description = "Instance Profile for Joomla server"
-  default     = ""
-  //TODO: Create CloudWatch_EC2 in Terraform
-  //default     = "CloudWatch_EC2"
-}
-
 variable "joomla_instance_type" {
   description = "Instance type for Joomla server"
   default     = "m4.2xlarge"
@@ -285,4 +287,8 @@ variable "joomla_backup_ami" {
 
 output "joomla_instance_id" {
   value = "${aws_instance.joomla.id}"
+}
+
+output "joomla_db_instance_id" {
+  value = "${aws_db_instance.joomla_db.id}"
 }
