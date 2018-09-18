@@ -6,8 +6,6 @@ provider "aws" {
   }
 }
 
-provider "archive" {}
-
 terraform {
   backend "s3" {
     key     = "operating-system"
