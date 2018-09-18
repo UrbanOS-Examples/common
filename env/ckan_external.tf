@@ -20,7 +20,7 @@ data "template_file" "ckan_external_nginx_config" {
   template = "${file("${path.module}/files/ckan/nginx-external.conf.tpl")}"
 
   vars {
-    DNS_ZONE = "${terraform.workspace}.${var.root_dns_zone}"
+    DNS_ZONE = "${coalesce("${var.prod_dns_zone}","${terraform.workspace}.${var.root_dns_zone}")}"
   }
 }
 

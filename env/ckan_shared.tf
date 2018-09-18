@@ -39,13 +39,13 @@ resource "aws_iam_role" "ckan_ec2" {
 {
     "Version": "2012-10-17",
     "Statement": [
-        {
-            "Action": "sts:AssumeRole",
-            "Principal": {
-               "Service": "ec2.amazonaws.com"
-            },
-            "Effect": "Allow"
-        }
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "ec2.amazonaws.com"
+        },
+        "Effect": "Allow"
+      }
     ]
 }
 EOF
@@ -65,6 +65,16 @@ resource "aws_iam_role_policy" "ckan_data_s3_policy" {
       ],
       "Effect": "Allow",
       "Resource": ["${aws_s3_bucket.ckan.arn}/*", "${aws_s3_bucket.ckan.arn}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "ec2:DescribeTags"
+      ],
+      "Resource":"*"
     }
   ]
 }
@@ -174,5 +184,9 @@ variable "ckan_db_engine_version" {
 
 variable "ckan_theme_version" {
   description = "The version of the custom ckan theme to install"
-  default     = "1.0.6"
+  default     = "1.0.8"
+}
+
+output "ckan_db_instance_id" {
+  value = "${aws_db_instance.ckan.id}"
 }
