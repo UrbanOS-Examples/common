@@ -19,6 +19,7 @@ module "eks-cluster" {
     asg_min_size         = "3"
     asg_max_size         = "6"
     instance_type        = "t2.medium"
+    key_name             = "${aws_key_pair.cloud_key.key_name}"
   }]
 
   tags = {
