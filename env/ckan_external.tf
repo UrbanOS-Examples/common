@@ -6,7 +6,7 @@ data "template_file" "ckan_external_config" {
     DB_DATASTORE_PASSWORD = "${random_string.ckan_db_password_datastore.result}"
     DB_HOST = "${aws_db_instance.ckan.address}"
     DB_PORT = "${aws_db_instance.ckan.port}"
-    DNS_ZONE = "${coalesce("${var.prod_dns_zone}","${terraform.workspace}.${var.root_dns_zone}")}"
+    DNS_ZONE = "${local.ckan_dns_zone}"
     SOLR_HOST = "127.0.0.1"
     REDIS_HOST = "127.0.0.1"
     S3_BUCKET = "${aws_s3_bucket.ckan.id}"

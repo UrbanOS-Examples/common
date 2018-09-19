@@ -143,6 +143,11 @@ resource "random_string" "ckan_db_password_datastore" {
   special = false
 }
 
+locals {
+  ckan_dns_zone = "${coalesce("${var.prod_dns_zone}","${terraform.workspace}.${var.root_dns_zone}")}"
+}
+
+
 variable "ckan_db_identifier" {
   description = "AWS RDS identifier for ckan_internal db instance"
   default     = "production-ckan"
