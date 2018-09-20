@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+
+help() {
+    cat <<EOF
+Usage: ${0} [OPTIONS]
+Specialized Terraform initialization script for the Smart Columbus Operating System.  Used
+to help with the flags and file state requirements for running a terraform init, and to help
+users select a workspace before attempting to manipulate resources.
+
+Options:
+--sandbox                    Initialize Terraform to use the sandbox backend config.  If not
+                             passed, the alm backend config will be used
+-w, --workspace <workspace>  The workspace to select/create after being initialized. If
+                             not passed, you will be prompted to select or create a workspace
+-h, --help
+EOF
+}
+
+_die() {
+    echo "${@}"
+    exit 1
+}
+
+set -o pipefail
+
+git_root=$(git rev-parse --show-toplevel) || _die failed to resolve git_root
+
+backend_config="${git_root}/backends/alm.conf"
+
+until [ ${#} -eq 0 ]; do
+    case "${1}" in
+        --sandbox)
+            backend_config="${git_root}/backends/sandbox-alm.conf"
+            ;;
+        -w|--workspace)
+            workspace=${2}
+            shift
+            ;;
+        -h|--help)
+            help
+            exit 0
+            ;;
+    esac
+    shift
+done
+
+echo "detecting default vars file"
+vars_file="variables/${workspace}.tfvars"
+if [ ! -f "${vars_file}" ]; then
+    vars_file="variables/sandbox.tfvars"
+    if [ ! -f "${vars_file}" ]; then
+        _die failed detecting variables file
+    fi
+fi
+echo "detected: ${vars_file}"
+
+echo "handling feature enablement"
+rm -f _feature*.tf
+enabled_features=$(cat "${vars_file}" | grep enabled_features | \
+    sed -E 's/^enabled_features\s*=\s*"([0-9a-zA-Z ]+)"$/\1/g' | \
+    awk '$0 !~ /enabled_features/ { print $0 }') || _die failed resolving list of enabled_features
+for feature in ${enabled_features}; do
+    echo "enabling feature ${feature}"
+    feature_file=$(pwd)/"features/${feature}.hcl"
+    if [ ! -f "${feature_file}" ]; then
+        _die cannot find file "${feature_file}"
+    fi
+    ln -s "${feature_file}" _feature_"${feature}".tf || _die failed adding feature
+done
+
+echo "removing .terraform"
+rm -rf .terraform
+
+echo "initializing terraform"
+terraform init -backend-config=${backend_config} || _die failed initializing terraform
+
+workspaces=$(terraform workspace list | cut -c 3- | /usr/bin/tail -r | tail -n +2) || _die failed listing workspaces
+
+if [ -z "${workspace}" ]; then
+    echo "Workspaces available:"
+    echo "${workspaces}"
+    echo
+
+    read -p "Select a workspace or name a new one to be created: " workspace
+fi
+
+if (echo "${workspaces}" | grep -xq ${workspace}); then
+    terraform workspace select ${workspace} || _die failed selecting workspace
+else
+    terraform workspace new ${workspace} || _die failed creating new workspace
+fi
+
+exit 0

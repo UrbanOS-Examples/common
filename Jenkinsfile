@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@4.0.0',
+    identifier: 'pipeline-lib@use-tf-init',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])

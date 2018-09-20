@@ -1,3 +1,5 @@
+enabled_features = "cloudbreak"
+
 credentials_profile = "sandbox"
 
 accepter_credentials_profile = "sandbox"
