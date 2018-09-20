@@ -57,7 +57,7 @@ echo "detected: ${vars_file}"
 echo "handling feature enablement"
 rm -f _feature*.tf
 enabled_features=$(cat "${vars_file}" | grep enabled_features | \
-    sed -E 's/^enabled_features\s*=\s*"([0-9a-zA-Z ]+)"$/\1/g' | \
+    sed -E 's/^enabled_features[ ]*=[ ]*"([0-9a-zA-Z ]+)"$/\1/g' | \
     awk '$0 !~ /enabled_features/ { print $0 }') || _die failed resolving list of enabled_features
 for feature in ${enabled_features}; do
     echo "enabling feature ${feature}"
