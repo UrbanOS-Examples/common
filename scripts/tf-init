@@ -74,7 +74,7 @@ rm -rf .terraform
 echo "initializing terraform"
 terraform init -backend-config=${backend_config} || _die failed initializing terraform
 
-workspaces=$(terraform workspace list | cut -c 3- | /usr/bin/tail -r | tail -n +2) || _die failed listing workspaces
+workspaces=$(terraform workspace list | cut -c 3- | sort -f | tail -n +2) || _die failed listing workspaces
 
 if [ -z "${workspace}" ]; then
     echo "Workspaces available:"
