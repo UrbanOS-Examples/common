@@ -1,3 +1,5 @@
+enabled_features = "cloudbreak"
+
 vpc_name = "test"
 
 role_arn = "arn:aws:iam::647770347641:role/jenkins_role"
