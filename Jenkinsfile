@@ -31,7 +31,7 @@ properties(
                 description: 'The AMI for the CKAN External EC2 instance snapshot to deploy'),
             string(
                 name: 'ckan_db_snapshot_id',
-                defaultValue: 'arn:aws:rds:us-west-2:068920858268:snapshot:ckan-92b73cc8e5540bee9c9fb11fe9cd988e3d9b6f24',
+                defaultValue: 'arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-21-16-00',
                 description: 'The Snapshot ID for the CKAN database to deploy'),
             string(
                 name: 'kong_backup_ami',
