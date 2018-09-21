@@ -60,17 +60,6 @@ sudo -u admin php /tmp/unite.phar /tmp/scos_unite.xml --debug --log=/tmp | tee /
 grep 'Total definitions failed to run        : 0' /home/centos/unite.log
 rm -rf /tmp/scos_unite.xml
 
-# Turn off command trace so passwords don't get dumped to log in jenkins
-set +x
-# Inject CKAN URL into Joomla iframe config
-mysql="mysql joomla -h${db_host} -u${db_user} -p${db_password}"
-
-params=$(${mysql} -e "select params as '' from scos_menu where title='data' and menutype = 'mainmenu' and link like '%ckaniframe%'" | \
-   jq ".ckanbasedomain = \"https://ckan.${dns_zone}\" | .ckanurl = \"https://ckan.${dns_zone}/dataset\"")
-
-${mysql} -e "update scos_menu set params='${params}' where title='data' and menutype = 'mainmenu' and link like '%ckaniframe%'"
-set -x
-
 # Recombobulate Nginx and HTTPD configs
 find /etc/nginx/conf.d/ -name '172*' -exec rm {} \;
 find /etc/httpd/conf.d/ -name '172*' -exec rm {} \;
