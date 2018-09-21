@@ -31,10 +31,8 @@ _get_tfvar() {
     varfile=$(_file "${1}") || _die "Failed to load var file \"${1}\""
     variable=${2}
 
-    (
-    source <(sed 's/ = /=/' ${varfile})
-    echo ${!variable}
-    )
+    # xargs magically trims strings to make them look like we expect
+    cat ${varfile} | grep ${variable} | cut -f 2- -d'=' | xargs
 }
 
 set -o pipefail
@@ -60,14 +58,12 @@ until [ ${#} -eq 0 ]; do
     shift
 done
 
-vars_file=$(_file "variables/${workspace}.tfvars" || _file "variables/sandbox.tfvars") ||
+varfile=$(_file "variables/${workspace}.tfvars" || _file "variables/sandbox.tfvars") ||
     _die "Failed to find a tfvars file for the workspace \"${workspace}\""
-echo "Using \"${vars_file}\""
-
-enabled_features=$(_get_tfvar "${vars_file}" enabled_features)
+echo "Using \"${varfile}\""
 
 rm -f _feature*.tf
-for feature in ${enabled_features}; do
+for feature in $(_get_tfvar "${varfile}" enabled_features); do
     echo "enabling feature ${feature}"
     feature_file=$(_file ${PWD}/"features/${feature}.hcl") ||
         _die "Cannot find file for feature \"${feature}\" (${feature_file})"
