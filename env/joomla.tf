@@ -118,7 +118,6 @@ resource "aws_instance" "joomla" {
 
   lifecycle {
     ignore_changes = ["ami"]
-    create_before_destroy = true
   }
 
   provisioner "file" {
