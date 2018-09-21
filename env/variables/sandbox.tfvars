@@ -1,4 +1,4 @@
-enabled_features = "cloudbreak"
+enabled_features = "ambari cloudbreak hive"
 
 credentials_profile = "sandbox"
 

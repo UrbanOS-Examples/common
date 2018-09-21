@@ -3,6 +3,11 @@ resource "aws_kms_key" "cloudbreak_db_key" {
   description             = "cloudbreak db encryption key for ${terraform.workspace}"
 }
 
+resource "aws_kms_alias" "cloudbreak_db_key_alias" {
+  name_prefix           = "alias/cloudbreak"
+  target_key_id         = "${aws_kms_key.cloudbreak_db_key.key_id}"
+}
+
 resource "random_string" "cloudbreak_db_password" {
   length = 40
   special = false

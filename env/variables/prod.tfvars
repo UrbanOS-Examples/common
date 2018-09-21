@@ -1,4 +1,4 @@
-enabled_features = "cloudbreak"
+enabled_features = ""
 
 role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
 

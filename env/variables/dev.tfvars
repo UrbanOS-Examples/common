@@ -1,4 +1,4 @@
-enabled_features = "cloudbreak"
+enabled_features = "ambari cloudbreak hive"
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 

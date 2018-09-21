@@ -1,4 +1,4 @@
-enabled_features = "cloudbreak"
+enabled_features = "ambari cloudbreak hive"
 
 vpc_name = "test"
 
