@@ -31,7 +31,8 @@ _get_tfvar() {
     local -r varfile=$(_file "${1}") || _die "Failed to load var file \"${1}\""
     local -r variable=${2}
 
-    _json2hcl -reverse < ${varfile} | jq -r ".${variable}"
+    _json2hcl -reverse < ${varfile} | jq -r ".${variable}" || \
+        _die "Failed to parse variable \"${variable}\" out of \"${varfile}\""
 }
 
 _json2hcl() {
@@ -68,7 +69,7 @@ varfile=$(_file "variables/${workspace}.tfvars" || _file "variables/sandbox.tfva
 echo "Using \"${varfile}\""
 
 rm -f _feature*.tf
-for feature in $(_get_tfvar "${varfile}" enabled_features | jq '.[]'); do
+for feature in $(_get_tfvar "${varfile}" enabled_features | jq -r '.[]'); do
     echo "enabling feature ${feature}"
     feature_file=$(_file ${PWD}/"features/${feature}.hcl") ||
         _die "Cannot find file for feature \"${feature}\" (${feature_file})"
