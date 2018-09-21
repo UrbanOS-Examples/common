@@ -10,3 +10,7 @@ role_arn = "arn:aws:iam::647770347641:role/jenkins_role"
 vpc_cidr = "10.180.0.0/16"
 
 joomla_backup_file_name = "site-www.staging.internal.smartcolumbusos.com-20180921-135800edt.zip"
+
+cloudbreak_db_apply_immediately = true
+ambari_db_apply_immediately = true
+hive_db_apply_immediately = true

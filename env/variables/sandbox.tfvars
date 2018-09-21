@@ -65,3 +65,7 @@ kong_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:prod-kong-0-1
 cloudbreak_db_multi_az = false
 ambari_db_multi_az = false
 hive_db_multi_az = false
+
+cloudbreak_db_apply_immediately = true
+ambari_db_apply_immediately = true
+hive_db_apply_immediately = true

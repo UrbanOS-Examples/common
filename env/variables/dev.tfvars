@@ -13,4 +13,8 @@ cloudbreak_db_multi_az = false
 ambari_db_multi_az = false
 hive_db_multi_az = false
 
+cloudbreak_db_apply_immediately = true
+ambari_db_apply_immediately = true
+hive_db_apply_immediately = true
+
 joomla_backup_file_name = "site-www.dev.internal.smartcolumbusos.com-20180921-095355edt.zip"
