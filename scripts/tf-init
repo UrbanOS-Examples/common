@@ -17,22 +17,27 @@ EOF
 }
 
 _die() {
-    echo "${@}"
+    >&2 echo "${@}"
     exit 1
 }
 
 _file() {
-    filename="${1}"
+    local -r filename="${1}"
     [ -f "${filename}" ] || return 1
     echo ${filename}
 }
 
 _get_tfvar() {
-    varfile=$(_file "${1}") || _die "Failed to load var file \"${1}\""
-    variable=${2}
+    local -r varfile=$(_file "${1}") || _die "Failed to load var file \"${1}\""
+    local -r variable=${2}
 
-    # xargs magically trims strings to make them look like we expect
-    cat ${varfile} | grep ${variable} | cut -f 2- -d'=' | xargs
+    _json2hcl -reverse < ${varfile} | jq -r ".${variable}"
+}
+
+_json2hcl() {
+    local -r json2hcl=$(_file "${git_root}/scripts/bin/json2hcl.v0.0.6.$(uname -s).$(uname -m)") || \
+        _die "Unable to find json2hcl for \"$(uname -sm)\" in ${git_root}/scripts/bin/"
+    "${json2hcl}" "${@}"
 }
 
 set -o pipefail
@@ -63,7 +68,7 @@ varfile=$(_file "variables/${workspace}.tfvars" || _file "variables/sandbox.tfva
 echo "Using \"${varfile}\""
 
 rm -f _feature*.tf
-for feature in $(_get_tfvar "${varfile}" enabled_features); do
+for feature in $(_get_tfvar "${varfile}" enabled_features | jq '.[]'); do
     echo "enabling feature ${feature}"
     feature_file=$(_file ${PWD}/"features/${feature}.hcl") ||
         _die "Cannot find file for feature \"${feature}\" (${feature_file})"

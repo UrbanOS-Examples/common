@@ -1,7 +1,8 @@
-# The enabled_features variable is interpreted by `tf-init` as a space-separated list. Eg. "featureA featureB featureC"
-# If you change the list of enabled features, or if you switch to a different environment
+# the enabled_features variable is interpreted by `tf-init` to enable different features by copying them
+#   into the root working directory
+# if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
-enabled_features = "ambari cloudbreak hive"
+enabled_features = ["ambari", "cloudbreak", hive"]
 
 credentials_profile = "sandbox"
 
@@ -61,6 +62,7 @@ kong_instance_ebs_optimized = false
 kong_db_instance_class = "db.t2.2xlarge"
 
 kong_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:prod-kong-0-13-1-2018-08-29-07-20"
+<<<<<<< HEAD
 
 cloudbreak_db_multi_az = false
 ambari_db_multi_az = false
@@ -69,3 +71,5 @@ hive_db_multi_az = false
 cloudbreak_db_apply_immediately = true
 ambari_db_apply_immediately = true
 hive_db_apply_immediately = true
+=======
+>>>>>>> Use json2hcl and jq to parse the enabled_features from the tfvars in tf-init
