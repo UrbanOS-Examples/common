@@ -118,6 +118,7 @@ resource "aws_instance" "joomla" {
 
   lifecycle {
     ignore_changes = ["ami"]
+    create_before_destroy = true
   }
 
   provisioner "file" {
@@ -130,18 +131,6 @@ resource "aws_instance" "joomla" {
       user = "centos"
     }
   }
-
-  provisioner "file" {
-    source     = "${path.module}/files/joomla/doJoomlaBackup.sh"
-    destination = "/home/centos/doJoomlaBackup.sh"
-
-    connection {
-      type = "ssh"
-      host = "${self.private_ip}"
-      user = "centos"
-    }
-  }
-
 
   provisioner "file" {
     source     = "${path.module}/files/joomla/setup.sh"

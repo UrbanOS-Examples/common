@@ -47,9 +47,11 @@ if ls -d /home/admin/web/*.smartcolumbusos.com &>/dev/null; then
     rmdir /home/admin/web/*.smartcolumbusos.com
 fi
 
+# Remove old cron jobs
+[[ $(crontab -u centos -l) ]] && crontab -u centos -r || true
+
 # Install backup cron job
-chmod +x /home/centos/doJoomlaBackup.sh
-echo "  0  0  *  *  * admin /home/centos/doJoomlaBackup.sh ${s3_bucket}" > /etc/cron.d/joomla_backup
+echo "0 0 * * * admin /usr/bin/php /home/admin/web/public_html/cli/akeeba-backup.php" > /etc/cron.d/joomla_backup
 
 # Restore Joomla from backup
 aws s3 cp s3://${s3_bucket}/${s3_path} /tmp/backup.zip

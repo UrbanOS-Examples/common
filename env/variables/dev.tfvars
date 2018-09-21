@@ -12,3 +12,5 @@ ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:prod-ckan-sna
 cloudbreak_db_multi_az = false
 ambari_db_multi_az = false
 hive_db_multi_az = false
+
+joomla_backup_file_name = "site-www.dev.internal.smartcolumbusos.com-20180921-095355edt.zip"
