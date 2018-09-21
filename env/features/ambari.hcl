@@ -67,6 +67,7 @@ resource "aws_db_instance" "ambari_db" {
   backup_retention_period = 7
   storage_encrypted       = true
   kms_key_id              = "${aws_kms_key.ambari_db_key.arn}"
+  apply_immediately       = "${var.ambari_db_apply_immediately}"
 
   lifecycle = {
     prevent_destroy = true
@@ -76,4 +77,9 @@ resource "aws_db_instance" "ambari_db" {
 variable "ambari_db_multi_az" {
   description = "Should the Ambari DB be multi-az?"
   default     = true
+}
+
+variable "ambari_db_apply_immediately" {
+  description = "Should changes to the Ambari DB be applied immediately?"
+  default = false
 }
