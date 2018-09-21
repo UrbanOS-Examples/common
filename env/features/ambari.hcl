@@ -58,11 +58,11 @@ resource "aws_db_instance" "ambari_db" {
   db_subnet_group_name    = "${aws_db_subnet_group.ambari_db_subnet_group.name}"
   engine                  = "postgres"
   engine_version          = "10.4"
-  allocated_storage       = 100
+  allocated_storage       = 100 # The allocated storage in gibibytes.
   storage_type            = "gp2"
   username                = "ambari"
   password                = "${random_string.ambari_db_password.result}"
-  multi_az                = true
+  multi_az                = "${var.ambari_db_multi_az}"
   backup_window           = "04:54-05:24"
   backup_retention_period = 7
   storage_encrypted       = true
@@ -71,4 +71,9 @@ resource "aws_db_instance" "ambari_db" {
   lifecycle = {
     prevent_destroy = true
   }
+}
+
+variable "ambari_db_multi_az" {
+  description = "Should the Ambari DB be multi-az?"
+  default     = true
 }
