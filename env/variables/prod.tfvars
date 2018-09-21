@@ -9,6 +9,8 @@ vpc_cidr = "10.200.0.0/16"
 
 prod_dns_zone = "smartcolumbusos.com"
 
+joomla_backup_file_name = "site-www.smartcolumbusos.com-20180921-081715edt.zip"
+
 ckan_db_multi_az = true
 
 kong_db_multi_az = true
