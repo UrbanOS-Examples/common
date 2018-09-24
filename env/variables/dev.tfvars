@@ -7,7 +7,7 @@ role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
 vpc_cidr = "10.100.0.0/16"
 
-ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:prod-ckan-snapshot-8-30"
+ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-24-12-10"
 
 cloudbreak_db_multi_az = false
 ambari_db_multi_az = false
