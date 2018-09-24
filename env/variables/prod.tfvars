@@ -21,4 +21,4 @@ ckan_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:rds:prod-prod
 
 min_num_of_workers = 9
 
-min_num_of_workers = 15
+max_num_of_workers = 15
