@@ -201,6 +201,19 @@ resource "aws_s3_bucket" "joomla-backups" {
   bucket        = "${terraform.workspace}-os-joomla-backups"
   acl           = "private"
   force_destroy = true
+
+  lifecycle_rule {
+    enabled = true
+
+    transition {
+      days          = 30
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 183
+    }
+  }
 }
 
 resource "aws_lb_target_group_attachment" "joomla_private" {
