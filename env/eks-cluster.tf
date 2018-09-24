@@ -16,8 +16,8 @@ module "eks-cluster" {
 
   worker_groups = [{
     name                 = "Workers"
-    asg_min_size         = "3"
-    asg_max_size         = "6"
+    asg_min_size         = "${var.min_num_of_workers}"
+    asg_max_size         = "${var.max_num_of_workers}"
     instance_type        = "t2.medium"
     key_name             = "${aws_key_pair.cloud_key.key_name}"
   }]
@@ -92,6 +92,15 @@ resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
 }
 
+variable "min_num_of_workers" {
+  description = "Minimum number of workers to be created on eks cluster"
+  default = 5
+}
+
+variable "max_num_of_workers" {
+  description = "Maximum number of workers to be created on eks cluster"
+  default = 10
+}
 output "eks_cluster_kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
   value       = "${module.eks-cluster.kubeconfig}"
