@@ -7,6 +7,8 @@ vpc_name = "test"
 
 role_arn = "arn:aws:iam::647770347641:role/jenkins_role"
 
+ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-24-12-10"
+
 vpc_cidr = "10.180.0.0/16"
 
 joomla_backup_file_name = "site-www.staging.internal.smartcolumbusos.com-20180921-135800edt.zip"

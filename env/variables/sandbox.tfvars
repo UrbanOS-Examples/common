@@ -47,7 +47,7 @@ ckan_db_instance_class = "db.t2.large"
 
 ckan_db_allocated_storage = 30
 
-ckan_db_snapshot_id = "arn:aws:rds:us-west-2:068920858268:snapshot:ckan-92b73cc8e5540bee9c9fb11fe9cd988e3d9b6f24"
+ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-24-12-10"
 
 ckan_db_storage_encrypted = false
 
