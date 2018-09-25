@@ -10,6 +10,10 @@ properties(
         pipelineTriggers([scos.dailyBuildTrigger()]),
         disableConcurrentBuilds(),
         parameters([
+            booleanParam(
+                name: 'skipBuild',
+                defaultValue: true,
+                description: 'Leave true to generate parameters for production releases without executing the entire job.'),
             text(
                 name: 'environmentsParameter',
                 defaultValue: scos.environments().join("\n"),
@@ -63,6 +67,12 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
         keyFileVariable: 'keyfile'
     )
 ]) {
+
+    if(params.skipBuild && scos.changeset.isRelease) {
+        currentBuild.result = 'ABORTED'
+        error('Build skipped per "skipBuild" parameter.')
+    }
+
     String publicKey
 
     scos.doCheckoutStage()
