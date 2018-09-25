@@ -79,3 +79,9 @@ module "jupyterhub_repository" {
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "jupyterhub"
 }
+
+module "micro_service_watchinator_repository" {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "micro-service-watchinator"
+}
