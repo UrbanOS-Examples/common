@@ -1,9 +1,13 @@
+locals {
+  dns_zone = "${coalesce("${var.prod_dns_zone}","${terraform.workspace}.${var.root_dns_zone}")}"
+}
+
 data "template_file" "joomla_unite_config" {
   template = "${file("${path.module}/files/joomla/joomla_unite_config.xml.tpl")}"
 
   vars {
     JOOMLA_ADMIN_EMAIL = "smartcolumbusos@columbus.gov"
-    JOOMLA_SITE_URL    = "https://www.smartcolumbusos.com/"
+    JOOMLA_SITE_URL    = "https://www.${local.dns_zone}/"
     JOOMLA_DB_HOST     = "${aws_db_instance.joomla_db.address}"
     JOOMLA_DB_USER     = "${aws_db_instance.joomla_db.username}"
     JOOMLA_DB_PASSWORD = "${random_string.joomla_db_password.result}"
@@ -185,7 +189,7 @@ sudo bash /tmp/setup.sh \
   --db-user ${aws_db_instance.joomla_db.username} \
   --s3-bucket ${aws_s3_bucket.joomla-backups.id} \
   --s3-path '${var.joomla_backup_file_name}' \
-  --dns-zone '${coalesce("${var.prod_dns_zone}","${terraform.workspace}.${var.root_dns_zone}")}'
+  --dns-zone '${local.dns_zone}'
 EOF
     ]
 
