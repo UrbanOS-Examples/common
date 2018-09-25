@@ -54,7 +54,9 @@ def environments = params.environmentsParameter.trim().split("\n").collect { env
     environment.trim()
 }
 
-def terraformOverrides = params.findAll { key, value -> key != "environmentsParameter" && value != "" }
+def terraformOverrides = params.findAll { key, value ->
+    key != "environmentsParameter" && key != "skipBuild" && value != ""
+}
 
 node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCredentials([
     [
