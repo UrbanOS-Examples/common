@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@4.2.0',
+    identifier: 'pipeline-lib@4.3.0',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -7,6 +7,7 @@ library(
 
 properties(
     [
+        pipelineTriggers([scos.dailyBuildTrigger()]),
         disableConcurrentBuilds(),
         parameters([
             text(
