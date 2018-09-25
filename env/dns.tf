@@ -42,3 +42,7 @@ variable "prod_dns_zone" {
   description = "Set this when deploying to prod environments to override the default internal.smartcolumbusos.com zones for application configs"
   default     = ""
 }
+
+output "dns_zone_name" {
+  value = "${coalesce("${var.prod_dns_zone}","${aws_route53_zone.public_hosted_zone.name}")}"
+}
