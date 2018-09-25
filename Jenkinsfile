@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@4.2.0',
+    identifier: 'pipeline-lib@4.3.0',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -7,8 +7,13 @@ library(
 
 properties(
     [
+        pipelineTriggers([scos.dailyBuildTrigger()]),
         disableConcurrentBuilds(),
         parameters([
+            booleanParam(
+                name: 'skipBuild',
+                defaultValue: true,
+                description: 'Leave true to generate parameters for production releases without executing the entire job.'),
             text(
                 name: 'environmentsParameter',
                 defaultValue: scos.environments().join("\n"),
@@ -49,7 +54,9 @@ def environments = params.environmentsParameter.trim().split("\n").collect { env
     environment.trim()
 }
 
-def terraformOverrides = params.findAll { key, value -> key != "environmentsParameter" && value != "" }
+def terraformOverrides = params.findAll { key, value ->
+    key != "environmentsParameter" && key != "skipBuild" && value != ""
+}
 
 node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCredentials([
     [
@@ -62,6 +69,12 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
         keyFileVariable: 'keyfile'
     )
 ]) {
+
+    if(params.skipBuild && scos.changeset.isRelease) {
+        currentBuild.result = 'ABORTED'
+        error('Build skipped per "skipBuild" parameter.')
+    }
+
     String publicKey
 
     scos.doCheckoutStage()
