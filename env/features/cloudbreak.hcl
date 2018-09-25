@@ -74,6 +74,317 @@ resource "aws_db_instance" "cloudbreak_db" {
   }
 }
 
+resource "random_string" "cloudbreak_cluster_secret" {
+  length = 40
+  special = false
+}
+
+resource "random_string" "cloudbreak_admin_password" {
+  length = 40
+  special = false
+}
+
+data "template_file" "cloudbreak_profile" {
+  template = "${file("${path.module}/files/cloudbreak/Profile.tpl")}"
+
+  vars {
+    UAA_DEFAULT_SECRET="${random_string.cloudbreak_cluster_secret.result}"
+    UAA_DEFAULT_USER_PW="${random_string.cloudbreak_admin_password.result}"
+    UAA_DEFAULT_USER_EMAIL="admin@smartcolumbusos.com"
+    PUBLIC_IP="cloudbreak.${aws_route53_zone.public_hosted_zone.name}"
+    CB_HOST_ADDRESS="$(hostname -i)"
+
+    DATABASE_HOST="${aws_db_instance.cloudbreak_db.address}"
+    DATABASE_PORT="${aws_db_instance.cloudbreak_db.port}"
+    DATABASE_USERNAME="cloudbreak"
+    DATABASE_PASSWORD="${random_string.cloudbreak_db_password.result}"
+  }
+}
+
+data "aws_ami" "cloudbreak" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["packer-aws-ebs-*"]
+  }
+
+  tags = [
+    {
+      key   = "promotion-tag",
+      value = "${var.cloudbreak_tag}"
+    },
+    {
+      key   = "cloudbreak-version",
+      value = "2.7.1"
+    }
+  ]
+
+  owners = [
+    "068920858268",
+    "199837183662"
+  ]
+}
+
+resource "aws_instance" "cloudbreak" {
+  instance_type          = "t2.xlarge"
+  ami                    = "${data.aws_ami.cloudbreak.id}"
+  vpc_security_group_ids = ["${aws_security_group.cloudbreak_security_group.id}"]
+  ebs_optimized          = "false"
+  subnet_id              = "${module.vpc.private_subnets[0]}"
+  key_name               = "${aws_key_pair.cloud_key.key_name}"
+  iam_instance_profile   = "${aws_iam_instance_profile.cloudbreak.name}"
+
+  depends_on = ["aws_db_instance.cloudbreak_db"]
+
+  tags {
+    Name    = "${terraform.workspace} Cloudbreak"
+    BaseAMI = "${data.aws_ami.cloudbreak.id}"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "null_resource" "cloudbreak" {
+  triggers {
+    instance_updated = "${aws_instance.cloudbreak.id}"
+    profile_updated  = "${sha1(data.template_file.cloudbreak_profile.rendered)}"
+    setup_updated    = "${sha1(file("${path.module}/files/cloudbreak/setup.sh"))}"
+  }
+
+  connection {
+    type = "ssh"
+    host = "${aws_instance.cloudbreak.private_ip}"
+    user = "ec2-user"
+  }
+
+  provisioner "file" {
+    content = "${data.template_file.cloudbreak_profile.rendered}\n"
+    destination = "/tmp/Profile"
+  }
+
+  provisioner "file" {
+    source = "${path.module}/files/cloudbreak/setup.sh"
+    destination = "/tmp/setup.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = ["chmod +x /tmp/setup.sh && sudo /tmp/setup.sh"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_alb_target_group_attachment" "cloudbreak_private" {
+  target_group_arn = "${module.load_balancer_private.target_group_arns["${terraform.workspace}-Int-Cloudbreak"]}"
+  target_id        = "${aws_instance.cloudbreak.id}"
+  port             = 443
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [ "null_resource.cloudbreak" ]
+}
+
+resource "aws_route53_record" "cloudbreak_public_dns" {
+  zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
+  name    = "cloudbreak"
+  type    = "A"
+  count   = 1
+
+  alias {
+    name                   = "${module.load_balancer_private.dns_name}"
+    zone_id                = "${module.load_balancer_private.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_iam_instance_profile" "cloudbreak" {
+  name = "${terraform.workspace}_cloudbreak"
+  role = "${aws_iam_role.cloudbreak_ec2.name}"
+}
+
+resource "aws_iam_role" "cloudbreak_ec2" {
+  name = "${terraform.workspace}_cloudbreak_ec2"
+  path = "/"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "ec2.amazonaws.com"
+        },
+        "Effect": "Allow"
+      }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "cloudbreak_role_assumption" {
+  name = "cloudbreak_role_assumption_policy"
+  role = "${aws_iam_role.cloudbreak_ec2.id}"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": {
+        "Sid": "AssumeDefaultCredentialRole",
+        "Effect": "Allow",
+        "Action": ["sts:AssumeRole"],
+        "Resource": "*"
+    }
+}
+EOF
+}
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_role" "cloudbreak_credential" {
+  name = "${terraform.workspace}_cloudbreak_credential"
+  path = "/"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+                ]
+            },
+            "Action": "sts:AssumeRole",
+            "Condition": {}
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "cloudbreak_credential" {
+  name = "cloudbreak_credential_policy"
+  role = "${aws_iam_role.cloudbreak_credential.id}"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:CreateStack",
+                "cloudformation:DeleteStack",
+                "cloudformation:DescribeStackEvents",
+                "cloudformation:DescribeStackResource",
+                "cloudformation:DescribeStacks"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "ec2:AllocateAddress",
+            "ec2:AssociateAddress",
+            "ec2:AssociateRouteTable",
+            "ec2:AuthorizeSecurityGroupIngress",
+            "ec2:DescribeRegions",
+            "ec2:DescribeAvailabilityZones",
+            "ec2:CreateRoute",
+            "ec2:CreateRouteTable",
+            "ec2:CreateSecurityGroup",
+            "ec2:CreateSubnet",
+            "ec2:CreateTags",
+            "ec2:CreateVpc",
+            "ec2:ModifyVpcAttribute",
+            "ec2:DeleteSubnet",
+            "ec2:CreateInternetGateway",
+            "ec2:CreateKeyPair",
+            "ec2:DeleteKeyPair",
+            "ec2:DisassociateAddress",
+            "ec2:DisassociateRouteTable",
+            "ec2:ModifySubnetAttribute",
+            "ec2:ReleaseAddress",
+            "ec2:DescribeAddresses",
+            "ec2:DescribeImages",
+            "ec2:DescribeInstanceStatus",
+            "ec2:DescribeInstances",
+            "ec2:DescribeInternetGateways",
+            "ec2:DescribeKeyPairs",
+            "ec2:DescribeRouteTables",
+            "ec2:DescribeSecurityGroups",
+            "ec2:DescribeSubnets",
+            "ec2:DescribeVpcs",
+            "ec2:DescribeSpotInstanceRequests",
+            "ec2:DescribeVpcAttribute",
+            "ec2:ImportKeyPair",
+            "ec2:AttachInternetGateway",
+            "ec2:DeleteVpc",
+            "ec2:DeleteSecurityGroup",
+            "ec2:DeleteRouteTable",
+            "ec2:DeleteInternetGateway",
+            "ec2:DeleteRouteTable",
+            "ec2:DeleteRoute",
+            "ec2:DetachInternetGateway",
+            "ec2:RunInstances",
+            "ec2:StartInstances",
+            "ec2:StopInstances",
+            "ec2:TerminateInstances"
+          ],
+          "Resource": [
+            "*"
+          ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "iam:ListRolePolicies",
+            "iam:GetRolePolicy",
+            "iam:ListAttachedRolePolicies",
+            "iam:ListInstanceProfiles",
+            "iam:PutRolePolicy",
+            "iam:PassRole",
+            "iam:GetRole"
+          ],
+          "Resource": [
+            "*"
+          ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "autoscaling:CreateAutoScalingGroup",
+            "autoscaling:CreateLaunchConfiguration",
+            "autoscaling:DeleteAutoScalingGroup",
+            "autoscaling:DeleteLaunchConfiguration",
+            "autoscaling:DescribeAutoScalingGroups",
+            "autoscaling:DescribeLaunchConfigurations",
+            "autoscaling:DescribeScalingActivities",
+            "autoscaling:DetachInstances",
+            "autoscaling:ResumeProcesses",
+            "autoscaling:SuspendProcesses",
+            "autoscaling:UpdateAutoScalingGroup"
+          ],
+          "Resource": [
+            "*"
+          ]
+        }
+    ]
+}
+EOF
+}
+
 variable "cloudbreak_db_multi_az" {
   description = "Should the Cloudbreak DB be multi-az?"
   default     = true
@@ -82,4 +393,9 @@ variable "cloudbreak_db_multi_az" {
 variable "cloudbreak_db_apply_immediately" {
   description = "Should changes to the Cloudbreak DB be applied immediately?"
   default = false
+}
+
+variable "cloudbreak_tag" {
+  description = "The released version of a Cloudbreak AMI to use"
+  default = "1.0.0"
 }

@@ -28,6 +28,16 @@ locals {
       health_check_path    = "/"
       health_check_matcher = "200"
     },
+    {
+      name                  = "Cloudbreak"
+      condition_field       = "host-header"
+      condition_values      = "cloudbreak.${var.dns_zone}"
+      health_check_path     = "/cb/info"
+      health_check_matcher  = "200"
+      health_check_protocol = "HTTPS"
+      port                  = "443"
+      protocol              = "HTTPS"
+    },
   ]
 
   target_group_arns = "${zipmap(aws_alb_target_group.all_target_groups.*.name, aws_alb_target_group.all_target_groups.*.arn)}"
@@ -38,11 +48,13 @@ resource "aws_alb_target_group" "all_target_groups" {
   count    = "${length(local.lb_rules)}"
   name     = "${var.target_group_prefix}-${lookup(local.lb_rules[count.index], "name")}"
   vpc_id   = "${var.vpc_id}"
-  port     = 80
-  protocol = "HTTP"
+  port     = "${lookup(local.lb_rules[count.index], "port", "80")}"
+  protocol = "${lookup(local.lb_rules[count.index], "protocol", "HTTP")}"
   health_check {
     path                = "${lookup(local.lb_rules[count.index], "health_check_path")}"
     matcher             = "${lookup(local.lb_rules[count.index], "health_check_matcher")}"
+    protocol            = "${lookup(local.lb_rules[count.index], "health_check_protocol", "HTTP")}"
+    healthy_threshold   = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
   }
