@@ -53,6 +53,9 @@ fi
 # Install backup cron job
 echo "0 0 * * * admin /usr/bin/php /home/admin/web/public_html/cli/akeeba-backup.php" > /etc/cron.d/joomla_backup
 
+# the cloudwatch metrics collection scripts are baked into our ami
+echo "*/5 * * * * centos /home/centos/aws-scripts-mon/mon-put-instance-data.pl --mem-util --disk-space-util --disk-path=/ --from-cron" > /etc/cron.d/cloudwatch
+
 # Restore Joomla from backup
 aws s3 cp s3://${s3_bucket}/${s3_path} /tmp/backup.zip
 chown -R admin:admin /home/admin/web/public_html
