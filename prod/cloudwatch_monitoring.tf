@@ -119,7 +119,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_cpu" {
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_internal_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_mem" {
@@ -135,7 +135,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_mem" {
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_internal_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_high_cpu_util" {
@@ -151,7 +151,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_high_cpu_util" {
   dimensions {
     DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.ckan_db_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_instance_status_check_failed" {
@@ -167,7 +167,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_instance_status_check_failed" {
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_external_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_high_mem" {
@@ -183,7 +183,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_high_mem" {
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_external_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_high_cpu" {
@@ -199,7 +199,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_high_cpu" {
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_external_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_internal_instance_status_check_failed" {
@@ -215,7 +215,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_instance_status_check_fail
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_internal_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_free_storage_space_low" {
@@ -231,7 +231,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_free_storage_space_low" {
   dimensions {
     DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.kong_db_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_high_cpu_util" {
@@ -247,7 +247,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_high_cpu_util" {
   dimensions {
     DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.kong_db_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "kong_high_mem" {
@@ -263,7 +263,7 @@ resource "aws_cloudwatch_metric_alarm" "kong_high_mem" {
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.kong_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "kong_instance_status_check_failed" {
@@ -279,7 +279,7 @@ resource "aws_cloudwatch_metric_alarm" "kong_instance_status_check_failed" {
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.kong_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "kong_high_cpu" {
@@ -295,7 +295,7 @@ resource "aws_cloudwatch_metric_alarm" "kong_high_cpu" {
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.kong_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_free_storage_space_low" {
@@ -311,7 +311,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_free_storage_space_low" 
   dimensions {
     DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.joomla_db_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_high_cpu_util" {
@@ -327,7 +327,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_high_cpu_util" {
   dimensions {
     DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.joomla_db_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_scos_elb_no_healthy_hosts" {
@@ -344,7 +344,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_scos_elb_no_healthy_hosts" {
     TargetGroup                         = "${module.load_balancer_public.target_group_arn_suffix["${terraform.workspace}-Joomla"]}",
     LoadBalancer                        = "${module.load_balancer_public.lb_arn_suffix}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_free_storage_space_low" {
@@ -360,7 +360,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_free_storage_space_low" {
   dimensions {
     DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.ckan_db_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
   alarm_name                            = "Joomla - High CPU Utilization"
@@ -375,7 +375,7 @@ resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.joomla_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "joomla_instance_status_check_failed" {
@@ -391,7 +391,23 @@ resource "aws_cloudwatch_metric_alarm" "joomla_instance_status_check_failed" {
   dimensions {
     InstanceId                          = "${data.terraform_remote_state.env_remote_state.joomla_instance_id}"
   }
-  treat_missing_data                    = "breaching" 
+  treat_missing_data                    = "breaching"
+}
+
+resource "aws_cloudwatch_metric_alarm" "watchintor_cota_streaming_consumer_open_connection_failed" {
+  alarm_name                            = "Watchinator - Cota Streaming Consumer Open Connection Failed"
+  comparison_operator                   = "LessThanThreshold"
+  evaluation_periods                    = "1"
+  metric_name                           = "Opened"
+  namespace                             = "Socket Connection"
+  period                                = "120"
+  statistic                             = "Sum"
+  threshold                             = "1"
+  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  dimensions {
+    ApplicationName                     = "Cota-Streaming-Consumer"
+  }
+  treat_missing_data                    = "breaching"
 }
 //-----------------------//
 
