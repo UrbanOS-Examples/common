@@ -2,7 +2,7 @@
 #   into the root working directory
 # If you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
-enabled_features = ["ambari", "cloudbreak", hive"]
+enabled_features = ["ambari", "cloudbreak", "hive"]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
