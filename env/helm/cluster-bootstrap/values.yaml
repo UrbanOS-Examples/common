@@ -1,6 +1,10 @@
 global:
   environment: sandbox
 
+resourceLimits:
+  cpu: 100m
+  memory: 256Mi
+
 calico:
   enabled: true
   name: calico
