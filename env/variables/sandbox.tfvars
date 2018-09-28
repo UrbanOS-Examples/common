@@ -46,7 +46,7 @@ ckan_external_instance_ebs_optimized = false
 # CKAN database
 ckan_db_instance_class = "db.t2.large"
 
-ckan_db_allocated_storage = 30
+# ckan_db_allocated_storage = 30
 
 ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-24-12-10"
 
@@ -62,7 +62,6 @@ kong_instance_ebs_optimized = false
 kong_db_instance_class = "db.t2.2xlarge"
 
 kong_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:prod-kong-0-13-1-2018-08-29-07-20"
-<<<<<<< HEAD
 
 cloudbreak_db_multi_az = false
 ambari_db_multi_az = false
@@ -71,5 +70,3 @@ hive_db_multi_az = false
 cloudbreak_db_apply_immediately = true
 ambari_db_apply_immediately = true
 hive_db_apply_immediately = true
-=======
->>>>>>> Use json2hcl and jq to parse the enabled_features from the tfvars in tf-init
