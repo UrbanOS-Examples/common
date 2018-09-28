@@ -90,7 +90,6 @@ alertmanager:
     subPath: ""
   podAnnotations: {}
   replicaCount: 1
-  resources: {}
   securityContext: {}
   service:
     annotations: {}
@@ -120,7 +119,6 @@ configmapReload:
     #   mountPath: /etc/alerts.d
     #   configMap: prometheus-alerts
     #   readOnly: true
-  resources: {}
 
 initChownData:
   enabled: true
@@ -129,7 +127,6 @@ initChownData:
     repository: busybox
     tag: latest
     pullPolicy: IfNotPresent
-  resources: {}
 
 kubeStateMetrics:
   enabled: true
@@ -146,7 +143,6 @@ kubeStateMetrics:
   pod:
     labels: {}
   replicaCount: 1
-  resources: {}
   securityContext: {}
   service:
     annotations:
@@ -185,7 +181,6 @@ nodeExporter:
   podAnnotations: {}
   pod:
     labels: {}
-  resources: {}
   securityContext: {}
   service:
     annotations:
@@ -284,7 +279,6 @@ server:
     subPath: ""
   podAnnotations: {}
   replicaCount: 1
-  resources: {}
   securityContext: {}
   service:
     annotations: {}
@@ -316,7 +310,6 @@ pushgateway:
   nodeSelector: {}
   podAnnotations: {}
   replicaCount: 1
-  resources: {}
   securityContext: {}
   service:
     annotations:
@@ -364,7 +357,6 @@ grafana:
     hosts:
       - chart-example.local
     tls: []
-  resources: {}
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -460,7 +452,6 @@ grafana:
   sidecar:
     image: kiwigrid/k8s-sidecar:0.0.3
     imagePullPolicy: IfNotPresent
-    resources:
     dashboards:
       enabled: false
       # label that the configmaps with dashboards are marked with
@@ -790,7 +781,6 @@ externalDns:
   nodeSelector: {}
   podAnnotations: {}
   replicaCount: 1
-  resources: {}
   securityContext: {}
 
 networkPolicy:

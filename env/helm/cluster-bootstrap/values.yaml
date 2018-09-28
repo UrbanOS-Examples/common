@@ -2,7 +2,7 @@ global:
   environment: sandbox
 
 resourceLimits:
-  cpu: 100m
+  cpu: 10m
   memory: 256Mi
 
 calico:
@@ -43,11 +43,6 @@ calico:
       v: "2"
     podAnnotations:
       scheduler.alpha.kubernetes.io/critical-pod: ''
-    resources:
-      requests:
-        cpu: 10m
-      limits:
-        cpu: 10m
   customResources:
   - name: bgpconfiguration
     plural: bgpconfigurations
@@ -111,7 +106,6 @@ albIngress:
     AWS_MAX_RETRIES: "20"
   pod:
     labels: {}
-  resources: {}
   strategy: {}
 
 externalDns:
@@ -122,7 +116,6 @@ externalDns:
     tag: v0.5.5
     pullPolicy: IfNotPresent
   args: {}
-  resources: {}
   strategy:
     type: Recreate
   pod:

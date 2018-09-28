@@ -59,7 +59,7 @@ spec:
 {{- end }}
         {{- end }}
           resources:
-{{ toYaml .Values.externalDns.resources | trim | indent 12 }}
+{{ include "prometheus.resources" . | trim | indent 12 }}
     {{- if .Values.externalDns.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.externalDns.nodeSelector | trim | indent 8 }}
