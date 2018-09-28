@@ -17,3 +17,14 @@ joomla_backup_file_name = "site-www.staging.internal.smartcolumbusos.com-2018092
 cloudbreak_db_apply_immediately = true
 ambari_db_apply_immediately = true
 hive_db_apply_immediately = true
+
+# prod is an m4.2xl and m4.xl respectively
+# We're at 5% and 14% memory utilization and negligible cpu usage in non-prod environments.
+# This works out to a t2.medium being about 2x our actual usage.
+ckan_internal_instance_type = "t2.medium"
+
+ckan_internal_instance_ebs_optimized = false
+
+ckan_external_instance_type = "t2.medium"
+
+ckan_external_instance_ebs_optimized = false
