@@ -60,6 +60,7 @@ resource "aws_db_instance" "ambari_db" {
   engine_version          = "10.4"
   allocated_storage       = 100 # The allocated storage in gibibytes.
   storage_type            = "gp2"
+  name                    = "ambari"
   username                = "ambari"
   password                = "${random_string.ambari_db_password.result}"
   multi_az                = "${var.ambari_db_multi_az}"
