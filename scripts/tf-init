@@ -17,13 +17,33 @@ EOF
 }
 
 _die() {
-    echo "${@}"
+    >&2 echo "${@}"
     exit 1
+}
+
+_file() {
+    local -r filename="${1}"
+    [ -f "${filename}" ] || return 1
+    echo ${filename}
+}
+
+_get_tfvar() {
+    local -r varfile=$(_file "${1}") || _die "Failed to load var file \"${1}\""
+    local -r variable=${2}
+
+    _json2hcl -reverse < ${varfile} | jq --raw-output ".${variable}" || \
+        _die "Failed to parse variable \"${variable}\" out of \"${varfile}\""
+}
+
+_json2hcl() {
+    local -r json2hcl=$(_file "${git_root}/scripts/bin/json2hcl.v0.0.6.$(uname -s).$(uname -m)") || \
+        _die "Unable to find json2hcl for \"$(uname -sm)\" in ${git_root}/scripts/bin/"
+    "${json2hcl}" "${@}"
 }
 
 set -o pipefail
 
-git_root=$(git rev-parse --show-toplevel) || _die failed to resolve git_root
+git_root=$(git rev-parse --show-toplevel) || _die "Failed to resolve git_root.  Are you in a git repository?"
 
 backend_config="${git_root}/backends/alm.conf"
 
@@ -44,37 +64,26 @@ until [ ${#} -eq 0 ]; do
     shift
 done
 
-echo "detecting default vars file"
-vars_file="variables/${workspace}.tfvars"
-if [ ! -f "${vars_file}" ]; then
-    vars_file="variables/sandbox.tfvars"
-    if [ ! -f "${vars_file}" ]; then
-        _die failed detecting variables file
-    fi
-fi
-echo "detected: ${vars_file}"
+varfile=$(_file "variables/${workspace}.tfvars" || _file "variables/sandbox.tfvars") ||
+    _die "Failed to find a tfvars file for the workspace \"${workspace}\""
+echo "Using \"${varfile}\""
 
-echo "handling feature enablement"
 rm -f _feature*.tf
-enabled_features=$(cat "${vars_file}" | grep enabled_features | \
-    sed -E 's/^enabled_features[ ]*=[ ]*"([0-9a-zA-Z ]+)"$/\1/g' | \
-    awk '$0 !~ /enabled_features/ { print $0 }') || echo "WARNING: No list of enabled_features found."
-for feature in ${enabled_features}; do
+for feature in $(_get_tfvar "${varfile}" enabled_features | jq --raw-output '.[]'); do
     echo "enabling feature ${feature}"
-    feature_file=$(pwd)/"features/${feature}.hcl"
-    if [ ! -f "${feature_file}" ]; then
-        _die cannot find file "${feature_file}"
-    fi
-    ln -s "${feature_file}" _feature_"${feature}".tf || _die failed adding feature
+    feature_file=$(_file ${PWD}/"features/${feature}.hcl") ||
+        _die "Cannot find file for feature \"${feature}\" (${feature_file})"
+
+    ln -s "${feature_file}" _feature_"${feature}".tf || _die "failed adding feature"
 done
 
 echo "removing .terraform"
 rm -rf .terraform
 
 echo "initializing terraform"
-terraform init -backend-config=${backend_config} || _die failed initializing terraform
+terraform init -backend-config=${backend_config} || _die "Failed to initialize terraform"
 
-workspaces=$(terraform workspace list | cut -c 3- | sort -f | tail -n +2) || _die failed listing workspaces
+workspaces=$(terraform workspace list | cut -c 3- | sort -f | tail -n +2) || _die "Failed to list workspaces"
 
 if [ -z "${workspace}" ]; then
     echo "Workspaces available:"
@@ -85,9 +94,9 @@ if [ -z "${workspace}" ]; then
 fi
 
 if (echo "${workspaces}" | grep -xq ${workspace}); then
-    terraform workspace select ${workspace} || _die failed selecting workspace
+    terraform workspace select ${workspace} || _die "Failed to select workspace \"${workspace}\""
 else
-    terraform workspace new ${workspace} || _die failed creating new workspace
+    terraform workspace new ${workspace} || _die "Failed to create new workspace \"${workspace}\""
 fi
 
 exit 0
