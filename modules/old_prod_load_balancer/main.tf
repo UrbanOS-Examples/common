@@ -28,16 +28,6 @@ locals {
       health_check_path    = "/"
       health_check_matcher = "200"
     },
-    {
-      name                  = "Cloudbreak"
-      condition_field       = "host-header"
-      condition_values      = "cloudbreak.${var.dns_zone}"
-      health_check_path     = "/cb/info"
-      health_check_matcher  = "200"
-      health_check_protocol = "HTTPS"
-      port                  = "443"
-      protocol              = "HTTPS"
-    },
   ]
 
   target_group_arns = "${zipmap(aws_alb_target_group.all_target_groups.*.name, aws_alb_target_group.all_target_groups.*.arn)}"
