@@ -60,6 +60,7 @@ resource "aws_db_instance" "hive_db" {
   engine_version          = "10.4"
   allocated_storage       = 100 # The allocated storage in gibibytes.
   storage_type            = "gp2"
+  name                    = "hive"
   username                = "hive"
   password                = "${random_string.hive_db_password.result}"
   multi_az                = "${var.hive_db_multi_az}"
