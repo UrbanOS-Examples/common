@@ -68,7 +68,7 @@ spec:
           value: {{ $value | quote }}
         {{- end }}
         resources:
-{{ toYaml .Values.albIngress.resources | trim | indent 10 }}
+{{ include "bootstrap.resources" . | trim | indent 10 }}
         terminationMessagePath: /dev/termination-log
       {{- if .Values.albIngress.nodeSelector }}
       nodeSelector:
