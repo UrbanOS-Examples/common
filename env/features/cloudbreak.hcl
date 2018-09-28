@@ -125,12 +125,17 @@ data "aws_ami" "cloudbreak" {
   ]
 }
 
+resource "random_shuffle" "private_subnet" {
+  input = ["${module.vpc.private_subnets}"]
+  seed  = "${terraform.workspace}"
+}
+
 resource "aws_instance" "cloudbreak" {
   instance_type          = "t2.xlarge"
   ami                    = "${data.aws_ami.cloudbreak.id}"
   vpc_security_group_ids = ["${aws_security_group.cloudbreak_security_group.id}"]
   ebs_optimized          = "false"
-  subnet_id              = "${module.vpc.private_subnets[0]}"
+  subnet_id              = "${random_shuffle.private_subnet.result[0]}"
   key_name               = "${aws_key_pair.cloud_key.key_name}"
   iam_instance_profile   = "${aws_iam_instance_profile.cloudbreak.name}"
 
