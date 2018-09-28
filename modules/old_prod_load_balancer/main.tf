@@ -38,12 +38,11 @@ resource "aws_alb_target_group" "all_target_groups" {
   count    = "${length(local.lb_rules)}"
   name     = "${var.target_group_prefix}-${lookup(local.lb_rules[count.index], "name")}"
   vpc_id   = "${var.vpc_id}"
-  port     = "${lookup(local.lb_rules[count.index], "port", "80")}"
-  protocol = "${lookup(local.lb_rules[count.index], "protocol", "HTTP")}"
+  port     = 80
+  protocol = "HTTP"
   health_check {
     path                = "${lookup(local.lb_rules[count.index], "health_check_path")}"
     matcher             = "${lookup(local.lb_rules[count.index], "health_check_matcher")}"
-    protocol            = "${lookup(local.lb_rules[count.index], "health_check_protocol", "HTTP")}"
     healthy_threshold   = 5
     unhealthy_threshold = 2
   }
