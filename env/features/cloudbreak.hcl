@@ -74,6 +74,7 @@ resource "aws_db_instance" "cloudbreak_db" {
   }
 }
 
+// if this changes, there is a chance that deployed clusters will be orphaned
 resource "random_string" "cloudbreak_cluster_secret" {
   length = 40
   special = false
@@ -126,8 +127,10 @@ data "aws_ami" "cloudbreak" {
 }
 
 resource "random_shuffle" "private_subnet" {
-  input = ["${module.vpc.private_subnets}"]
-  seed  = "${terraform.workspace}"
+  input   = ["${module.vpc.private_subnets}"]
+  keepers = {
+    private_subnets = "${join(",", module.vpc.private_subnets)}"
+  }
 }
 
 resource "aws_instance" "cloudbreak" {
@@ -138,8 +141,6 @@ resource "aws_instance" "cloudbreak" {
   subnet_id              = "${random_shuffle.private_subnet.result[0]}"
   key_name               = "${aws_key_pair.cloud_key.key_name}"
   iam_instance_profile   = "${aws_iam_instance_profile.cloudbreak.name}"
-
-  depends_on = ["aws_db_instance.cloudbreak_db"]
 
   tags {
     Name    = "${terraform.workspace} Cloudbreak"
@@ -388,7 +389,7 @@ resource "aws_iam_role_policy" "cloudbreak_credential" {
 }
 EOF
 }
-/////////////////
+
 resource "aws_alb" "cloudbreak" {
   name = "cloudbreak-lb-${terraform.workspace}"
   load_balancer_type = "application"
@@ -427,7 +428,6 @@ resource "aws_alb_listener" "https" {
     target_group_arn = "${aws_alb_target_group.cloudbreak.arn}"
   }
 }
-/////////////
 
 variable "cloudbreak_db_multi_az" {
   description = "Should the Cloudbreak DB be multi-az?"
