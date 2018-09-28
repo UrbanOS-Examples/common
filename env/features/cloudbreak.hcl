@@ -92,7 +92,6 @@ data "template_file" "cloudbreak_profile" {
     UAA_DEFAULT_USER_PW="${random_string.cloudbreak_admin_password.result}"
     UAA_DEFAULT_USER_EMAIL="admin@smartcolumbusos.com"
     PUBLIC_IP="cloudbreak.${aws_route53_zone.public_hosted_zone.name}"
-    CB_HOST_ADDRESS="$(hostname -i)"
 
     DATABASE_HOST="${aws_db_instance.cloudbreak_db.address}"
     DATABASE_PORT="${aws_db_instance.cloudbreak_db.port}"
@@ -161,6 +160,7 @@ resource "null_resource" "cloudbreak" {
   }
 
   provisioner "file" {
+    //newline included here because Cloudbreak appends to the end of this file
     content = "${data.template_file.cloudbreak_profile.rendered}\n"
     destination = "/tmp/Profile"
   }
@@ -195,7 +195,6 @@ resource "aws_route53_record" "cloudbreak_public_dns" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
   name    = "cloudbreak"
   type    = "A"
-  count   = 1
 
   alias {
     name                   = "${module.load_balancer_private.dns_name}"

@@ -55,7 +55,6 @@ resource "aws_alb_target_group" "all_target_groups" {
     matcher             = "${lookup(local.lb_rules[count.index], "health_check_matcher")}"
     protocol            = "${lookup(local.lb_rules[count.index], "health_check_protocol", "HTTP")}"
     healthy_threshold   = 5
-    healthy_threshold   = 5
     unhealthy_threshold = 2
   }
 }
