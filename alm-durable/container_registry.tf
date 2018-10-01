@@ -90,3 +90,9 @@ module "discovery_api_repository" {
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "discovery-api"
 }
+
+module "discovery_ui_repository" {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "discovery-ui"
+}
