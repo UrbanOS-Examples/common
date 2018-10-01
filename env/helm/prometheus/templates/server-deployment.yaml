@@ -116,7 +116,7 @@ spec:
             initialDelaySeconds: 30
             timeoutSeconds: 30
           resources:
-{{ include "prometheus.resources" . | trim | indent 12 }}
+{{ toYaml .Values.server.resources | trim | indent 12 }}
           volumeMounts:
             - name: config-volume
               mountPath: /etc/config
