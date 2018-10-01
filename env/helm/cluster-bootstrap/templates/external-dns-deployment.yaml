@@ -43,7 +43,6 @@ spec:
 {{- end }}
       containers:
         - name: {{ .Chart.Name }}-{{ .Values.externalDns.name }}
-          resources:
           image: "{{ .Values.externalDns.image.repository }}:{{ .Values.externalDns.image.tag }}"
           imagePullPolicy: "{{ .Values.externalDns.image.pullPolicy }}"
         {{- if .Values.externalDns.args }}
@@ -55,7 +54,7 @@ spec:
 {{ toYaml .Values.externalDns.extraArgs | trim | indent 12 }}
 {{- end }}
         {{- end }}
-          resources: {{ include "bootstrap.resources" . | indent 4 }}
+          resources:
 {{ toYaml .Values.externalDns.resources | trim | indent 12 }}
     {{- if .Values.externalDns.nodeSelector }}
       nodeSelector:
