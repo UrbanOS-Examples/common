@@ -10,10 +10,4 @@ spec:
     defaultRequest:
       memory: {{ .Values.resourceLimits.memory }}
       cpu: {{ .Values.resourceLimits.cpu }}
-    max:
-      memory: {{ .Values.resourceLimits.memory }}
-      cpu: {{ .Values.resourceLimits.cpu }}
-    min:
-      memory: {{ .Values.resourceLimits.memory }}
-      cpu: {{ .Values.resourceLimits.cpu }}
     type: Container
