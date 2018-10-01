@@ -18,7 +18,7 @@ cloudbreak_db_apply_immediately = true
 ambari_db_apply_immediately = true
 hive_db_apply_immediately = true
 
-joomla_backup_file_name = "site-www.dev.internal.smartcolumbusos.com-20180921-095355edt.zip"
+joomla_backup_file_name = "site-www.dev.internal.smartcolumbusos.com-20180930-200001edt.zip"
 
 # prod is an m4.2xl and m4.xl respectively
 # We're at 5% and 14% memory utilization and negligible cpu usage in non-prod environments.

@@ -12,7 +12,7 @@ ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-
 
 vpc_cidr = "10.180.0.0/16"
 
-joomla_backup_file_name = "site-www.staging.internal.smartcolumbusos.com-20180921-135800edt.zip"
+joomla_backup_file_name = "site-www.staging.internal.smartcolumbusos.com-20180930-200001edt.zip"
 
 cloudbreak_db_apply_immediately = true
 ambari_db_apply_immediately = true
