@@ -52,7 +52,7 @@ spec:
             initialDelaySeconds: 10
             timeoutSeconds: 10
           resources:
-{{ include "prometheus.resources" . | trim | indent 12 }}
+{{ toYaml .Values.pushgateway.resources | trim | indent 12 }}
     {{- if .Values.pushgateway.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.pushgateway.nodeSelector | trim | indent 8 }}

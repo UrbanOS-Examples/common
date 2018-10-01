@@ -237,12 +237,3 @@ Create chart name and version as used by the chart label.
 {{- define "prometheus.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
-
-{{- define "prometheus.resources" -}}
-limits:
-  memory: {{ .Values.resourceLimits.memory }}
-  cpu: {{ .Values.resourceLimits.cpu }}
-requests:
-  memory: {{ .Values.resourceLimits.memory }}
-  cpu: {{ .Values.resourceLimits.cpu }}
-{{- end -}}

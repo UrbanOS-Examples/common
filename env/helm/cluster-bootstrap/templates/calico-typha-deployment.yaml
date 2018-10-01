@@ -33,8 +33,6 @@ spec:
       serviceAccountName: {{ $name }}-node
       containers:
       - name: {{ $name }}-typha
-        resources:
-{{ include "bootstrap.resources" . | trim | indent 10 }}
         image: {{ .Values.calico.typha.image.repository }}:{{ .Values.calico.typha.image.tag }}
         imagePullPolicy: "{{ .Values.calico.typha.image.pullPolicy }}"
         ports:
