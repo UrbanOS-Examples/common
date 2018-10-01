@@ -1,6 +1,6 @@
 resourceLimits:
   cpu: 100m
-  memory: 256Mi
+  memory: 512Mi
 
 rbac:
   create: true
