@@ -85,6 +85,11 @@ module "micro_service_watchinator_repository" {
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "micro-service-watchinator"
 }
+module "discovery_api_repository" {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "discovery-api"
+}
 
 module "discovery_ui_repository" {
   source          = "../modules/ecr"
