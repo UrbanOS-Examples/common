@@ -42,7 +42,7 @@ spec:
           {{- end }}
           {{- if .Values.calico.typhaHpa.resources }}
           resources:
-{{ include "bootstrap.resources" . | trim | indent 12 }}
+{{ toYaml .Values.calico.typhaHpa.resources | trim | indent 12 }}
           {{- end }}
       serviceAccountName: {{ $name }}-typha-cpha
 {{- end -}}

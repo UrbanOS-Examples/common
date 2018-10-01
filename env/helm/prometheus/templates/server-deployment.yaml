@@ -51,7 +51,7 @@ spec:
         image: "{{ .Values.initChownData.image.repository }}:{{ .Values.initChownData.image.tag }}"
         imagePullPolicy: "{{ .Values.initChownData.image.pullPolicy }}"
         resources:
-{{ include "prometheus.resources" . | trim | indent 10 }}
+{{ toYaml .Values.initChownData.resources | trim | indent 12 }}
         # 65534 is the nobody user that prometheus uses.
         command: ["chown", "-R", "65534:65534", "{{ .Values.server.persistentVolume.mountPath }}"]
         volumeMounts:
@@ -70,7 +70,7 @@ spec:
             - --{{ $key }}={{ $value }}
           {{- end }}
           resources:
-{{ include "prometheus.resources" . | trim | indent 12 }}
+{{ toYaml .Values.configmapReload.resources | trim | indent 12 }}
           volumeMounts:
             - name: config-volume
               mountPath: /etc/config
@@ -116,7 +116,7 @@ spec:
             initialDelaySeconds: 30
             timeoutSeconds: 30
           resources:
-{{ include "prometheus.resources" . | trim | indent 12 }}
+{{ toYaml .Values.server.resources | trim | indent 12 }}
           volumeMounts:
             - name: config-volume
               mountPath: /etc/config

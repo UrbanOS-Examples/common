@@ -81,7 +81,7 @@ spec:
             - name: FOLDER
               value: "{{ .Values.grafana.sidecar.dashboards.folder }}"
           resources:
-{{ include "prometheus.resources" . | trim | indent 12 }}
+{{ toYaml .Values.grafana.sidecar.resources | indent 12 }}
           volumeMounts:
             - name: sc-dashboard-volume
               mountPath: {{ .Values.grafana.sidecar.dashboards.folder | quote }}
@@ -96,7 +96,7 @@ spec:
             - name: FOLDER
               value: "/etc/grafana/provisioning/datasources"
           resources:
-{{ include "prometheus.resources" . | trim | indent 12 }}
+{{ toYaml .Values.grafana.sidecar.resources | indent 12 }}
           volumeMounts:
             - name: sc-datasources-volume
               mountPath: "/etc/grafana/provisioning/datasources"
@@ -104,8 +104,6 @@ spec:
         - name: {{ .Values.grafana.name }}
           image: "{{ .Values.grafana.image.repository }}:{{ .Values.grafana.image.tag }}"
           imagePullPolicy: {{ .Values.grafana.image.pullPolicy }}
-          resources:
-{{ include "prometheus.resources" . | trim | indent 12 }}
           volumeMounts:
             - name: config
               mountPath: "/etc/grafana/grafana.ini"
@@ -217,6 +215,8 @@ spec:
             timeoutSeconds: 30
             failureThreshold: 10
             periodSeconds: 10
+          resources:
+{{ toYaml .Values.grafana.resources | trim | indent 12 }}
     {{- if .Values.grafana.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.grafana.nodeSelector | trim | indent 8 }}

@@ -33,8 +33,6 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.calico.node.terminationGrace }}
       containers:
         - name: {{ $name }}-node
-          resources:
-{{ include "bootstrap.resources" . | trim | indent 12 }}
           image: {{ .Values.calico.node.image.repository }}:{{ .Values.calico.node.image.tag }}
           imagePullPolicy: "{{ .Values.calico.node.image.pullPolicy }}"
           env:
