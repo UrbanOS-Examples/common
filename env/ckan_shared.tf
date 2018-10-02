@@ -189,7 +189,7 @@ variable "ckan_db_engine_version" {
 
 variable "ckan_theme_version" {
   description = "The version of the custom ckan theme to install"
-  default     = "1.0.8"
+  default     = "1.0.9"
 }
 
 output "ckan_db_instance_id" {
