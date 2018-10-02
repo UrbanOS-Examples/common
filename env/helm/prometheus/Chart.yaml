@@ -2,7 +2,6 @@ name: prometheus
 apiVersion: v1
 description: Combined prometheus and grafana stack for the Smart City OS
 version: 1.0.0
-kubeVersion: ">=1.10.0"
 tillerVersion: ">=2.8.0"
 keywords:
 - monitoring
