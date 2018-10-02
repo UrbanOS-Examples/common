@@ -1,0 +1,185 @@
+{
+  "general": {
+    "name": "",
+    "credentialName": "cb-credential"
+  },
+  "placement": {
+    "availabilityZone": "us-west-2c",
+    "region": "us-west-2"
+  },
+  "parameters": {},
+  "inputs": {},
+  "customDomain": {
+    "clusterNameAsSubdomain": false,
+    "hostgroupNameAsHostname": false
+  },
+  "tags": {
+    "userDefinedTags": {}
+  },
+  "instanceGroups": [
+    {
+      "nodeCount": 1,
+      "group": "management",
+      "type": "GATEWAY",
+      "parameters": {},
+      "template": {
+        "volumeCount": 1,
+        "volumeSize": 100,
+        "rootVolumeSize": 50,
+        "parameters": {
+          "encrypted": false
+        },
+        "volumeType": "standard",
+        "instanceType": "m5.2xlarge"
+      },
+      "securityGroup": {
+        "securityGroupId": "sg-08777dc19ffa7330b",
+        "securityRules": []
+      },
+      "recipeNames": [],
+      "recoveryMode": "MANUAL"
+    },
+    {
+      "nodeCount": 1,
+      "group": "master_namednode2",
+      "type": "CORE",
+      "parameters": {},
+      "template": {
+        "volumeCount": 1,
+        "volumeSize": 100,
+        "rootVolumeSize": 50,
+        "parameters": {
+          "encrypted": false
+        },
+        "volumeType": "standard",
+        "instanceType": "m5.2xlarge"
+      },
+      "securityGroup": {
+        "securityGroupId": "sg-08777dc19ffa7330b",
+        "securityRules": []
+      },
+      "recipeNames": [],
+      "recoveryMode": "MANUAL"
+    },
+    {
+      "nodeCount": 1,
+      "group": "master_namednode1",
+      "type": "CORE",
+      "parameters": {},
+      "template": {
+        "volumeCount": 1,
+        "volumeSize": 100,
+        "rootVolumeSize": 50,
+        "parameters": {
+          "encrypted": false
+        },
+        "volumeType": "standard",
+        "instanceType": "m5.2xlarge"
+      },
+      "securityGroup": {
+        "securityGroupId": "sg-08777dc19ffa7330b",
+        "securityRules": []
+      },
+      "recipeNames": [],
+      "recoveryMode": "MANUAL"
+    },
+    {
+      "nodeCount": 1,
+      "group": "broker",
+      "type": "CORE",
+      "parameters": {},
+      "template": {
+        "volumeCount": 1,
+        "volumeSize": 100,
+        "rootVolumeSize": 50,
+        "parameters": {
+          "encrypted": false
+        },
+        "volumeType": "standard",
+        "instanceType": "m5.2xlarge"
+      },
+      "securityGroup": {
+        "securityGroupId": "sg-01282ef77f7ec2977",
+        "securityRules": []
+      },
+      "recipeNames": [],
+      "recoveryMode": "MANUAL"
+    },
+    {
+      "nodeCount": 1,
+      "group": "worker",
+      "type": "CORE",
+      "parameters": {},
+      "template": {
+        "volumeCount": 1,
+        "volumeSize": 100,
+        "rootVolumeSize": 50,
+        "parameters": {
+          "encrypted": false
+        },
+        "volumeType": "standard",
+        "instanceType": "m5.xlarge"
+      },
+      "securityGroup": {
+        "securityGroupId": "sg-01282ef77f7ec2977",
+        "securityRules": []
+      },
+      "recipeNames": [],
+      "recoveryMode": "MANUAL"
+    }
+  ],
+  "stackAuthentication": {
+    "publicKeyId": "smrt_env_cloud_key"
+  },
+  "network": {
+    "parameters": {
+      "subnetId": "subnet-0874f137e36ab65f9",
+      "vpcId": "vpc-0fd1f78f126a11602"
+    }
+  },
+  "imageSettings": {
+    "imageCatalog": "cloudbreak-default",
+    "imageId": "69db7e20-f3ac-4d45-6f95-39204e70ddcf"
+  },
+  "cluster": {
+    "emailNeeded": false,
+    "rdsConfigNames": [
+      "hivedb"
+    ],
+    "ambari": {
+      "blueprintName": "SCOS DataLake",
+      "gateway": {
+        "path": "smrt-datalake",
+        "topologies": [
+          {
+            "topologyName": "dp-proxy",
+            "exposedServices": [
+              "AMBARI"
+            ]
+          }
+        ],
+        "ssoProvider": "/smrt-datalake/sso/api/v1/websso",
+        "gatewayType": "INDIVIDUAL",
+        "ssoType": "NONE"
+      },
+      "enableSecurity": false,
+      "userName": "admin",
+      "password": "",
+      "ambariStackDetails": {
+        "stack": "HDP",
+        "version": "3.0",
+        "stackRepoId": "HDP",
+        "enableGplRepo": false,
+        "verify": false,
+        "repositoryVersion": "3.0.0.0-1334",
+        "versionDefinitionFileUrl": "http://s3.amazonaws.com/dev.hortonworks.com/HDP/centos7/3.x/BUILDS/3.0.0.0-1334/HDP-3.0.0.0-1334.xml",
+        "mpacks": []
+      },
+      "ambariRepoDetailsJson": {
+        "version": "2.7.0.0-508",
+        "baseUrl": "http://s3.amazonaws.com/dev.hortonworks.com/ambari/centos7/2.x/BUILDS/2.7.0.0-508",
+        "gpgKeyUrl": "http://s3.amazonaws.com/dev.hortonworks.com/ambari/centos7/2.x/BUILDS/2.7.0.0-508/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins"
+      }
+    }
+  }
+}
