@@ -53,8 +53,9 @@ resource "aws_security_group" "hive_security_group" {
 
 resource "aws_db_instance" "hive_db" {
   identifier              = "${terraform.workspace}-hive"
+  name                    = "hive"
   instance_class          = "db.t2.small"
-  vpc_security_group_ids  = ["${aws_security_group.hive_security_group.id}"]
+  vpc_security_group_ids  = ["${aws_security_group.hive_security_group.id}", "${aws_security_group.postgres_allow_cloudbreak.id}"]
   db_subnet_group_name    = "${aws_db_subnet_group.hive_db_subnet_group.name}"
   engine                  = "postgres"
   engine_version          = "10.4"
