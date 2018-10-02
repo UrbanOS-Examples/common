@@ -2,7 +2,6 @@ name: cluster-bootstrap
 apiVersion: v1
 description: Bootstrapping the Kubernetes cluster for the Smart City OS
 version: 1.0.0
-kubeVersion: ">=1.10.0"
 tillerVersion: ">=2.8.0"
 keywords:
 - bootstrapping
