@@ -220,7 +220,7 @@ def applyInfraHelmCharts(environment) {
 
             for i in \$(seq 1 5); do
                 [ \$i -gt 1 ] && sleep 15
-                [ \$(kubectl get pods --namespace kube-system -l name='tiller' | grep -ic Running | wc -l) -gt 0 ] && break
+                [ \$(kubectl get pods --namespace kube-system -l name='tiller' | grep -ic Running) -gt 0 ] && break
                 echo "Running Tiller Pod not found"
                 [ \$i -eq 5 ] && exit 1
             done

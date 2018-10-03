@@ -51,6 +51,19 @@ resource "aws_security_group" "cloudbreak_security_group" {
   }
 }
 
+resource "aws_security_group" "postgres_allow_cloudbreak" {
+  name_prefix = "postgres_allow_cloudbreak"
+  vpc_id = "${module.vpc.vpc_id}"
+
+  ingress {
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    security_groups = ["${aws_security_group.cloudbreak_security_group.id}"]
+    description = "Allow postgres traffic from cloudbreak"
+  }
+}
+
 resource "aws_db_instance" "cloudbreak_db" {
   identifier              = "${terraform.workspace}-cloudbreak"
   instance_class          = "db.t2.small"
