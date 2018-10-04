@@ -14,13 +14,24 @@ module "eks-cluster" {
   kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
   kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
 
-  worker_groups = [{
-    name                 = "Workers"
-    asg_min_size         = "${var.min_num_of_workers}"
-    asg_max_size         = "${var.max_num_of_workers}"
-    instance_type        = "t2.large"
-    key_name             = "${aws_key_pair.cloud_key.key_name}"
-  }]
+  worker_group_count = 2
+  worker_groups = [
+    {
+      name                 = "Workers"
+      asg_min_size         = "${var.min_num_of_workers}"
+      asg_max_size         = "${var.max_num_of_workers}"
+      instance_type        = "t2.medium"
+      key_name             = "${aws_key_pair.cloud_key.key_name}"
+    },
+    {
+      name                 = "Jupyterhub-Workers"
+      asg_min_size         = "${var.min_num_of_jupyterhub_workers}"
+      asg_max_size         = "${var.max_num_of_jupyterhub_workers}"
+      instance_type        = "t2.medium"
+      key_name             = "${aws_key_pair.cloud_key.key_name}"
+      kubelet_extra_args   = "--register-with-taints=scos.run.jupyterhub=true:NoExecute --node-labels=scos.run.jupyterhub=true"
+    }
+  ]
 
   tags = {
     Environment = "${terraform.workspace}"
@@ -94,12 +105,22 @@ resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
 
 variable "min_num_of_workers" {
   description = "Minimum number of workers to be created on eks cluster"
-  default = 3
+  default = 2
 }
 
 variable "max_num_of_workers" {
   description = "Maximum number of workers to be created on eks cluster"
-  default = 5
+  default = 7
+}
+
+variable "min_num_of_jupyterhub_workers" {
+  description = "Minimum number of workers to be created on eks cluster"
+  default = 3
+}
+
+variable "max_num_of_jupyterhub_workers" {
+  description = "Maximum number of workers to be created on eks cluster"
+  default = 10
 }
 output "eks_cluster_kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
