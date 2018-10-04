@@ -220,12 +220,13 @@ def applyInfraHelmCharts(environment) {
 
             for i in \$(seq 1 5); do
                 [ \$i -gt 1 ] && sleep 15
-                [ \$(kubectl get pods --namespace cluster-infra -l name='tiller' | grep -ic Running) -gt 0 ] && break
+                [ \$(kubectl get pods --namespace kube-system -l name='tiller' | grep -ic Running) -gt 0 ] && break
                 echo "Running Tiller Pod not found"
                 [ \$i -eq 5 ] && exit 1
             done
 
             # label the dns namespace to later select for network policy rules; overwrite = no-op
+            kubectl get namespaces | egrep '^cluster-infra ' || kubectl create namespace cluster-infra
             kubectl label namespace cluster-infra name=cluster-infra --overwrite
 
             helm upgrade --install cluster-infra helm/cluster-infra \
