@@ -1,9 +1,15 @@
+___
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cluster-infra
+
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
- name: tiller
- namespace: cluster-infra
+  name: tiller
+  namespace: cluster-infra
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
