@@ -226,14 +226,15 @@ def applyInfraHelmCharts(environment) {
             done
 
             # label the dns namespace to later select for network policy rules; overwrite = no-op
-            kubectl label namespace kube-system name=kube-system --overwrite
+            kubectl get namespaces | egrep '^cluster-infra ' || kubectl create namespace cluster-infra
+            kubectl label namespace cluster-infra name=cluster-infra --overwrite
 
-            helm upgrade --install cluster-infra helm/cluster-bootstrap \
-                --namespace=kube-system \
+            helm upgrade --install cluster-infra helm/cluster-infra \
+                --namespace=cluster-infra \
                 --set externalDns.args."domain\\-filter"="\${DNS_ZONE}" \
                 --set albIngress.extraEnv."AWS\\_REGION"="\${AWS_REGION}" \
                 --set albIngress.extraEnv."CLUSTER\\_NAME"="\${EKS_CLUSTER_NAME}" \
-                --values helm/cluster-bootstrap/run-config.yaml
+                --values helm/cluster-infra/run-config.yaml
 
             helm upgrade --install prometheus helm/prometheus \
                 --namespace=prometheus \

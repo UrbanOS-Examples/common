@@ -1,4 +1,4 @@
-name: cluster-bootstrap
+name: cluster-infra
 apiVersion: v1
 description: Bootstrapping the Kubernetes cluster for the Smart City OS
 version: 1.0.0

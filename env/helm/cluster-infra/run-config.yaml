@@ -47,8 +47,8 @@ storageClass:
     mountOptions:
     - debug
 
-# helm install --name=cluster-infra --namespace=kube-system \
+# helm install --name=cluster-infra --namespace=cluster-infra \
 #   --set externalDns.args."domain\-filter"="${DNS_ZONE}" \
 #   --set albIngress.extraEnv."AWS\_REGION"="${AWS_REGION}" \
 #   --set albIngress.extraEnv."CLUSTER\_NAME"="${EKS_CLUSTER_NAME}" \
-#   --values cluster-bootstrap/run-config.yaml cluster-bootstrap
+#   --values cluster-infra/run-config.yaml cluster-infra
