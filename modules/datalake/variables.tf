@@ -4,6 +4,7 @@ variable "vpc_id" {
 
 variable "subnets" {
   description = "List of subnets to deploy the datalake into."
+  type        = "list"
 }
 
 variable "remote_management_cidr" {
@@ -26,6 +27,10 @@ variable "cloudbreak_db_multi_az" {
 variable "cloudbreak_db_apply_immediately" {
   description = "Should changes to the Cloudbreak DB be applied immediately?"
   default = false
+}
+
+variable "ssh_key" {
+  description = "The SSH key to inject into the cloudbreak instance."
 }
 
 variable "cloudbreak_version" {

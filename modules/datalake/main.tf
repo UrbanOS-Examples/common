@@ -65,7 +65,7 @@ resource "aws_instance" "cloudbreak" {
   vpc_security_group_ids = ["${aws_security_group.cloudbreak_security_group.id}"]
   ebs_optimized          = "false"
   subnet_id              = "${random_shuffle.private_subnet.result[0]}"
-  key_name               = "${aws_key_pair.cloud_key.key_name}"
+  key_name               = "${var.ssh_key}"
   iam_instance_profile   = "${aws_iam_instance_profile.cloudbreak.name}"
 
   tags {

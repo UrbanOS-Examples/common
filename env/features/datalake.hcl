@@ -7,4 +7,5 @@ module "datalake" {
   alb_certificate        = "${module.tls_certificate.arn}"
   cloudbreak_dns_zone    = "${aws_route53_zone.public_hosted_zone.zone_id}"
   cloudbreak_tag         = "1.0.0"
+  ssh_key                = "${aws_key_pair.cloud_key.key_name}"
 }
