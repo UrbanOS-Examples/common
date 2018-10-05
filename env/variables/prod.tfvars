@@ -2,7 +2,7 @@
 #   into the root working directory
 # if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
-enabled_features = []
+enabled_features = ["eks-cluster"]
 
 role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
 

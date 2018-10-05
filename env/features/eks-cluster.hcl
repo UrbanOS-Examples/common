@@ -1,7 +1,3 @@
-locals {
-  kubernetes_cluster_name = "streaming-kube-${terraform.workspace}"
-}
-
 module "eks-cluster" {
   source = "github.com/SmartColumbusOS/terraform-aws-eks"
   # source  = "terraform-aws-modules/eks/aws"

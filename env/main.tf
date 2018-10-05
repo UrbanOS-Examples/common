@@ -20,6 +20,7 @@ resource "aws_key_pair" "cloud_key" {
 
 locals {
   vpc_name = "${length(var.vpc_name) > 0 ? var.vpc_name : terraform.workspace}"
+  kubernetes_cluster_name = "streaming-kube-${terraform.workspace}"
 }
 
 variable "region" {

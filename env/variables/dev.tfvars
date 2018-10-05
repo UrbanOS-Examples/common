@@ -3,6 +3,7 @@
 # If you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = ["datalake",
+                    "eks-cluster",
                     "ckan_shared",
                     "ckan_internal",
                     "ckan_external",
