@@ -1,0 +1,20 @@
+#! /bin/bash
+## THIS IS FOR INFORMATION AND DOCUMENTATION PURPOSES; DO NOT RUN THIS CODE IN PRODUCTION   ##
+## THESE COMMANDS AND/OR THIS SCRIPT IS INTENDED TO OUTLINE A TERRAFORM NULL RESOURCE       ##
+## THAT WILL EXECUTE THE BUILDING OF A CLUSTER ON TOP OF INFRASTRUCTURE IT HAS PROVISIUONED ##
+
+# configure cloudbreak cli
+cb configure --server https://{{ cloudbreak_instance_subdomain }}.smartcolumbusos.com --username admin@smartcolumbusos.com --password {{ cloudbreak_password }}
+
+# create credential that assumes aws ${terraform.workspace}_cloudbreak_credential
+# template in aws_iam_role.cloudbreak_credential.arn
+cb credential create from-file --cli-input-json credential.json --name cb-credential
+
+# attach hive db
+cb database create postgres --name hivedb --type HIVE --url jdbc:postgresql://{{ hive_db_instance }}.us-west-2.rds.amazonaws.com:5432/hive --db-username hive --db-password {{ hive_db_password }}
+
+# create the blueprint
+cb blueprint create from-file --file datalake-ambari-blueprint.json --name {{ blueprint_name }}
+
+# cluster template
+cb cluster create --cli-input-json datalake_cluster_template.json --name {{ cluster_name }}
