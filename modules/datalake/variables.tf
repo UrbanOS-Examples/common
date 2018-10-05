@@ -15,8 +15,12 @@ variable "alb_certificate" {
   description = "ALB certificate to attach to the Cloudbreak load balancer."
 }
 
-variable "cloudbreak_dns_zone" {
+variable "cloudbreak_dns_zone_id" {
   description = "DNS public zone to create the cloudbreak A record."
+}
+
+variable "cloudbreak_dns_zone_name" {
+  description = "Name of the DNS public zone"
 }
 
 variable "cloudbreak_db_multi_az" {
