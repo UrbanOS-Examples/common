@@ -27,6 +27,6 @@ joomla_db_multi_az = true
 
 ckan_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:rds:prod-production-ckan-2018-09-24-05-00"
 
-min_num_of_workers = 5
+min_num_of_workers = 9
 
-max_num_of_workers = 9
+max_num_of_workers = 12

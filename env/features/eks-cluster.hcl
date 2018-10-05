@@ -18,6 +18,26 @@ module "eks-cluster" {
     asg_max_size         = "${var.max_num_of_workers}"
     instance_type        = "t2.large"
     key_name             = "${aws_key_pair.cloud_key.key_name}"
+    pre_userdata         = <<EOF
+
+# Prevent containers from exhausting the process table, killing the node. (Fork bomb.)
+cat <<MARK > /etc/systemd/system/docker.service.d/override.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd --default-ulimit nproc=5000:10000 --default-ulimit nofile=1024:4096
+MARK
+
+# Make sure kubelet gets restarted on exit.
+mkdir --parents /etc/systemd/system/kubelet.service.d
+cat <<MARK > /etc/systemd/system/kubelet.service.d/override.conf
+[Service]
+Restart=always
+MARK
+
+systemctl daemon-reload
+systemctl restart docker
+
+EOF
   }]
 
   tags = {
@@ -105,12 +125,12 @@ resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
 
 variable "min_num_of_workers" {
   description = "Minimum number of workers to be created on eks cluster"
-  default = 3
+  default = 6
 }
 
 variable "max_num_of_workers" {
   description = "Maximum number of workers to be created on eks cluster"
-  default = 5
+  default = 9
 }
 output "eks_cluster_kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
