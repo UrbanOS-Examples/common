@@ -2,7 +2,14 @@
 #   into the root working directory
 # If you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
-enabled_features = ["cloudbreak", "hive"]
+enabled_features = ["datalake",
+                    "ckan_shared",
+                    "ckan_internal",
+                    "ckan_external",
+                    "kong",
+                    "joomla",
+                    "load_balancer"
+                   ]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
