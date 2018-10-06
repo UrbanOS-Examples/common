@@ -1,9 +1,9 @@
 locals {
-    iam_instance_count   = 2
-    iam_instance_type    = "t2.small"
-    iam_instance_ami     = "ami-f5fc948d"
-    tcp_ports            = "53,80,88,389,443,464,636,7389,9443,9444,9445"
-    udp_ports            = "53,88,123,464"
+    freeipa_instance_count   = 2
+    iam_instance_type        = "t2.small"
+    iam_instance_ami         = "ami-0d50f5c6b01e2d95d"
+    tcp_ports                = "53,80,88,389,443,464,636,7389,9443,9444,9445"
+    udp_ports                = "53,88,123,464"
 }
 
 variable "vpc_id" {
@@ -45,10 +45,11 @@ variable "zone_id" {
   description = "The output id of the primary dns zone."
 }
 
-# variable "reverse_zone_id" {
-#   description = "The output id of the reverse lookup zone."
-# }
-
 variable "zone_name" {
   description = "The name of the primary dns zone."
+}
+
+variable "keycloak_version" {
+  description = "The version of Keycloak to download and install"
+  default     = "4.5.0"
 }

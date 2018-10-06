@@ -19,7 +19,7 @@ until dnf -y install freeipa-server; do
 done
 
 if [[ "${hostname}" =~ "master" ]]; then
-  /usr/sbin/ipa-server-install \
+  ipa-server-install \
     --ds-password=${admin_password} \
     --admin-password=${admin_password} \
     --hostname="${hostname}.${hosted_zone}" \
@@ -28,11 +28,27 @@ if [[ "${hostname}" =~ "master" ]]; then
     --realm="${upper("${hosted_zone}")}" \
     --ntp-pool=us.pool.ntp.org \
     --unattended
+
+  if [[ ${instance_count} -gt 1 ]]; then
+    echo "${admin_password}" | kinit "admin@${upper("${hosted_zone}")}"
+
+    until ipa host-find | grep replica; do
+      sleep 10
+    done 
+
+    for instance in $$(seq 1 ${instance_count - 1}); do
+      ipa hostgroup-add-member ipaservers --hosts "${hostname_prefix}-replica-$${instance}.${hosted_zone}"
+    done
+  fi
 else
+  sleep 360 
+
   until curl -I --insecure "https://${hostname_prefix}-master.${hosted_zone}/ipa/ui/"; do
     sleep 30
   done
-  /usr/sbin/ipa-client-install \
+
+  until \
+  ipa-client-install \
     --domain="${hosted_zone}" \
     --realm="${upper("${hosted_zone}")}" \
     --server="${hostname_prefix}-master.${hosted_zone}" \
@@ -40,5 +56,16 @@ else
     --principal="admin@${upper("${hosted_zone}")}" \
     --password="${admin_password}" \
     --ntp-server=us.pool.ntp.org \
-    --unattended
+    --unattended;
+  do
+    sleep 60
+  done
+
+  until ipa-replica-install; do
+    sleep 30
+  done
+
+  echo "${admin_password}" | ipa-ca-install
+
+  ipa-pkinit-manage enable
 fi

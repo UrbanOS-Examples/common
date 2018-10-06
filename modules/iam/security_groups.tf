@@ -1,5 +1,5 @@
-resource "aws_security_group" "iam_server_sg" {
-  name   = "IAM Server SG"
+resource "aws_security_group" "freeipa_server_sg" {
+  name   = "FreeIPA Server SG"
   vpc_id = "${var.vpc_id}"
 
   ingress {
@@ -18,6 +18,14 @@ resource "aws_security_group" "iam_server_sg" {
     description = "Allow all traffic from admin VPC"
   }
 
+  ingress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = ["${aws_security_group.keycloak_server_sg.id}"]
+    description     = "Allow all traffic from the Keycloak server"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -30,7 +38,7 @@ resource "aws_security_group" "iam_server_sg" {
   }
 }
 
-resource "aws_security_group_rule" "iam_tcp_ingress" {
+resource "aws_security_group_rule" "freeipa_tcp_ingress" {
   count             = "${length(split(",", local.tcp_ports))}"
   type              = "ingress"
   from_port         = "${element(split(",", local.tcp_ports), count.index)}"
@@ -38,10 +46,10 @@ resource "aws_security_group_rule" "iam_tcp_ingress" {
   protocol          = "tcp"
   cidr_blocks       = ["${var.realm_cidr}"]
   description       = "Allow inbound tcp port ${element(split(",", local.tcp_ports), count.index)}"
-  security_group_id = "${aws_security_group.iam_server_sg.id}"
+  security_group_id = "${aws_security_group.freeipa_server_sg.id}"
 }
 
-resource "aws_security_group_rule" "iam_udp_ingress" {
+resource "aws_security_group_rule" "freeipa_udp_ingress" {
   count             = "${length(split(",", local.udp_ports))}"
   type              = "ingress"
   from_port         = "${element(split(",", local.udp_ports), count.index)}"
@@ -49,5 +57,93 @@ resource "aws_security_group_rule" "iam_udp_ingress" {
   protocol          = "udp"
   cidr_blocks       = ["${var.realm_cidr}"]
   description       = "Allow inbound udp port ${element(split(",", local.udp_ports), count.index)}"
-  security_group_id = "${aws_security_group.iam_server_sg.id}"
+  security_group_id = "${aws_security_group.freeipa_server_sg.id}"
+}
+
+resource "aws_security_group" "keycloak_server_sg" {
+  name   = "Keycloak Server SG"
+  vpc_id = "${var.vpc_id}"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
+    description = "Allow traffic from self"
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.management_cidr}"]
+    description = "Allow all traffic from admin VPC"
+  }
+
+  ingress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = ["${aws_security_group.freeipa_server_sg.id}"]
+    description     = "Allow all traffic from the Keycloak server"
+  }
+
+  ingress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = ["${aws_security_group.keycloak_lb_sg.id}"]
+    description     = "Allow all traffic from the keycloak loadbalancer"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name = "IAM OAuth internal"
+  }
+}
+
+resource "aws_security_group" "keycloak_lb_sg" {
+  name   = "Keycloak Loadbalancer SG"
+  vpc_id = "${var.vpc_id}"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
+    description = "Allow traffic from self"
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow keycloak http traffic"
+  }
+
+  ingress {
+    from_port   = 8443
+    to_port     = 8443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow keycloak https traffic"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name = "IAM OAuth external"
+  }
 }
