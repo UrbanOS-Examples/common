@@ -105,12 +105,12 @@ resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
 
 variable "min_num_of_workers" {
   description = "Minimum number of workers to be created on eks cluster"
-  default = 3
+  default = 6
 }
 
 variable "max_num_of_workers" {
   description = "Maximum number of workers to be created on eks cluster"
-  default = 5
+  default = 9
 }
 output "eks_cluster_kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
