@@ -21,6 +21,7 @@ module "eks-cluster" {
     pre_userdata         = <<EOF
 
 # Prevent containers from exhausting the process table, killing the node. (Fork bomb.)
+mkdir --parents /etc/systemd/system/docker.service.d
 cat <<MARK > /etc/systemd/system/docker.service.d/override.conf
 [Service]
 ExecStart=
