@@ -2,11 +2,11 @@ global:
   environment: sandbox
 
 resourceLimits:
-  cpu: 10m
+  cpu: 100m
   memory: 256Mi
 
 calico:
-  enabled: true
+  enabled: false
   name: calico
   crdGroup: crd.projectcalico.org
   service:

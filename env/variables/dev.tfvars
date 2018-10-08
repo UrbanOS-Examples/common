@@ -2,7 +2,15 @@
 #   into the root working directory
 # If you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
-enabled_features = ["ambari", "cloudbreak", "hive"]
+enabled_features = ["datalake",
+                    "eks-cluster",
+                    "ckan_shared",
+                    "ckan_internal",
+                    "ckan_external",
+                    "kong",
+                    "joomla",
+                    "load_balancer"
+                   ]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
@@ -18,7 +26,7 @@ cloudbreak_db_apply_immediately = true
 ambari_db_apply_immediately = true
 hive_db_apply_immediately = true
 
-joomla_backup_file_name = "site-www.dev.internal.smartcolumbusos.com-20180921-095355edt.zip"
+joomla_backup_file_name = "site-www.dev.internal.smartcolumbusos.com-20180930-200001edt.zip"
 
 # prod is an m4.2xl and m4.xl respectively
 # We're at 5% and 14% memory utilization and negligible cpu usage in non-prod environments.

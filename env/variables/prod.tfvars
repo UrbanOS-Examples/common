@@ -2,7 +2,14 @@
 #   into the root working directory
 # if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
-enabled_features = []
+enabled_features = ["eks-cluster",
+                    "ckan_shared",
+                    "ckan_internal",
+                    "ckan_external",
+                    "joomla",
+                    "kong",
+                    "load_balancer"
+                   ]
 
 role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
 
@@ -20,6 +27,6 @@ joomla_db_multi_az = true
 
 ckan_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:rds:prod-production-ckan-2018-09-24-05-00"
 
-min_num_of_workers = 5
+min_num_of_workers = 9
 
-max_num_of_workers = 9
+max_num_of_workers = 12

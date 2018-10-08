@@ -279,6 +279,11 @@ server:
     subPath: ""
   podAnnotations: {}
   replicaCount: 1
+  resources:
+    limits:
+      memory: 1024Mi
+    requests:
+      memory: 1024Mi
   securityContext: {}
   service:
     annotations: {}

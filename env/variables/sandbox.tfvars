@@ -2,7 +2,9 @@
 #   into the root working directory
 # if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
-enabled_features = ["ambari", "cloudbreak", "hive"]
+enabled_features = ["datalake",
+                    "eks-cluster"
+                   ]
 
 credentials_profile = "sandbox"
 

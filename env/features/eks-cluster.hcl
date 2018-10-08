@@ -1,7 +1,3 @@
-locals {
-  kubernetes_cluster_name = "streaming-kube-${terraform.workspace}"
-}
-
 module "eks-cluster" {
   source = "github.com/SmartColumbusOS/terraform-aws-eks"
   # source  = "terraform-aws-modules/eks/aws"
@@ -15,13 +11,35 @@ module "eks-cluster" {
   kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
 
   worker_group_count = 2
+  worker_additional_security_group_ids = ["${aws_security_group.allow_ssh_from_alm.id}"]
+
   worker_groups = [
     {
       name                 = "Workers"
       asg_min_size         = "${var.min_num_of_workers}"
       asg_max_size         = "${var.max_num_of_workers}"
-      instance_type        = "t2.medium"
+      instance_type        = "t2.large"
       key_name             = "${aws_key_pair.cloud_key.key_name}"
+      pre_userdata         = <<EOF
+# Prevent containers from exhausting the process table, killing the node. (Fork bomb.)
+mkdir --parents /etc/systemd/system/docker.service.d
+cat <<MARK > /etc/systemd/system/docker.service.d/override.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd --default-ulimit nproc=5000:10000 --default-ulimit nofile=1024:4096
+MARK
+
+# Make sure kubelet gets restarted on exit.
+mkdir --parents /etc/systemd/system/kubelet.service.d
+cat <<MARK > /etc/systemd/system/kubelet.service.d/override.conf
+[Service]
+Restart=always
+MARK
+
+systemctl daemon-reload
+systemctl restart docker
+
+EOF
     },
     {
       name                 = "Jupyterhub-Workers"
@@ -30,11 +48,44 @@ module "eks-cluster" {
       instance_type        = "t2.medium"
       key_name             = "${aws_key_pair.cloud_key.key_name}"
       kubelet_extra_args   = "--register-with-taints=scos.run.jupyterhub=true:NoExecute --node-labels=scos.run.jupyterhub=true"
+      pre_userdata         = <<EOF
+# Prevent containers from exhausting the process table, killing the node. (Fork bomb.)
+mkdir --parents /etc/systemd/system/docker.service.d
+cat <<MARK > /etc/systemd/system/docker.service.d/override.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd --default-ulimit nproc=5000:10000 --default-ulimit nofile=1024:4096
+MARK
+
+# Make sure kubelet gets restarted on exit.
+mkdir --parents /etc/systemd/system/kubelet.service.d
+cat <<MARK > /etc/systemd/system/kubelet.service.d/override.conf
+[Service]
+Restart=always
+MARK
+
+systemctl daemon-reload
+systemctl restart docker
+
+EOF
     }
   ]
 
   tags = {
     Environment = "${terraform.workspace}"
+  }
+}
+
+resource "aws_security_group" "allow_ssh_from_alm" {
+  name_prefix = "allow_ssh_from_alm_"
+  vpc_id       = "${module.vpc.vpc_id}"
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+    # datablock from vpc_peer.tf
+    cidr_blocks = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
   }
 }
 
@@ -105,11 +156,16 @@ resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
 
 variable "min_num_of_workers" {
   description = "Minimum number of workers to be created on eks cluster"
+<<<<<<< HEAD:env/eks-cluster.tf
   default = 2
+=======
+  default = 6
+>>>>>>> origin/master:env/features/eks-cluster.hcl
 }
 
 variable "max_num_of_workers" {
   description = "Maximum number of workers to be created on eks cluster"
+<<<<<<< HEAD:env/eks-cluster.tf
   default = 7
 }
 
@@ -121,6 +177,9 @@ variable "min_num_of_jupyterhub_workers" {
 variable "max_num_of_jupyterhub_workers" {
   description = "Maximum number of workers to be created on eks cluster"
   default = 10
+=======
+  default = 9
+>>>>>>> origin/master:env/features/eks-cluster.hcl
 }
 output "eks_cluster_kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
