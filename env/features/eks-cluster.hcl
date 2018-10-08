@@ -10,9 +10,12 @@ module "eks-cluster" {
   kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
   kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
 
-  worker_group_count = 2
+
   worker_additional_security_group_ids = ["${aws_security_group.allow_ssh_from_alm.id}"]
 
+  # THIS COUNT NEEDS TO MATCH THE LENGTH OF THE PROVIDED LIST OR IT WILL NOT WORK
+  # as of Terraform v0.11.7, computing this value is not seemingly supported
+  worker_group_count = 2
   worker_groups = [
     {
       name                 = "Workers"
@@ -20,26 +23,7 @@ module "eks-cluster" {
       asg_max_size         = "${var.max_num_of_workers}"
       instance_type        = "t2.large"
       key_name             = "${aws_key_pair.cloud_key.key_name}"
-      pre_userdata         = <<EOF
-# Prevent containers from exhausting the process table, killing the node. (Fork bomb.)
-mkdir --parents /etc/systemd/system/docker.service.d
-cat <<MARK > /etc/systemd/system/docker.service.d/override.conf
-[Service]
-ExecStart=
-ExecStart=/usr/bin/dockerd --default-ulimit nproc=5000:10000 --default-ulimit nofile=1024:4096
-MARK
-
-# Make sure kubelet gets restarted on exit.
-mkdir --parents /etc/systemd/system/kubelet.service.d
-cat <<MARK > /etc/systemd/system/kubelet.service.d/override.conf
-[Service]
-Restart=always
-MARK
-
-systemctl daemon-reload
-systemctl restart docker
-
-EOF
+      pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
       name                 = "Jupyterhub-Workers"
@@ -48,26 +32,7 @@ EOF
       instance_type        = "t2.medium"
       key_name             = "${aws_key_pair.cloud_key.key_name}"
       kubelet_extra_args   = "--register-with-taints=scos.run.jupyterhub=true:NoExecute --node-labels=scos.run.jupyterhub=true"
-      pre_userdata         = <<EOF
-# Prevent containers from exhausting the process table, killing the node. (Fork bomb.)
-mkdir --parents /etc/systemd/system/docker.service.d
-cat <<MARK > /etc/systemd/system/docker.service.d/override.conf
-[Service]
-ExecStart=
-ExecStart=/usr/bin/dockerd --default-ulimit nproc=5000:10000 --default-ulimit nofile=1024:4096
-MARK
-
-# Make sure kubelet gets restarted on exit.
-mkdir --parents /etc/systemd/system/kubelet.service.d
-cat <<MARK > /etc/systemd/system/kubelet.service.d/override.conf
-[Service]
-Restart=always
-MARK
-
-systemctl daemon-reload
-systemctl restart docker
-
-EOF
+      pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     }
   ]
 
