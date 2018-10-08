@@ -70,10 +70,10 @@ systemctl enable keycloak
 systemctl start keycloak
 
 echo "${admin_password}" | kinit "admin@${upper("${hosted_zone}")}"
-ipa service-add HTTP/${hostname}.${hosted_zone}@${upper(${hosted_zone})}
+ipa service-add "HTTP/${hostname}.${hosted_zone}@${upper("${hosted_zone}")}"
 
-ipa-getkeytab -s ${hostname}.${hosted_zone} \
-  -p HTTP/${hostname}.${hosted_zone}@${upper(${hosted_zone})} \
+ipa-getkeytab -s "${hostname_prefix}-master.${hosted_zone}" \
+  -p "HTTP/${hostname}.${hosted_zone}@${upper("${hosted_zone}")}" \
   -k /etc/ipa.keytab
 
 cd $$KEYCLOAK_HOME/standalone/configuration
@@ -93,10 +93,10 @@ keytool -certreq \
   > keycloak.careq
 
 ipa cert-request --principal \
-  HTTP/${hostname}.${hosted_zone}@${upper(${hosted_zone})} \
+  "HTTP/${hostname}.${hosted_zone}@${upper("${hosted_zone}")}" \
   keycloak.careq
 
-ipa service-show HTTP/${hostname}.${hosted_zone} \
+ipa service-show "HTTP/${hostname}.${hosted_zone}" \
   --out keycloak.cert
 
 keytool -import \

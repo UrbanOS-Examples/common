@@ -18,7 +18,7 @@ resource "aws_alb_target_group" "keycloak" {
 
 resource "aws_alb_target_group_attachment" "keycloak_private" {
   target_group_arn = "${aws_alb_target_group.keycloak.arn}" 
-  target_id        = "${aws_instance.keycloak.id}"
+  target_id        = "${aws_instance.keycloak_server.id}"
   port             = 8443
 
   lifecycle {
@@ -53,8 +53,6 @@ resource "aws_alb_listener" "keycloak_https" {
 
 resource "aws_alb_listener" "keycloak_http" {
   load_balancer_arn = "${aws_alb.keycloak.arn}"
-  certificate_arn   = "${var.alb_certificate}"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
   port              = 80
   protocol          = "HTTP"
 

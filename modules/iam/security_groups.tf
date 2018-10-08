@@ -18,14 +18,6 @@ resource "aws_security_group" "freeipa_server_sg" {
     description = "Allow all traffic from admin VPC"
   }
 
-  ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    security_groups = ["${aws_security_group.keycloak_server_sg.id}"]
-    description     = "Allow all traffic from the Keycloak server"
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -60,6 +52,16 @@ resource "aws_security_group_rule" "freeipa_udp_ingress" {
   security_group_id = "${aws_security_group.freeipa_server_sg.id}"
 }
 
+resource "aws_security_group_rule" "freeipa_allow_keycloak" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = "${aws_security_group.keycloak_server_sg.id}"
+  description              = "Allow keycloak to communicate with freeipa"
+  security_group_id        = "${aws_security_group.freeipa_server_sg.id}"
+}
+
 resource "aws_security_group" "keycloak_server_sg" {
   name   = "Keycloak Server SG"
   vpc_id = "${var.vpc_id}"
@@ -85,7 +87,7 @@ resource "aws_security_group" "keycloak_server_sg" {
     to_port         = 0
     protocol        = "-1"
     security_groups = ["${aws_security_group.freeipa_server_sg.id}"]
-    description     = "Allow all traffic from the Keycloak server"
+    description     = "Allow all traffic from the FreeIPA server"
   }
 
   ingress {
