@@ -85,61 +85,75 @@ resource "aws_security_group" "datalake_master" {
   tags {
     Name = "datalake master"
   }
+}
 
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    self        = true
-    description = "Allow traffic from self"
-  }
+resource "aws_security_group_rule" "hdp_allow_mgmt_self" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  self              = true
+  description       = "Allow traffic from self"
+  security_group_id = "${aws_security_group.datalake_master.id}"
+}
 
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks = ["${var.remote_management_cidr}"]
-    description = "Allow internal ssh"
-  }
+resource "aws_security_group_rule" "hdp_allow_mgmt_ssh" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.remote_management_cidr}"]
+  description       = "Allow internal ssh"
+  security_group_id = "${aws_security_group.datalake_master.id}"
+}
 
-  ingress {
-    from_port = 3000
-    to_port   = 3000
-    protocol  = "tcp"
-    cidr_blocks = ["${var.remote_management_cidr}"]
-    description = "Allow Grafana UI"
-  }
+resource "aws_security_group_rule" "hdp_allow_mgmt_grafana" {
+  type              = "ingress"
+  from_port         = 3000
+  to_port           = 3000
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.remote_management_cidr}"]
+  description       = "Allow Grafana UI"
+  security_group_id = "${aws_security_group.datalake_master.id}"
+}
 
-  ingress {
-    from_port = 8443
-    to_port   = 8443
-    protocol  = "tcp"
-    cidr_blocks = ["${var.remote_management_cidr}"]
-    description = "Allow internal https"
-  }
+resource "aws_security_group_rule" "hdp_allow_mgmt_ambari_https" {
+  type              = "ingress"
+  from_port         = 8443
+  to_port           = 8443
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.remote_management_cidr}"]
+  description       = "Allow internal https"
+  security_group_id = "${aws_security_group.datalake_master.id}"
+}
 
-  ingress {
-    from_port = 8088
-    to_port   = 8088
-    protocol  = "tcp"
-    cidr_blocks = ["${var.remote_management_cidr}"]
-    description = "Allow internal resource manager"
-  }
+resource "aws_security_group_rule" "hdp_allow_mgmt_ambari_http" {
+  type              = "ingress"
+  from_port         = 8088
+  to_port           = 8088
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.remote_management_cidr}"]
+  description       = "Allow internal resource manager"
+  security_group_id = "${aws_security_group.datalake_master.id}"
+}
 
-  ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    security_groups = ["${aws_security_group.cloudbreak_security_group.id}"]
-    description     = "All inbound from the Hadoop Master nodes"
-  }
+resource "aws_security_group_rule" "hdp_cloudbreak_to_master" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = "${aws_security_group.cloudbreak_security_group.id}"
+  description              = "All inbound from the Hadoop Master nodes"
+  security_group_id        = "${aws_security_group.datalake_master.id}"
+}
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "hdp_master_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.datalake_master.id}"
 }
 
 resource "aws_security_group_rule" "hdp_worker_to_master" {
