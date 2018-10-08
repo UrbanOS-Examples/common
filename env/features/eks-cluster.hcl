@@ -10,36 +10,31 @@ module "eks-cluster" {
   kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
   kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
 
+
   worker_additional_security_group_ids = ["${aws_security_group.allow_ssh_from_alm.id}"]
 
-  worker_groups = [{
-    name                 = "Workers"
-    asg_min_size         = "${var.min_num_of_workers}"
-    asg_max_size         = "${var.max_num_of_workers}"
-    instance_type        = "t2.large"
-    key_name             = "${aws_key_pair.cloud_key.key_name}"
-    pre_userdata         = <<EOF
-
-# Prevent containers from exhausting the process table, killing the node. (Fork bomb.)
-mkdir --parents /etc/systemd/system/docker.service.d
-cat <<MARK > /etc/systemd/system/docker.service.d/override.conf
-[Service]
-ExecStart=
-ExecStart=/usr/bin/dockerd --default-ulimit nproc=5000:10000 --default-ulimit nofile=1024:4096
-MARK
-
-# Make sure kubelet gets restarted on exit.
-mkdir --parents /etc/systemd/system/kubelet.service.d
-cat <<MARK > /etc/systemd/system/kubelet.service.d/override.conf
-[Service]
-Restart=always
-MARK
-
-systemctl daemon-reload
-systemctl restart docker
-
-EOF
-  }]
+  # THIS COUNT NEEDS TO MATCH THE LENGTH OF THE PROVIDED LIST OR IT WILL NOT WORK
+  # as of Terraform v0.11.7, computing this value is not seemingly supported
+  worker_group_count = 2
+  worker_groups = [
+    {
+      name                 = "Workers"
+      asg_min_size         = "${var.min_num_of_workers}"
+      asg_max_size         = "${var.max_num_of_workers}"
+      instance_type        = "t2.large"
+      key_name             = "${aws_key_pair.cloud_key.key_name}"
+      pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+    },
+    {
+      name                 = "Jupyterhub-Workers"
+      asg_min_size         = "${var.min_num_of_jupyterhub_workers}"
+      asg_max_size         = "${var.max_num_of_jupyterhub_workers}"
+      instance_type        = "t2.medium"
+      key_name             = "${aws_key_pair.cloud_key.key_name}"
+      kubelet_extra_args   = "--register-with-taints=scos.run.jupyterhub=true:NoExecute --node-labels=scos.run.jupyterhub=true"
+      pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+    }
+  ]
 
   tags = {
     Environment = "${terraform.workspace}"
@@ -132,6 +127,16 @@ variable "min_num_of_workers" {
 variable "max_num_of_workers" {
   description = "Maximum number of workers to be created on eks cluster"
   default = 9
+}
+
+variable "min_num_of_jupyterhub_workers" {
+  description = "Minimum number of workers to be created on eks cluster"
+  default = 3
+}
+
+variable "max_num_of_jupyterhub_workers" {
+  description = "Maximum number of workers to be created on eks cluster"
+  default = 5
 }
 output "eks_cluster_kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
