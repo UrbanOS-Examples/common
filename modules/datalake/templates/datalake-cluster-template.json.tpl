@@ -1,11 +1,11 @@
 {
   "general": {
     "name": "",
-    "credentialName": "cb-credential"
+    "credentialName": "${CREDENTIAL_NAME}"
   },
   "placement": {
-    "availabilityZone": "us-west-2c",
-    "region": "us-west-2"
+    "availabilityZone": "${CLUSTER_AZ}",
+    "region": "${CLUSTER_REGION}"
   },
   "parameters": {},
   "inputs": {},
@@ -30,10 +30,10 @@
           "encrypted": false
         },
         "volumeType": "standard",
-        "instanceType": "m5.2xlarge"
+        "instanceType": "${MGMT_GROUP_INSTANCE_TYPE}"
       },
       "securityGroup": {
-        "securityGroupId": "sg-08777dc19ffa7330b",
+        "securityGroupId": "${MASTER_NODES_SG}",
         "securityRules": []
       },
       "recipeNames": [],
@@ -41,7 +41,7 @@
     },
     {
       "nodeCount": 1,
-      "group": "master_namednode2",
+      "group": "master_namenode2",
       "type": "CORE",
       "parameters": {},
       "template": {
@@ -52,10 +52,10 @@
           "encrypted": false
         },
         "volumeType": "standard",
-        "instanceType": "m5.2xlarge"
+        "instanceType": "${MASTER_GROUP_INSTANCE_TYPE}"
       },
       "securityGroup": {
-        "securityGroupId": "sg-08777dc19ffa7330b",
+        "securityGroupId": "${MASTER_NODES_SG}",
         "securityRules": []
       },
       "recipeNames": [],
@@ -63,7 +63,7 @@
     },
     {
       "nodeCount": 1,
-      "group": "master_namednode1",
+      "group": "master_namenode1",
       "type": "CORE",
       "parameters": {},
       "template": {
@@ -74,17 +74,17 @@
           "encrypted": false
         },
         "volumeType": "standard",
-        "instanceType": "m5.2xlarge"
+        "instanceType": "${MASTER_GROUP_INSTANCE_TYPE}"
       },
       "securityGroup": {
-        "securityGroupId": "sg-08777dc19ffa7330b",
+        "securityGroupId": "${MASTER_NODES_SG}",
         "securityRules": []
       },
       "recipeNames": [],
       "recoveryMode": "MANUAL"
     },
     {
-      "nodeCount": 1,
+      "nodeCount": ${BROKER_NODE_COUNT},
       "group": "broker",
       "type": "CORE",
       "parameters": {},
@@ -95,18 +95,18 @@
         "parameters": {
           "encrypted": false
         },
-        "volumeType": "standard",
-        "instanceType": "m5.2xlarge"
+        "volumeType": "gp2",
+        "instanceType": "${BROKER_GROUP_INSTANCE_TYPE}"
       },
       "securityGroup": {
-        "securityGroupId": "sg-01282ef77f7ec2977",
+        "securityGroupId": "${WORKER_NODES_SG}",
         "securityRules": []
       },
       "recipeNames": [],
       "recoveryMode": "MANUAL"
     },
     {
-      "nodeCount": 1,
+      "nodeCount": ${WORKER_NODE_COUNT},
       "group": "worker",
       "type": "CORE",
       "parameters": {},
@@ -118,10 +118,10 @@
           "encrypted": false
         },
         "volumeType": "standard",
-        "instanceType": "m5.xlarge"
+        "instanceType": "${WORKER_GROUP_INSTANCE_TYPE}"
       },
       "securityGroup": {
-        "securityGroupId": "sg-01282ef77f7ec2977",
+        "securityGroupId": "${WORKER_NODES_SG}",
         "securityRules": []
       },
       "recipeNames": [],
@@ -129,12 +129,12 @@
     }
   ],
   "stackAuthentication": {
-    "publicKeyId": "smrt_env_cloud_key"
+    "publicKeyId": "${SSH_KEY}"
   },
   "network": {
     "parameters": {
-      "subnetId": "subnet-0874f137e36ab65f9",
-      "vpcId": "vpc-0fd1f78f126a11602"
+      "subnetId": "${CLUSTER_SUBNET}",
+      "vpcId": "${CLUSTER_VPC}"
     }
   },
   "imageSettings": {
@@ -144,12 +144,13 @@
   "cluster": {
     "emailNeeded": false,
     "rdsConfigNames": [
-      "hivedb"
+      "${HIVE_CONNECTION_NAME}"
     ],
     "ambari": {
-      "blueprintName": "SCOS DataLake",
+      "blueprintName": "${AMBARI_BLUEPRINT_NAME}",
+      "validateBlueprint" : false,
       "gateway": {
-        "path": "smrt-datalake",
+        "path": "${AMBARI_GATEWAY_PATH}",
         "topologies": [
           {
             "topologyName": "dp-proxy",
@@ -158,13 +159,13 @@
             ]
           }
         ],
-        "ssoProvider": "/smrt-datalake/sso/api/v1/websso",
+        "ssoProvider": "/${AMBARI_GATEWAY_PATH}/sso/api/v1/websso",
         "gatewayType": "INDIVIDUAL",
         "ssoType": "NONE"
       },
       "enableSecurity": false,
-      "userName": "admin",
-      "password": "",
+      "userName": "${AMBARI_USERNAME}",
+      "password": "${AMBARI_PASSWORD}",
       "ambariStackDetails": {
         "stack": "HDP",
         "version": "3.0",
