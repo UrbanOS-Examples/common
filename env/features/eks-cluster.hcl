@@ -1,21 +1,4 @@
-module "eks-cluster" {
-  source = "github.com/SmartColumbusOS/terraform-aws-eks"
-  # source  = "terraform-aws-modules/eks/aws"
-  # version = "1.3.0"
-
-  cluster_name = "${local.kubernetes_cluster_name}"
-  subnets      = "${module.vpc.private_subnets}"
-  vpc_id       = "${module.vpc.vpc_id}"
-
-  kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
-  kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
-
-
-  worker_additional_security_group_ids = ["${aws_security_group.allow_ssh_from_alm.id}"]
-
-  # THIS COUNT NEEDS TO MATCH THE LENGTH OF THE PROVIDED LIST OR IT WILL NOT WORK
-  # as of Terraform v0.11.7, computing this value is not seemingly supported
-  worker_group_count = 2
+locals {
   worker_groups = [
     {
       name                 = "Workers"
@@ -35,6 +18,26 @@ module "eks-cluster" {
       pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     }
   ]
+}
+
+
+module "eks-cluster" {
+  source = "github.com/SmartColumbusOS/terraform-aws-eks"
+  # source  = "terraform-aws-modules/eks/aws"
+  # version = "1.3.0"
+
+  cluster_name = "${local.kubernetes_cluster_name}"
+  subnets      = "${module.vpc.private_subnets}"
+  vpc_id       = "${module.vpc.vpc_id}"
+
+  kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
+  kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
+
+
+  worker_additional_security_group_ids = ["${aws_security_group.allow_ssh_from_alm.id}"]
+
+  worker_group_count = "${length(local.worker_groups)}"
+  worker_groups = "${local.worker_groups}"
 
   tags = {
     Environment = "${terraform.workspace}"
