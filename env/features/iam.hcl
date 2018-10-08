@@ -9,4 +9,5 @@ module "iam_stack" {
   zone_id             = "${aws_route53_zone.public_hosted_zone.zone_id}"
   zone_name           = "${aws_route53_zone.public_hosted_zone.name}"
   vpc_cidr            = "${local.vpc_cidr}"
+  alb_certificate     = "${module.tls_certificate.arn}"
 }

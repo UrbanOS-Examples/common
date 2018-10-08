@@ -53,3 +53,7 @@ variable "keycloak_version" {
   description = "The version of Keycloak to download and install"
   default     = "4.5.0"
 }
+
+variable "alb_certificate" {
+  description = "The certificate to attach to the keycloak load balancer"
+}

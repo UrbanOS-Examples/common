@@ -21,9 +21,17 @@ resource "aws_route53_record" "freeipa_host_record" {
   records = ["${element("${aws_instance.freeipa_server.*.private_ip}", "${count.index}")}"]
 }
 
-resource "aws_route53_record" "keycloak_host_record" {
+resource "aws_route53_record" "keycloak_lb_record" {
   zone_id = "${var.zone_id}"
   name    = "${var.iam_hostname_prefix}-oauth"
+  type    = "A"
+  ttl     = 5
+  records = ["${aws_instance.keycloak_server.private_ip}"]
+}
+
+resource "aws_route53_record" "keycloak_lb_record" {
+  zone_id = "${var.zone_id}"
+  name    = "oauth"
   type    = "A"
 
   alias {
