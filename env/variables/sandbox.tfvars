@@ -2,7 +2,7 @@
 #   into the root working directory
 # if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
-enabled_features = ["ambari", "cloudbreak", "hive"]
+enabled_features = []
 
 credentials_profile = "sandbox"
 
@@ -70,3 +70,7 @@ hive_db_multi_az = false
 cloudbreak_db_apply_immediately = true
 ambari_db_apply_immediately = true
 hive_db_apply_immediately = true
+
+#Jupyterhub EKS Workers
+min_num_of_jupyterhub_workers=1
+max_num_of_jupyterhub_workers=2
