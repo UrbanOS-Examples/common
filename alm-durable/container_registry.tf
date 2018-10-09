@@ -56,6 +56,12 @@ module "cota_streaming_producer_repository" {
   repository_name = "cota-streaming-producer"
 }
 
+module "cota_producer_smoke_test_repository" {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "cota-producer-smoke-test"
+}
+
 module "cota_streaming_ui_repository" {
   source          = "../modules/ecr"
   alm_account_id  = "${var.alm_account_id}"
