@@ -51,7 +51,7 @@ resource "aws_alb_listener" "https" {
 }
 
 resource "aws_route53_record" "cloudbreak_public_dns" {
-  zone_id = "${var.cloudbreak_dns_zone}"
+  zone_id = "${var.cloudbreak_dns_zone_id}"
   name    = "cloudbreak"
   type    = "A"
 

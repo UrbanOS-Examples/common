@@ -40,5 +40,5 @@ ckan_external_instance_type = "t2.medium"
 ckan_external_instance_ebs_optimized = false
 
 #Jupyterhub EKS Workers
-min_num_of_jupyterhub_workers=1
-max_num_of_jupyterhub_workers=2
+min_num_of_jupyterhub_workers=3
+max_num_of_jupyterhub_workers=4
