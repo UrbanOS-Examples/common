@@ -1,7 +1,7 @@
 resource "aws_alb_target_group" "keycloak" {
   name     = "keycloak-lb-tg-${terraform.workspace}"
-  port     = 8443
-  protocol = "HTTPS"
+  port     = 8080
+  protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
 
   health_check {
@@ -9,17 +9,16 @@ resource "aws_alb_target_group" "keycloak" {
     unhealthy_threshold = 2
     timeout             = 3
     interval            = 30
-    path                = "/auth/admin"
-    protocol            = "HTTPS"
-    matcher             = "200"
-    port                = 8443
+    path                = "/auth/admin/master/console"
+    matcher             = "302"
+    protocol            = "HTTP"
   }
 }
 
 resource "aws_alb_target_group_attachment" "keycloak_private" {
   target_group_arn = "${aws_alb_target_group.keycloak.arn}" 
   target_id        = "${aws_instance.keycloak_server.id}"
-  port             = 8443
+  port             = 8080
 
   lifecycle {
       create_before_destroy = true
@@ -42,12 +41,8 @@ resource "aws_alb_listener" "keycloak_https" {
   protocol          = "HTTPS"
 
   default_action {
-    type             = "redirect"
-    redirect {
-      port        = "8443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+    type            = "forward"
+    target_group_arn = "${aws_alb_target_group.keycloak.arn}"
   }
 }
 
@@ -57,9 +52,9 @@ resource "aws_alb_listener" "keycloak_http" {
   protocol          = "HTTP"
 
   default_action {
-    type             = "redirect"
+    type            = "redirect"
     redirect {
-      port        = "8443"
+      port        = "443"
       protocol    = "HTTPS"
       status_code = "HTTP_301"
     }

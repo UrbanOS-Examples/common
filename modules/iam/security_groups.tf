@@ -2,32 +2,39 @@ resource "aws_security_group" "freeipa_server_sg" {
   name   = "FreeIPA Server SG"
   vpc_id = "${var.vpc_id}"
 
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    self        = true
-    description = "Allow traffic from self"
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["${var.management_cidr}"]
-    description = "Allow all traffic from admin VPC"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags {
     Name = "IAM directory traffic"
   }
+}
+
+resource "aws_security_group_rule" "freeipa_from_self" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  self              = true
+  description       = "Allow traffic from self"
+  security_group_id = "${aws_security_group.freeipa_server_sg.id}"
+}
+
+resource "aws_security_group_rule" "freeipa_from_alm" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["${var.management_cidr}"]
+  description       = "Allow all traffic from admin VPC."
+  security_group_id = "${aws_security_group.freeipa_server_sg.id}"
+}
+
+resource "aws_security_group_rule" "freeipa_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow outbound from freeipa servers"
+  security_group_id = "${aws_security_group.freeipa_server_sg.id}"
 }
 
 resource "aws_security_group_rule" "freeipa_tcp_ingress" {
@@ -87,7 +94,7 @@ resource "aws_security_group" "keycloak_server_sg" {
     to_port         = 0
     protocol        = "-1"
     security_groups = ["${aws_security_group.freeipa_server_sg.id}"]
-    description     = "Allow all traffic from the FreeIPA server"
+    description     = "Allow all traffic from the FreeIPA servers"
   }
 
   ingress {
@@ -123,16 +130,16 @@ resource "aws_security_group" "keycloak_lb_sg" {
   }
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow keycloak http traffic"
   }
 
   ingress {
-    from_port   = 8443
-    to_port     = 8443
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow keycloak https traffic"

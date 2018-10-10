@@ -81,7 +81,7 @@ keytool -genkey \
   -storepass ${admin_password} \
   -keypass ${admin_password} \
   -alias ${hosted_zone} \
-  -dname "CN=$hostname.$hosted_zone,OU=scos,O=smartcolumbus,L=Columbus,S=Ohio,C=US" \
+  -dname "CN=${hostname}.${hosted_zone},OU=scos,O=smartcolumbus,L=Columbus,S=Ohio,C=US" \
   -keyalg RSA \
   -keystore keycloak.jks \
   -validity 10950
@@ -113,19 +113,22 @@ keytool -import \
   -storepass ${admin_password}
 
 cat > cfgpatch1 <<EOF
-             <security-realm name="UndertowRealm">
-                 <server-identities>
-                     <ssl>
-                         <keystore path="keycloak.jks" relative-to="jboss.server.config.dir" keystore-password="PASSWORD" />
-                     </ssl>
-                 </server-identities>
-             </security-realm>
+            <security-realm name="UndertowRealm">
+                <server-identities>
+                    <ssl>
+                        <keystore path="keycloak.jks" relative-to="jboss.server.config.dir" keystore-password="${admin_password}" />
+                    </ssl>
+                </server-identities>
+            </security-realm>
 EOF
-sed -i '/<security-realms>/r cfgpatch1' standalone.xml
+awk '//; /<security-realms>/{while(getline<"cfgpatch1"){print}}' standalone.xml >tempconfig
+mv tempconfig standalone.xml
 
+sed -i '/https-listener/d' standalone.xml
 cat > cfgpatch2 <<EOF
-                 <https-listener name="https" socket-binding="https" security-realm="UndertowRealm"/>
+                <https-listener name="https" socket-binding="https" security-realm="UndertowRealm"/>
 EOF
-sed -i '/default-server/r cfgpatch2' standalone.xml
+awk '//; /<server name="default-server">/{while(getline<"cfgpatch2"){print}}' standalone.xml >tempconfig
+mv tempconfig standalone.xml
 
 systemctl restart keycloak
