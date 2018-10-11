@@ -3,7 +3,7 @@ resource "aws_security_group" "cloudbreak_security_group" {
   vpc_id = "${var.vpc_id}"
 
   tags {
-    Name = "Cloudbreak"
+    Name = "cloudbreak-${terraform.workspace}"
   }
 
   ingress {
@@ -74,7 +74,7 @@ resource "aws_security_group" "datalake_worker" {
   }
 
   tags {
-    Name = "datalake worker"
+    Name = "datalake-worker-${terraform.workspace}"
   }
 }
 
@@ -83,7 +83,7 @@ resource "aws_security_group" "datalake_master" {
   vpc_id = "${var.vpc_id}"
 
   tags {
-    Name = "datalake master"
+    Name = "datalake-master-${terraform.workspace}"
   }
 }
 
