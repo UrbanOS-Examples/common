@@ -82,12 +82,7 @@ variable "ssh_key" {
 
 variable "cloudbreak_version" {
   description = "The version of Cloudbreak to pack into the AMI."
-  default     = "2.7.1"
-}
-
-variable "cloudbreak_tag" {
-  description = "The released version of a Cloudbreak AMI to use"
-  default     = "1.0.0"
+  default     = "2.8.0"
 }
 
 variable "hive_db_multi_az" {
