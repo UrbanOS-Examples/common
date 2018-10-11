@@ -236,14 +236,6 @@ def applyInfraHelmCharts(environment) {
                 --set albIngress.extraEnv."CLUSTER\\_NAME"="\${EKS_CLUSTER_NAME}" \
                 --values helm/cluster-infra/run-config.yaml
 
-            helm upgrade --install prometheus helm/prometheus \
-                --namespace=prometheus \
-                --set global.ingress.annotations."alb\\.ingress\\.kubernetes\\.io\\/subnets"="\${SUBNETS//,/\\\\,}" \
-                --set global.ingress.annotations."alb\\.ingress\\.kubernetes\\.io\\/security\\-groups"="\${SECURITY_GROUPS}" \
-                --set grafana.ingress.hosts[0]="grafana\\.\${DNS_ZONE}" \
-                --set alertmanager.ingress.hosts[0]="alertmanager\\.\${DNS_ZONE}" \
-                --set server.ingress.hosts[0]="prometheus\\.\${DNS_ZONE}" \
-                --values helm/prometheus/run-config.yaml
         """.trim())
     }
 }
