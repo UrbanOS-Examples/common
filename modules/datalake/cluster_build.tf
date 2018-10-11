@@ -100,7 +100,7 @@ EOF
 resource "null_resource" "cloudbreak_blueprint" {
   triggers {
     instance_updated = "${null_resource.cloudbreak.id}"
-    setup_updated    = "${sha1(file(local.update_blueprint_path))}"
+    setup_updated    = "${sha1(file(local.create_blueprint_path))}"
     id_updated       = "${local.ambari_blueprint_name}"
   }
 
@@ -116,14 +116,14 @@ resource "null_resource" "cloudbreak_blueprint" {
   }
 
   provisioner "file" {
-    source      = "${local.update_blueprint_path}"
-    destination = "/tmp/update_blueprint.sh"
+    source      = "${local.create_blueprint_path}"
+    destination = "/tmp/create_blueprint.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
       <<EOF
-bash /tmp/update_blueprint.sh \
+bash /tmp/create_blueprint.sh \
   /tmp/blueprint.json \
   '${local.ambari_blueprint_name}'
 EOF
@@ -138,7 +138,7 @@ EOF
 resource "null_resource" "cloudbreak_cluster" {
   triggers {
     instance_updated = "${aws_instance.cloudbreak.id}"
-    setup_updated    = "${sha1(file(local.update_cluster_path))}"
+    setup_updated    = "${sha1(file(local.create_cluster_path))}"
     id_updated       = "${local.cluster_name}"                    // implies a change to the blueprint, etc.
   }
 
@@ -160,14 +160,14 @@ resource "null_resource" "cloudbreak_cluster" {
   }
 
   provisioner "file" {
-    source      = "${local.update_cluster_path}"
-    destination = "/tmp/update_cluster.sh"
+    source      = "${local.create_cluster_path}"
+    destination = "/tmp/create_cluster.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
       <<EOF
-bash /tmp/update_cluster.sh \
+bash /tmp/create_cluster.sh \
   /tmp/cluster.json \
   ${local.cluster_name}
 EOF

@@ -6,10 +6,10 @@ main() {
 
     set -eux
 
-    until update-cluster; do sleep 10 ; done
+    until create-cluster; do sleep 10 ; done
 }
 
-update-cluster() {
+create-cluster() {
     cb cluster describe --name ${CLUSTER_NAME} \
         || cb cluster create \
             --cli-input-json ${CLUSTER_TEMPLATE_FILE} \
