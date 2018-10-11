@@ -6,10 +6,10 @@ main() {
 
     set -eux
 
-    until update-blueprint; do sleep 10 ; done
+    until create-blueprint; do sleep 10 ; done
 }
 
-update-blueprint() {
+create-blueprint() {
     cb blueprint describe --name "${BLUEPRINT_NAME}" \
         || cb blueprint create from-file \
             --file ${BLUEPRINT_FILE} \

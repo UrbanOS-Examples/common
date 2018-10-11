@@ -13,8 +13,8 @@ locals {
   start_cloudbreak_path   = "${path.module}/templates/start_cloudbreak.sh"
   update_hive_path        = "${path.module}/templates/update_hive_db.sh"
   update_credentials_path = "${path.module}/templates/update_credentials.sh"
-  update_cluster_path     = "${path.module}/templates/update_cluster.sh"
-  update_blueprint_path   = "${path.module}/templates/update_blueprint.sh"
+  create_cluster_path     = "${path.module}/templates/create_cluster.sh"
+  create_blueprint_path   = "${path.module}/templates/create_blueprint.sh"
 }
 
 variable "vpc_id" {
