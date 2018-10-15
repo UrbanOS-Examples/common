@@ -1,35 +1,3 @@
-resource "aws_security_group" "cloudbreak_security_group" {
-  name   = "Cloudbreak Security Group"
-  vpc_id = "${var.vpc_id}"
-
-  tags {
-    Name = "cloudbreak-${terraform.workspace}"
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    self        = true
-    description = "Allow traffic from self"
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["${var.remote_management_cidr}"]
-    description = "Allow all traffic from admin VPC"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_security_group" "datalake_worker" {
   name_prefix = "datalake_worker_"
   vpc_id = "${var.vpc_id}"
@@ -58,6 +26,7 @@ resource "aws_security_group" "datalake_worker" {
     description     = "All inbound from the Hadoop Master nodes"
   }
 
+# Needs to be converted to do a data lookup on the cloudbreak security group created in the cloudbreak module.
   ingress {
     from_port       = 0
     to_port         = 0
@@ -137,6 +106,7 @@ resource "aws_security_group_rule" "hdp_allow_mgmt_ambari_http" {
   security_group_id = "${aws_security_group.datalake_master.id}"
 }
 
+# Needs to be converted to do a data lookup on the cloudbreak security group created in the cloudbreak module
 resource "aws_security_group_rule" "hdp_cloudbreak_to_master" {
   type                     = "ingress"
   from_port                = 0
@@ -166,8 +136,9 @@ resource "aws_security_group_rule" "hdp_worker_to_master" {
   security_group_id        = "${aws_security_group.datalake_master.id}"
 }
 
-resource "aws_security_group" "postgres_allow_hdpdbs" {
-  name_prefix = "postgres_allow_hdp"
+// The following group needs to be converted to a rule attached to the db_allow_hadoop group created in the cloudbreak module
+resource "aws_security_group" "db_allow_hadoop" {
+  name_prefix = "db_allow_hadoop"
   vpc_id = "${var.vpc_id}"
 
   tags {
@@ -178,7 +149,7 @@ resource "aws_security_group" "postgres_allow_hdpdbs" {
     from_port = 5432
     to_port   = 5432
     protocol  = "tcp"
-    security_groups = ["${aws_security_group.cloudbreak_security_group.id}", "${aws_security_group.datalake_master.id}"]
+    security_groups = ["${aws_security_group.datalake_master.id}"]
     description = "Allow postgres traffic from Hadoop"
   }
 }
