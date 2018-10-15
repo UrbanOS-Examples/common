@@ -31,7 +31,7 @@ resource "aws_security_group" "datalake_worker" {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    security_groups = ["${aws_security_group.cloudbreak_security_group.id}"]
+    security_groups = ["${var.cloudbreak_security_group}"]
     description     = "All inbound from the Hadoop Master nodes"
   }
 
@@ -112,7 +112,7 @@ resource "aws_security_group_rule" "hdp_cloudbreak_to_master" {
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
-  source_security_group_id = "${aws_security_group.cloudbreak_security_group.id}"
+  source_security_group_id = "${var.cloudbreak_security_group}"
   description              = "All inbound from the Hadoop Master nodes"
   security_group_id        = "${aws_security_group.datalake_master.id}"
 }

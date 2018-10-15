@@ -13,3 +13,12 @@ output "cloudbreak_db_endpoint" {
   value       = "${aws_db_instance.cloudbreak_db.endpoint}"
 }
 
+output "cloudbreak_security_group" {
+  description = "The id of the cloudbreak instance security group"
+  value       = "${aws_security_group.cloudbreak_security_group.id}"
+}
+
+output "cloudbreak_credential_name" {
+  description = "The name of the IAM credential to attach to the clusters."
+  value       = "${local.cb_credential_name}"
+}

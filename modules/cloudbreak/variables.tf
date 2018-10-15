@@ -1,5 +1,6 @@
 locals {
   cb_credential_name       = "cb-credential"   // at present we don't trigger updates based on IAM changes
+  cluster_subnet           = "${random_shuffle.private_subnet.result[0]}"
   start_cloudbreak_path   = "${path.module}/templates/start_cloudbreak.sh"
   update_credentials_path = "${path.module}/templates/update_credentials.sh"
 }

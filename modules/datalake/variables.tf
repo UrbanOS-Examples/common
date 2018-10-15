@@ -26,6 +26,23 @@ variable "subnets" {
   type        = "list"
 }
 
+variable "remote_management_cidr" {
+  description = "CIDR block of the ALM network."
+}
+
+variable "ssh_key" {
+  description = "The SSH key to inject into the cloudbreak instance."
+}
+
+variable "cloudbreak_credential_name" {
+  description = "The name of the IAM credential to attach to the deployed cluster."
+}
+
+
+variable "cloudbreak_ip" {
+  description = "The IP address of the cloudbreak server from which to execute deployments."
+}
+
 variable "hive_db_multi_az" {
   description = "Should the Hive DB be multi-az?"
   default     = true
@@ -35,6 +52,11 @@ variable "hive_db_apply_immediately" {
   description = "Should changes to the Hive DB be applied immediately?"
   default     = false
 }
+
+variable "cloudbreak_security_group" {
+  description = "The id of the security group wrapping the cloudbreak server."
+}
+
 
 variable "mgmt_group_instance_type" {
   description = "EC2 flavor to deploy the management hostgroup cluster nodes."

@@ -1,3 +1,11 @@
+resource "random_shuffle" "private_subnet" {
+  input = ["${var.subnets}"]
+
+  keepers = {
+    private_subnets = "${join(",", var.subnets)}"
+  }
+}
+
 resource "random_string" "cloudbreak_cluster_secret" {
   length  = 40
   special = false
