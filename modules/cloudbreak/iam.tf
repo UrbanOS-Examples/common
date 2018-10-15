@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {}
+
+// if this changes, there is a chance that deployed clusters will be orphaned
 resource "aws_iam_role" "cloudbreak_ec2" {
   name = "${terraform.workspace}_cloudbreak_ec2"
   path = "/"
