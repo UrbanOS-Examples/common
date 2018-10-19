@@ -26,7 +26,6 @@ resource "aws_security_group" "datalake_worker" {
     description     = "All inbound from the Hadoop Master nodes"
   }
 
-# Needs to be converted to do a data lookup on the cloudbreak security group created in the cloudbreak module.
   ingress {
     from_port       = 0
     to_port         = 0
@@ -106,7 +105,6 @@ resource "aws_security_group_rule" "hdp_allow_mgmt_ambari_http" {
   security_group_id = "${aws_security_group.datalake_master.id}"
 }
 
-# Needs to be converted to do a data lookup on the cloudbreak security group created in the cloudbreak module
 resource "aws_security_group_rule" "hdp_cloudbreak_to_master" {
   type                     = "ingress"
   from_port                = 0
@@ -149,7 +147,7 @@ resource "aws_security_group" "db_allow_hadoop" {
     from_port = 5432
     to_port   = 5432
     protocol  = "tcp"
-    security_groups = ["${aws_security_group.datalake_master.id}"]
+    security_groups = ["${aws_security_group.datalake_master.id}", "${var.cloudbreak_security_group}"]
     description = "Allow postgres traffic from Hadoop"
   }
 }

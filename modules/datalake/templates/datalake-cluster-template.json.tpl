@@ -142,6 +142,23 @@
     "imageId": "69db7e20-f3ac-4d45-6f95-39204e70ddcf"
   },
   "cluster": {
+    "cloudStorage": {
+      "locations": [
+        {
+          "value": "s3a://${BUCKET_CLOUD_STORAGE}/${CLUSTER_NAME}/apps/ranger/audit/${CLUSTER_NAME}",
+          "propertyFile": "ranger-hive-audit",
+          "propertyName": "xasecure.audit.destination.hdfs.dir"
+        },
+        {
+          "value": "s3a://${BUCKET_CLOUD_STORAGE}/${CLUSTER_NAME}/apps/hive/warehouse",
+          "propertyFile": "hive-site",
+          "propertyName": "hive.metastore.warehouse.dir"
+        }
+      ],
+      "s3": {
+        "instanceProfile": "arn:aws:iam::068920858268:instance-profile/HDP_EC2_S3_DefaultRole"
+      }
+    }
     "emailNeeded": false,
     "rdsConfigNames": [
       "${HIVE_CONNECTION_NAME}"
