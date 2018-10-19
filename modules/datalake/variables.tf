@@ -34,10 +34,14 @@ variable "ssh_key" {
   description = "The SSH key to inject into the cloudbreak instance."
 }
 
+variable "cloud_storage_bucket_name" {
+  description = "The name of the s3 bucket to use for the hdfs cloud storage"
+  default     = "scos-${terraform.workspace}-hdfs"
+}
+
 variable "cloudbreak_credential_name" {
   description = "The name of the IAM credential to attach to the deployed cluster."
 }
-
 
 variable "cloudbreak_ip" {
   description = "The IP address of the cloudbreak server from which to execute deployments."
