@@ -1,6 +1,7 @@
 provider "aws" {
-  alias  = "alm"
-  region = "${var.alm_region}"
+  version = "1.39"
+  alias   = "alm"
+  region  = "${var.alm_region}"
 
   assume_role {
     role_arn = "${var.alm_role_arn}"
