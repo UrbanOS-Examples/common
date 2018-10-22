@@ -1,6 +1,7 @@
 provider "aws" {
-  alias  = "prod"
-  region = "us-east-1"
+  version = "1.39"
+  alias   = "prod"
+  region  = "us-east-1"
 
   assume_role {
     role_arn = "${var.root_zone_role_arn}"
