@@ -69,12 +69,8 @@
                     "arn:aws:iam::${alm_account_id}:user/mchirita",
                     "arn:aws:iam::${alm_account_id}:root",
                     "arn:aws:iam::${alm_account_id}:user/smillard",
-                    "arn:aws:iam::${alm_account_id}:user/bschwanitz",
-                    "arn:aws:iam::${alm_account_id}:user/brogers",
                     "arn:aws:iam::${alm_account_id}:user/cyeater",
                     "arn:aws:iam::${alm_account_id}:user/jlutz",
-                    "arn:aws:iam::${alm_account_id}:user/oqi",
-                    "arn:aws:iam::${alm_account_id}:user/abhagat",
                     "arn:aws:iam::${alm_account_id}:user/emoore",
                     "arn:aws:iam::${alm_account_id}:user/bbalser",
                     "arn:aws:iam::${alm_account_id}:user/afreeman",
@@ -86,7 +82,9 @@
                     "arn:aws:iam::${alm_account_id}:user/amarkley",
                     "arn:aws:iam::${alm_account_id}:user/bbrewer",
                     "arn:aws:iam::${alm_account_id}:user/jolson",
-                    "arn:aws:iam::${alm_account_id}:user/plinville"
+                    "arn:aws:iam::${alm_account_id}:user/plinville",
+                    "arn:aws:iam::${alm_account_id}:user/nstevens",
+                    "arn:aws:iam::${alm_account_id}:user/akucera"
                 ]
             },
             "Action": [
