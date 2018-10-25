@@ -8,9 +8,9 @@ locals {
   ambari_username          = "admin"
   cluster_subnet           = "${random_shuffle.private_subnet.result[0]}"
   cluster_name             = "hdp-${local.deployment_template_sha}"
-  update_hive_path        = "${path.module}/templates/update_hive_db.sh"
-  create_cluster_path     = "${path.module}/templates/create_cluster.sh"
-  create_blueprint_path   = "${path.module}/templates/create_blueprint.sh"
+  update_hive_path         = "${path.module}/templates/update_hive_db.sh"
+  create_cluster_path      = "${path.module}/templates/create_cluster.sh"
+  create_blueprint_path    = "${path.module}/templates/create_blueprint.sh"
 }
 
 variable "vpc_id" {
@@ -34,9 +34,9 @@ variable "ssh_key" {
   description = "The SSH key to inject into the cloudbreak instance."
 }
 
-variable "cloud_storage_bucket_name" {
+variable "cloud_storage_bucket_prefix" {
   description = "The name of the s3 bucket to use for the hdfs cloud storage"
-  default     = "scos-${terraform.workspace}-hdfs"
+  default     = "scos-hdfs"
 }
 
 variable "cloudbreak_credential_name" {
