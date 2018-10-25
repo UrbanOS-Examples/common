@@ -19,8 +19,7 @@ data "template_file" "cloudbreak_cluster" {
   template = "${file("${path.module}/templates/datalake-cluster-template.json.tpl")}"
 
   vars {
-    BUCKET_CLOUD_STORAGE = "${var.cloud_storage_bucket_name}"
-    CLUSTER_NAME         = "${local.cluster_name}"
+    BUCKET_CLOUD_STORAGE = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
     CLUSTER_REGION       = "${var.region}"
     CLUSTER_VPC          = "${var.vpc_id}"
     CLUSTER_SUBNET       = "${local.cluster_subnet}"

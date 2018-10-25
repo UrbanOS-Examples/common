@@ -16,6 +16,7 @@
   "tags": {
     "userDefinedTags": {}
   },
+  "imageType": "prewarmed",
   "instanceGroups": [
     {
       "nodeCount": 1,
@@ -135,22 +136,23 @@
     "parameters": {
       "subnetId": "${CLUSTER_SUBNET}",
       "vpcId": "${CLUSTER_VPC}"
-    }
+    },
+    "subnetCIDR": null
   },
   "imageSettings": {
     "imageCatalog": "cloudbreak-default",
-    "imageId": "69db7e20-f3ac-4d45-6f95-39204e70ddcf"
+    "imageId": "086a2119-4cc2-4655-511b-0a528f7406c0"
   },
   "cluster": {
     "cloudStorage": {
       "locations": [
         {
-          "value": "s3a://${BUCKET_CLOUD_STORAGE}/${CLUSTER_NAME}/apps/ranger/audit/${CLUSTER_NAME}",
+          "value": "s3a://${BUCKET_CLOUD_STORAGE}/scos-hdp-datalake/apps/ranger/audit/scos-hdp-datalake",
           "propertyFile": "ranger-hive-audit",
           "propertyName": "xasecure.audit.destination.hdfs.dir"
         },
         {
-          "value": "s3a://${BUCKET_CLOUD_STORAGE}/${CLUSTER_NAME}/apps/hive/warehouse",
+          "value": "s3a://${BUCKET_CLOUD_STORAGE}/scos-hdp-datalake/apps/hive/warehouse",
           "propertyFile": "hive-site",
           "propertyName": "hive.metastore.warehouse.dir"
         }
@@ -158,7 +160,7 @@
       "s3": {
         "instanceProfile": "arn:aws:iam::068920858268:instance-profile/HDP_EC2_S3_DefaultRole"
       }
-    }
+    },
     "emailNeeded": false,
     "rdsConfigNames": [
       "${HIVE_CONNECTION_NAME}"
@@ -185,18 +187,18 @@
       "password": "${AMBARI_PASSWORD}",
       "ambariStackDetails": {
         "stack": "HDP",
-        "version": "3.0",
+        "version": "2.6",
         "stackRepoId": "HDP",
         "enableGplRepo": false,
         "verify": false,
-        "repositoryVersion": "3.0.0.0-1334",
-        "versionDefinitionFileUrl": "http://s3.amazonaws.com/dev.hortonworks.com/HDP/centos7/3.x/BUILDS/3.0.0.0-1334/HDP-3.0.0.0-1334.xml",
+        "repositoryVersion": "2.6.5.0-292",
+        "versionDefinitionFileUrl": "http://public-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.6.5.0/HDP-2.6.5.0-292.xml",
         "mpacks": []
       },
       "ambariRepoDetailsJson": {
-        "version": "2.7.0.0-508",
-        "baseUrl": "http://s3.amazonaws.com/dev.hortonworks.com/ambari/centos7/2.x/BUILDS/2.7.0.0-508",
-        "gpgKeyUrl": "http://s3.amazonaws.com/dev.hortonworks.com/ambari/centos7/2.x/BUILDS/2.7.0.0-508/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins"
+        "version": "2.6.2.2",
+        "baseUrl": "http://public-repo-1.hortonworks.com/ambari/centos6/2.x/updates/2.6.2.2",
+        "gpgKeyUrl": "http://public-repo-1.hortonworks.com/ambari/centos6/2.x/updates/2.6.2.2/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins"
       }
     }
   }
