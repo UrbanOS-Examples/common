@@ -8,7 +8,8 @@ enabled_features = ["eks-cluster",
                     "ckan_external",
                     "kong",
                     "joomla",
-                    "load_balancer"
+                    "load_balancer",
+                    "streaming-data-aggregator",
                    ]
 
 vpc_name = "test"

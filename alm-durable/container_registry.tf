@@ -44,6 +44,12 @@ module "cota_streaming_consumer_repository" {
   repository_name = "cota-streaming-consumer"
 }
 
+module "cota_consumer_smoke_test_repository" {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "cota-consumer-smoke-test"
+}
+
 module "jenkins_worker_infrastructure_repository" {
   source          = "../modules/ecr"
   alm_account_id  = "${var.alm_account_id}"
@@ -101,6 +107,11 @@ module "discovery_ui_repository" {
   source          = "../modules/ecr"
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "discovery-ui"
+}
+module streaming_data_aggregator {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "streaming-data-aggregator"
 }
 
 module "mockylo_repository" {

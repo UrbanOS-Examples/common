@@ -1,5 +1,6 @@
 provider "aws" {
-  region = "us-east-2"
+  version = "1.39"
+  region  = "us-east-2"
 
   assume_role {
     role_arn = "${var.alm_role_arn}"
