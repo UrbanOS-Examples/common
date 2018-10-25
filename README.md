@@ -44,9 +44,7 @@ terraform apply sandbox.plan
 Until we can automate this, here are the minimal things (without renaming/adding resources, etc.) you need to do to make your own env. Note that the `vpc_cidr` and `vpc_*_subnets` need to match up.
 ```bash
 cd env
-terraform init --backend-config=backends/sandbox.conf
-terraform workspace new my-own-personal-sandbox
-terraform workspace select my-own-personal-sandbox
+tf-init --sandbox -w my-own-personal-sandbox
 terraform plan \
   --var-file=variables/sandbox.tfvars \
   --out=update.plan
