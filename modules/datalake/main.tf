@@ -19,10 +19,11 @@ data "template_file" "cloudbreak_cluster" {
   template = "${file("${path.module}/templates/datalake-cluster-template.json.tpl")}"
 
   vars {
-    CLUSTER_REGION = "${var.region}"
-    CLUSTER_VPC    = "${var.vpc_id}"
-    CLUSTER_SUBNET = "${local.cluster_subnet}"
-    CLUSTER_AZ     = "${data.aws_subnet.az_selector.availability_zone}"
+    BUCKET_CLOUD_STORAGE = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
+    CLUSTER_REGION       = "${var.region}"
+    CLUSTER_VPC          = "${var.vpc_id}"
+    CLUSTER_SUBNET       = "${local.cluster_subnet}"
+    CLUSTER_AZ           = "${data.aws_subnet.az_selector.availability_zone}"
 
     MGMT_GROUP_INSTANCE_TYPE   = "${var.mgmt_group_instance_type}"
     MASTER_GROUP_INSTANCE_TYPE = "${var.master_group_instance_type}"

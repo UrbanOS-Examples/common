@@ -46,7 +46,7 @@ variable "ssh_key" {
 
 variable "cloudbreak_version" {
   description = "The version of Cloudbreak to pack into the AMI."
-  default     = "2.8.0"
+  default     = "2.7.2"
 }
 
 variable "cloudbreak_tag" {
