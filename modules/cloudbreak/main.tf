@@ -37,15 +37,8 @@ data "aws_ami" "cloudbreak" {
 
   filter {
     name   = "name"
-    values = ["packer-aws-cloudbreak-*"]
+    values = ["packer-aws-cloudbreak-${var.cloudbreak_version}-*"]
   }
-
-  tags = [
-    {
-      key   = "cloudbreak-version"
-      value = "${var.cloudbreak_version}"
-    }
-  ]
 
   owners = [
     "068920858268",
