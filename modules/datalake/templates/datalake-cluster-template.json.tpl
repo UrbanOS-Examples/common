@@ -158,7 +158,7 @@
         }
       ],
       "s3": {
-        "instanceProfile": "arn:aws:iam::068920858268:instance-profile/HDP_EC2_S3_DefaultRole"
+        "instanceProfile": "${INSTANCE_PROFILE_FOR_BUCKET_ACCESS}"
       }
     },
     "emailNeeded": false,
