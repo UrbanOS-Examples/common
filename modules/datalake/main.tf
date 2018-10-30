@@ -19,11 +19,12 @@ data "template_file" "cloudbreak_cluster" {
   template = "${file("${path.module}/templates/datalake-cluster-template.json.tpl")}"
 
   vars {
-    BUCKET_CLOUD_STORAGE = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
-    CLUSTER_REGION       = "${var.region}"
-    CLUSTER_VPC          = "${var.vpc_id}"
-    CLUSTER_SUBNET       = "${local.cluster_subnet}"
-    CLUSTER_AZ           = "${data.aws_subnet.az_selector.availability_zone}"
+    BUCKET_CLOUD_STORAGE               = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
+    INSTANCE_PROFILE_FOR_BUCKET_ACCESS = "${aws_iam_instance_profile.cloudstorage_bucket_access.arn}"
+    CLUSTER_REGION                     = "${var.region}"
+    CLUSTER_VPC                        = "${var.vpc_id}"
+    CLUSTER_SUBNET                     = "${local.cluster_subnet}"
+    CLUSTER_AZ                         = "${data.aws_subnet.az_selector.availability_zone}"
 
     MGMT_GROUP_INSTANCE_TYPE   = "${var.mgmt_group_instance_type}"
     MASTER_GROUP_INSTANCE_TYPE = "${var.master_group_instance_type}"
@@ -46,8 +47,8 @@ data "template_file" "cloudbreak_cluster" {
 
 resource "null_resource" "cloudbreak_hive_db" {
   triggers {
-    setup_updated    = "${sha1(file(local.update_hive_path))}"
-    id_updated       = "${local.hive_db_name}"
+    setup_updated = "${sha1(file(local.update_hive_path))}"
+    id_updated    = "${local.hive_db_name}"
   }
 
   connection {
@@ -69,6 +70,7 @@ bash /tmp/update_hive_db.sh \
   ${local.hive_db_name} \
   ${aws_db_instance.hive_db.password}
 EOF
+      ,
     ]
   }
 
@@ -79,8 +81,8 @@ EOF
 
 resource "null_resource" "cloudbreak_blueprint" {
   triggers {
-    setup_updated    = "${sha1(file(local.create_blueprint_path))}"
-    id_updated       = "${local.ambari_blueprint_name}"
+    setup_updated = "${sha1(file(local.create_blueprint_path))}"
+    id_updated    = "${local.ambari_blueprint_name}"
   }
 
   connection {
@@ -106,6 +108,7 @@ bash /tmp/create_blueprint.sh \
   /tmp/blueprint.json \
   '${local.ambari_blueprint_name}'
 EOF
+      ,
     ]
   }
 
@@ -116,8 +119,8 @@ EOF
 
 resource "null_resource" "cloudbreak_cluster" {
   triggers {
-    setup_updated    = "${sha1(file(local.create_cluster_path))}"
-    id_updated       = "${local.cluster_name}"    // implies a change to the blueprint, etc.
+    setup_updated = "${sha1(file(local.create_cluster_path))}"
+    id_updated    = "${local.cluster_name}"                    // implies a change to the blueprint, etc.
   }
 
   depends_on = [
@@ -148,6 +151,7 @@ bash /tmp/create_cluster.sh \
   /tmp/cluster.json \
   ${local.cluster_name}
 EOF
+      ,
     ]
   }
 

@@ -10,7 +10,7 @@ main() {
 }
 
 create-blueprint() {
-    cb blueprint describe --name "${BLUEPRINT_NAME}" \
+    timeout 10 cb blueprint describe --name "${BLUEPRINT_NAME}" \
         || cb blueprint create from-file \
             --file ${BLUEPRINT_FILE} \
             --name "${BLUEPRINT_NAME}"
