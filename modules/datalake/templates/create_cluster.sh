@@ -15,6 +15,9 @@ create-cluster() {
             --cli-input-json ${CLUSTER_TEMPLATE_FILE} \
             --name ${CLUSTER_NAME} \
             --wait
+
+    cb cluster describe --name ${CLUSTER_NAME} --output json \
+        | jq -e 'any(.status; contains("AVAILABLE"))'
 }
 
 main "${@}"
