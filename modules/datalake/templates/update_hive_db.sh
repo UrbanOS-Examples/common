@@ -12,7 +12,7 @@ main() {
 
 update-hive-database-connection() {
     timeout 10 cb database list | grep -qw ${HIVE_DB_NAME} \
-        || cb database create postgres \
+        || timeout 10 cb database create postgres \
             --name ${HIVE_DB_NAME} \
             --type HIVE \
             --url ${HIVE_DB_URL} \
