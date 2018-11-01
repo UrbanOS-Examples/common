@@ -1,6 +1,6 @@
 locals {
-    iam_instance_type        = "t2.small"
-    iam_instance_ami         = "ami-0d50f5c6b01e2d95d"
+    iam_instance_type        = "t3.medium"
+    iam_instance_ami         = "ami-055ddd16f0e2c2e5d"
     tcp_ports                = "53,80,88,389,443,464,636,7389,9443,9444,9445"
     udp_ports                = "53,88,123,464"
 }
