@@ -1,5 +1,5 @@
 locals {
-    freeipa_instance_count   = 2
+    freeipa_replica_count    = 1
     iam_instance_type        = "t2.small"
     iam_instance_ami         = "ami-0d50f5c6b01e2d95d"
     tcp_ports                = "53,80,88,389,443,464,636,7389,9443,9444,9445"
@@ -47,6 +47,11 @@ variable "zone_id" {
 
 variable "zone_name" {
   description = "The name of the primary dns zone."
+}
+
+variable "deploy_keycloak" {
+  description = "Enable or disable the keycloak OAuth server"
+  default     = false
 }
 
 variable "keycloak_version" {

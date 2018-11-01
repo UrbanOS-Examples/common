@@ -1,4 +1,5 @@
 resource "aws_alb_target_group" "keycloak" {
+  count    = "${var.deploy_keycloak}"
   name     = "keycloak-lb-tg-${terraform.workspace}"
   port     = 8080
   protocol = "HTTP"
@@ -16,6 +17,7 @@ resource "aws_alb_target_group" "keycloak" {
 }
 
 resource "aws_alb_target_group_attachment" "keycloak_private" {
+  count            = "${var.deploy_keycloak}"
   target_group_arn = "${aws_alb_target_group.keycloak.arn}" 
   target_id        = "${aws_instance.keycloak_server.id}"
   port             = 8080
@@ -26,6 +28,7 @@ resource "aws_alb_target_group_attachment" "keycloak_private" {
 }
 
 resource "aws_alb" "keycloak" {
+  count              = "${var.deploy_keycloak}"
   name               = "keycloak-lb-${terraform.workspace}"
   load_balancer_type = "application"
   internal           = true
@@ -34,6 +37,7 @@ resource "aws_alb" "keycloak" {
 }
 
 resource "aws_alb_listener" "keycloak_https" {
+  count             = "${var.deploy_keycloak}"
   load_balancer_arn = "${aws_alb.keycloak.arn}"
   certificate_arn   = "${var.alb_certificate}"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -47,6 +51,7 @@ resource "aws_alb_listener" "keycloak_https" {
 }
 
 resource "aws_alb_listener" "keycloak_http" {
+  count             = "${var.deploy_keycloak}"
   load_balancer_arn = "${aws_alb.keycloak.arn}"
   port              = 80
   protocol          = "HTTP"

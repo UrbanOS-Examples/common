@@ -1,4 +1,5 @@
 data "template_file" "keycloak_userdata" {
+  count    = "${var.deploy_keycloak}"
   template = "${file("${path.module}/templates/keycloak-userdata.sh")}"
 
   vars {
@@ -11,6 +12,7 @@ data "template_file" "keycloak_userdata" {
 }
 
 resource "aws_instance" "keycloak_server" {
+  count                  = "${var.deploy_keycloak}"
   instance_type          = "${local.iam_instance_type}"
   ami                    = "${local.iam_instance_ami}"
   vpc_security_group_ids = ["${aws_security_group.keycloak_server_sg.id}"]
