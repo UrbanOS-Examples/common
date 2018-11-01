@@ -4,7 +4,7 @@ locals {
 
 resource "aws_route53_zone" "public_hosted_reverse_zone" {
   name              = "${local.reverse_cidr}.in-addr.arpa"
-  vpc_id            = "${var.vpc_id}"
+  vpc               = "${var.vpc_id}"
   force_destroy     = true
 
   tags = {
