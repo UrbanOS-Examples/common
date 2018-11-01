@@ -3,6 +3,7 @@
 hostname=
 hosted_zone=
 admin_password=
+realm_name=
 hostname_prefix=
 
 until [ ${#} -eq 0 ]; do
@@ -19,6 +20,10 @@ until [ ${#} -eq 0 ]; do
             admin_password=${2}
             shift
             ;;
+        --realm-name)
+            realm_name=${2}
+            shift
+            ;;
         --hostname-prefix)
             hostname_prefix=${2}
             shift
@@ -27,7 +32,7 @@ until [ ${#} -eq 0 ]; do
     shift
 done
 
-set -ex
+set -e
 
 IP=$(hostname -I | xargs)
 
@@ -43,10 +48,10 @@ dnf -y install freeipa-server
 
 ipa-client-install \
   --domain="${hosted_zone}" \
-  --realm="${hosted_zone^^}" \
+  --realm="${realm_name^^}" \
   --server="${hostname_prefix}-master.${hosted_zone}" \
   --hostname="${hostname}.${hosted_zone}" \
-  --principal="admin@${hosted_zone^^}" \
+  --principal="admin@${realm_name^^}" \
   --password="${admin_password}" \
   --ntp-server=us.pool.ntp.org \
   --unattended

@@ -1,9 +1,13 @@
 locals {
-    freeipa_replica_count    = 1
     iam_instance_type        = "t2.small"
     iam_instance_ami         = "ami-0d50f5c6b01e2d95d"
     tcp_ports                = "53,80,88,389,443,464,636,7389,9443,9444,9445"
     udp_ports                = "53,88,123,464"
+}
+
+variable "freeipa_replica_count" {
+  description = "The number of FreeIPA replica servers to support the master"
+  default     = 1
 }
 
 variable "vpc_id" {
@@ -36,17 +40,16 @@ variable "iam_hostname_prefix" {
   default     = "iam"
 }
 
-variable "admin_password" {
-  description = "The default admin password of the IPA server"
-  default     = "letmeinnow"
-}
-
 variable "zone_id" {
   description = "The output id of the primary dns zone."
 }
 
 variable "zone_name" {
   description = "The name of the primary dns zone."
+}
+
+variable "realm_name" {
+  description = "The kerberos realm of the KDCs"
 }
 
 variable "deploy_keycloak" {

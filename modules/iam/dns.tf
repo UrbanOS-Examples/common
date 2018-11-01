@@ -21,7 +21,7 @@ resource "aws_route53_record" "freeipa_master_host_record" {
 }
 
 resource "aws_route53_record" "freeipa_replica_host_record" {
-  count   = "${local.freeipa_replica_count}"
+  count   = "${var.freeipa_replica_count}"
   zone_id = "${var.zone_id}"
   name    = "${var.iam_hostname_prefix}-replica-${count.index}"
   type    = "A"
@@ -60,7 +60,7 @@ resource "aws_route53_record" "freeipa_master_host_reverse_record" {
 }
 
 resource "aws_route53_record" "freeipa_replica_host_reverse_record" {
-  count   = "${local.freeipa_replica_count}"
+  count   = "${var.freeipa_replica_count}"
   zone_id = "${aws_route53_zone.public_hosted_reverse_zone.zone_id}"
   name    = "${format("%s.%s", "${element("${split(".", "${element("${aws_instance.freeipa_replica.*.private_ip}", "${count.index}")}")}", 3)}", "${element("${split(".", "${element("${aws_instance.freeipa_replica.*.private_ip}", "${count.index}")}")}", 2)}")}"
   type    = "PTR"

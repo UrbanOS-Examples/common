@@ -6,7 +6,7 @@ data "template_file" "keycloak_userdata" {
     hostname         = "${var.iam_hostname_prefix}-oauth"
     hostname_prefix  = "${var.iam_hostname_prefix}"
     hosted_zone      = "${var.zone_name}"
-    admin_password   = "${var.admin_password}"
+    admin_password   = "${random_string.freeipa_admin_password.result}"
     keycloak_version = "${var.keycloak_version}"
   }
 }

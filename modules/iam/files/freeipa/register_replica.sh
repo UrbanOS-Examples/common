@@ -2,6 +2,7 @@
 
 hostname=
 hosted_zone=
+realm_name=
 admin_password=
 
 until [ ${#} -eq 0 ]; do
@@ -14,6 +15,10 @@ until [ ${#} -eq 0 ]; do
             hosted_zone=${2}
             shift
             ;;
+        --realm-name)
+            realm_name=${2}
+            shift
+            ;;
         --admin-password)
             admin_password=${2}
             shift
@@ -22,9 +27,9 @@ until [ ${#} -eq 0 ]; do
     shift
 done
 
-set -ex
+set -e
 
-echo "${admin_password}" | kinit "admin@${hosted_zone^^}"
+echo "${admin_password}" | kinit "admin@${realm_name^^}"
 
 until ipa host-find | grep ${hostname}; do
   sleep 10

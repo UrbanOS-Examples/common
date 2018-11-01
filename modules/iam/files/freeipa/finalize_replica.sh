@@ -12,7 +12,7 @@ until [ ${#} -eq 0 ]; do
     shift
 done
 
-set -ex
+set -e
 
 until ipa-replica-install; do
   sleep 30

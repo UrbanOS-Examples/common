@@ -2,6 +2,7 @@
 
 hostname=
 hosted_zone=
+realm_name=
 admin_password=
 
 until [ ${#} -eq 0 ]; do
@@ -14,6 +15,9 @@ until [ ${#} -eq 0 ]; do
             hosted_zone=${2}
             shift
             ;;
+        --realm-name)
+            realm_name=${2}
+            shift;;
         --admin-password)
             admin_password=${2}
             shift
@@ -22,7 +26,7 @@ until [ ${#} -eq 0 ]; do
     shift
 done
 
-set -ex
+set -e
 
 IP=$(hostname -I | xargs)
 
@@ -42,6 +46,6 @@ ipa-server-install \
   --hostname="${hostname}.${hosted_zone}" \
   --ip-address="${IP}" \
   --domain="${hosted_zone}" \
-  --realm="${hosted_zone^^}" \
+  --realm="${realm_name^^}" \
   --ntp-pool=us.pool.ntp.org \
   --unattended

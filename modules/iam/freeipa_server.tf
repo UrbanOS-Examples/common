@@ -27,7 +27,8 @@ resource "aws_instance" "freeipa_master" {
 sudo bash /tmp/setup_master.sh \
   --hostname ${var.iam_hostname_prefix}-master \
   --hosted-zone ${var.zone_name} \
-  --admin-password ${var.admin_password}
+  --realm-name ${var.realm_name} \
+  --admin-password ${random_string.freeipa_admin_password.result}
 EOF
     ]
 
@@ -40,7 +41,7 @@ EOF
 }
 
 resource "aws_instance" "freeipa_replica" {
-  count                  = "${local.freeipa_replica_count}"
+  count                  = "${var.freeipa_replica_count}"
   instance_type          = "${local.iam_instance_type}"
   ami                    = "${local.iam_instance_ami}"
   vpc_security_group_ids = ["${aws_security_group.freeipa_server_sg.id}"]
@@ -92,7 +93,8 @@ sudo bash /tmp/setup_replica.sh \
   --hostname ${var.iam_hostname_prefix}-replica-${count.index} \
   --hostname-prefix ${var.iam_hostname_prefix} \
   --hosted-zone ${var.zone_name} \
-  --admin-password ${var.admin_password}
+  --realm-name ${var.realm_name} \
+  --admin-password ${random_string.freeipa_admin_password.result}
 EOF
     ]
 
@@ -109,7 +111,8 @@ EOF
 sudo bash /tmp/register_replica.sh \
   --hostname ${var.iam_hostname_prefix}-replica-${count.index} \
   --hosted-zone ${var.zone_name} \
-  --admin-password ${var.admin_password}
+  --realm-name ${var.realm_name} \
+  --admin-password ${random_string.freeipa_admin_password.result}
 EOF
     ]
 
@@ -123,7 +126,7 @@ EOF
 
 # FreeIPA replicas can only be registered with forward and reverse DNS records already created
 resource "null_resource" "freeipa_replica_finalizer" {
-  count = "${local.freeipa_replica_count}"
+  count = "${var.freeipa_replica_count}"
   depends_on = [
     "aws_route53_record.freeipa_replica_host_record",
     "aws_route53_record.freeipa_replica_host_reverse_record"
@@ -133,7 +136,7 @@ resource "null_resource" "freeipa_replica_finalizer" {
     inline = [
       <<EOF
 sudo bash /tmp/finalize_replica.sh \
-  --admin-password ${var.admin_password}
+  --admin-password ${random_string.freeipa_admin_password.result}
 EOF
     ]
 
@@ -143,4 +146,9 @@ EOF
       user = "fedora"
     }
   }
+}
+
+resource "random_string" "freeipa_admin_password" {
+  length = 40
+  special = false
 }
