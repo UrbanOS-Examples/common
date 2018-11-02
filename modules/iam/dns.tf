@@ -1,5 +1,7 @@
 locals {
-  reverse_cidr = "${format("%s.%s", "${element("${split(".", "${var.vpc_cidr}")}", 1)}", "${element("${split(".", "${var.vpc_cidr}")}", 0)}")}"
+  cidr_octet_1 = "${element("${split(".", "${var.vpc_cidr}")}", 0)}"
+  cidr_octet_2 = "${element("${split(".", "${var.vpc_cidr}")}", 1)}"
+  reverse_cidr = "${local.cidr_octet_2}.${local.cidr_octet_1}"
 }
 
 resource "aws_route53_zone" "public_hosted_reverse_zone" {
@@ -51,9 +53,14 @@ resource "aws_route53_record" "keycloak_lb_record" {
   }
 }
 
+locals {
+  freeipa_master_octet_4 = "${element("${split(".", "${aws_instance.freeipa_master.private_ip}")}", 3)}"
+  freeipa_master_octet_3 = "${element("${split(".", "${aws_instance.freeipa_master.private_ip}")}", 2)}"
+}
+
 resource "aws_route53_record" "freeipa_master_host_reverse_record" {
   zone_id = "${aws_route53_zone.public_hosted_reverse_zone.zone_id}"
-  name    = "${format("%s.%s", "${element("${split(".", "${aws_instance.freeipa_master.private_ip}")}", 3)}", "${element("${split(".", "${aws_instance.freeipa_master.private_ip}")}", 2)}")}"
+  name    = "${local.freeipa_master_octet_4}.${local.freeipa_master_octet_3}"
   type    = "PTR"
   ttl     = 5
   records = ["${var.iam_hostname_prefix}-master.${var.zone_name}"]
@@ -62,7 +69,7 @@ resource "aws_route53_record" "freeipa_master_host_reverse_record" {
 resource "aws_route53_record" "freeipa_replica_host_reverse_record" {
   count   = "${var.freeipa_replica_count}"
   zone_id = "${aws_route53_zone.public_hosted_reverse_zone.zone_id}"
-  name    = "${format("%s.%s", "${element("${split(".", "${element("${aws_instance.freeipa_replica.*.private_ip}", "${count.index}")}")}", 3)}", "${element("${split(".", "${element("${aws_instance.freeipa_replica.*.private_ip}", "${count.index}")}")}", 2)}")}"
+  name    = "${element("${split(".", "${element("${aws_instance.freeipa_replica.*.private_ip}", "${count.index}")}")}", 3)}.${element("${split(".", "${element("${aws_instance.freeipa_replica.*.private_ip}", "${count.index}")}")}", 2)}"
   type    = "PTR"
   ttl     = 5
   records = ["${var.iam_hostname_prefix}-replica-${count.index}.${var.zone_name}"]

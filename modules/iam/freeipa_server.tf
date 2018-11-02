@@ -28,7 +28,8 @@ sudo bash /tmp/setup_master.sh \
   --hostname ${var.iam_hostname_prefix}-master \
   --hosted-zone ${var.zone_name} \
   --realm-name ${var.realm_name} \
-  --admin-password ${random_string.freeipa_admin_password.result}
+  --admin-password ${random_string.freeipa_admin_password.result} \
+  --freeipa-version ${var.freeipa_version}
 EOF
     ]
 
@@ -94,7 +95,8 @@ sudo bash /tmp/setup_replica.sh \
   --hostname-prefix ${var.iam_hostname_prefix} \
   --hosted-zone ${var.zone_name} \
   --realm-name ${var.realm_name} \
-  --admin-password ${random_string.freeipa_admin_password.result}
+  --admin-password ${random_string.freeipa_admin_password.result} \
+  --freeipa-version ${var.freeipa_version}
 EOF
     ]
 

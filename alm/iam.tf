@@ -10,5 +10,4 @@ module "iam_stack" {
   zone_name           = "${aws_route53_zone.public_hosted_zone.name}"
   realm_name          = "internal.smartcolumbusos.com"
   vpc_cidr            = "${var.vpc_cidr}"
-  alb_certificate     = "${module.tls_certificate.arn}"
 }

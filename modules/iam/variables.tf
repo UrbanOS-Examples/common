@@ -10,6 +10,11 @@ variable "freeipa_replica_count" {
   default     = 1
 }
 
+variable "freeipa_version" {
+  description = "The pinned version of the freeipa server"
+  default     = "4.7.0-3.fc28"
+}
+
 variable "vpc_id" {
   description = "The output id of the vpc to host the stack"
 }
@@ -64,4 +69,5 @@ variable "keycloak_version" {
 
 variable "alb_certificate" {
   description = "The certificate to attach to the keycloak load balancer"
+  default     = ""
 }

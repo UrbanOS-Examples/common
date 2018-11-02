@@ -5,6 +5,7 @@ hosted_zone=
 admin_password=
 realm_name=
 hostname_prefix=
+freeipa_version=
 
 until [ ${#} -eq 0 ]; do
     case "${1}" in
@@ -28,8 +29,11 @@ until [ ${#} -eq 0 ]; do
             hostname_prefix=${2}
             shift
             ;;
+        --freeipa-version)
+            freeipa_version=${2}
+            shift
+            ;;
     esac
-    shift
 done
 
 set -e
@@ -44,7 +48,7 @@ EOF
 
 hostnamectl set-hostname "${hostname}.${hosted_zone}"
 
-dnf -y install freeipa-server
+dnf -y install freeipa-server-${freeipa_version}
 
 ipa-client-install \
   --domain="${hosted_zone}" \
