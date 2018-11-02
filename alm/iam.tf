@@ -11,3 +11,11 @@ module "iam_stack" {
   realm_name          = "internal.smartcolumbusos.com"
   vpc_cidr            = "${var.vpc_cidr}"
 }
+
+output "freeipa_server_ips" {
+  value = ["${module.iam_stack.freeipa_server_ips}"]
+}
+
+output "keycloak_server_ip" {
+  value = "${module.iam_stack.keycloak_server_ip}"
+}
