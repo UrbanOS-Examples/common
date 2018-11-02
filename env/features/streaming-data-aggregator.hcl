@@ -13,6 +13,19 @@ resource "aws_s3_bucket_policy" "streaming_data_aggregator" {
 {
    "Version": "2012-10-17",
    "Statement": [
+        {
+         "Effect": "Allow",
+         "Principal": {
+           "AWS":
+            [
+              "${module.eks-cluster.worker_iam_role_arn}"
+            ]
+           },
+         "Action": [
+            "s3:ListBucket"
+         ],
+         "Resource": "${aws_s3_bucket.streaming_data_aggregator.arn}"
+      },
       {
          "Effect": "Allow",
          "Principal": {
