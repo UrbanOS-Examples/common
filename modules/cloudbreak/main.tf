@@ -103,7 +103,7 @@ resource "null_resource" "cloudbreak" {
 resource "null_resource" "cloudbreak_credential" {
   triggers {
     instance_updated = "${null_resource.cloudbreak.id}"
-    setup_updated    = "${sha1(file(local.update_credentials_path))}"
+    setup_updated    = "${sha1(file(local.ensure_credentials_path))}"
     id_updated       = "${local.cb_credential_name}"
   }
 
@@ -118,14 +118,14 @@ resource "null_resource" "cloudbreak_credential" {
   }
 
   provisioner "file" {
-    source      = "${local.update_credentials_path}"
-    destination = "/tmp/update_credentials.sh"
+    source      = "${local.ensure_credentials_path}"
+    destination = "/tmp/ensure_credentials.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
       <<EOF
-bash /tmp/update_credentials.sh \
+bash /tmp/ensure_credentials.sh \
   ${local.cb_credential_name} \
   ${aws_iam_role.cloudbreak_credential.arn}
 EOF

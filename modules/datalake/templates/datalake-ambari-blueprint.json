@@ -160,7 +160,11 @@
                 {"name": "YARN_CLIENT"},
                 {"name": "MAPREDUCE2_CLIENT"},
                 {"name": "HIVE_CLIENT"},
-                {"name": "TEZ_CLIENT"}
+                {"name": "TEZ_CLIENT"},
+                {"name": "RANGER_TAGSYNC"},
+                {"name": "RANGER_USERSYNC"},
+                {"name": "RANGER_ADMIN"},
+                {"name": "KNOX_GATEWAY"}
             ],
             "cardinality": "1"
         },

@@ -9,4 +9,5 @@ module "datalake" {
   cloudbreak_ip              = "${module.cloudbreak.cloudbreak_instance}"
   cloudbreak_security_group  = "${module.cloudbreak.cloudbreak_security_group}"
   cloudbreak_credential_name = "${module.cloudbreak.cloudbreak_credential_name}"
+  cloudbreak_ready           = "${module.cloudbreak.cloudbreak_ready}"
 }

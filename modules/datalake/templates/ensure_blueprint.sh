@@ -6,12 +6,12 @@ main() {
 
     set -eux
 
-    until create-blueprint; do sleep 10 ; done
+    until ensure-blueprint; do sleep 10; done
 }
 
-create-blueprint() {
-    timeout 10 cb blueprint describe --name "${BLUEPRINT_NAME}" \
-        || timeout 10 cb blueprint create from-file \
+ensure-blueprint() {
+    cb blueprint describe --name "${BLUEPRINT_NAME}" \
+        || cb blueprint create from-file \
             --file ${BLUEPRINT_FILE} \
             --name "${BLUEPRINT_NAME}" \
             --description "Created $(date)"
