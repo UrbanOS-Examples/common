@@ -8,9 +8,9 @@ locals {
   ambari_username          = "admin"
   cluster_subnet           = "${random_shuffle.private_subnet.result[0]}"
   cluster_name             = "hdp-${local.deployment_template_sha}"
-  update_hive_path         = "${path.module}/templates/update_hive_db.sh"
-  create_cluster_path      = "${path.module}/templates/create_cluster.sh"
-  create_blueprint_path    = "${path.module}/templates/create_blueprint.sh"
+  ensure_hive_path         = "${path.module}/templates/ensure_hive_db.sh"
+  ensure_cluster_path      = "${path.module}/templates/ensure_cluster.sh"
+  ensure_blueprint_path    = "${path.module}/templates/ensure_blueprint.sh"
 }
 
 variable "vpc_id" {
@@ -45,6 +45,10 @@ variable "cloudbreak_credential_name" {
 
 variable "cloudbreak_ip" {
   description = "The IP address of the cloudbreak server from which to execute deployments."
+}
+
+variable "cloudbreak_ready" {
+  description = "The cloudbreak readiness state, so we can depend on it"
 }
 
 variable "hive_db_multi_az" {

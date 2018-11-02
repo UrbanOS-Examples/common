@@ -174,7 +174,7 @@
           {
             "topologyName": "dp-proxy",
             "exposedServices": [
-              "AMBARI"
+              "ALL"
             ]
           }
         ],

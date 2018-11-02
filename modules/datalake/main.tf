@@ -47,8 +47,9 @@ data "template_file" "cloudbreak_cluster" {
 
 resource "null_resource" "cloudbreak_hive_db" {
   triggers {
-    setup_updated = "${sha1(file(local.update_hive_path))}"
-    id_updated    = "${local.hive_db_name}"
+    setup_updated    = "${sha1(file(local.ensure_hive_path))}"
+    id_updated       = "${local.hive_db_name}"
+    cloudbreak_ready = "${var.cloudbreak_ready}"
   }
 
   connection {
@@ -58,14 +59,14 @@ resource "null_resource" "cloudbreak_hive_db" {
   }
 
   provisioner "file" {
-    source      = "${local.update_hive_path}"
-    destination = "/tmp/update_hive_db.sh"
+    source      = "${local.ensure_hive_path}"
+    destination = "/tmp/ensure_hive_db.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
       <<EOF
-bash /tmp/update_hive_db.sh \
+bash /tmp/ensure_hive_db.sh \
   jdbc:postgresql://${aws_db_instance.hive_db.endpoint}/${aws_db_instance.hive_db.name} \
   ${local.hive_db_name} \
   ${aws_db_instance.hive_db.password}
@@ -81,8 +82,9 @@ EOF
 
 resource "null_resource" "cloudbreak_blueprint" {
   triggers {
-    setup_updated = "${sha1(file(local.create_blueprint_path))}"
-    id_updated    = "${local.ambari_blueprint_name}"
+    setup_updated    = "${sha1(file(local.ensure_blueprint_path))}"
+    id_updated       = "${local.ambari_blueprint_name}"
+    cloudbreak_ready = "${var.cloudbreak_ready}"
   }
 
   connection {
@@ -97,14 +99,14 @@ resource "null_resource" "cloudbreak_blueprint" {
   }
 
   provisioner "file" {
-    source      = "${local.create_blueprint_path}"
-    destination = "/tmp/create_blueprint.sh"
+    source      = "${local.ensure_blueprint_path}"
+    destination = "/tmp/ensure_blueprint.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
       <<EOF
-bash /tmp/create_blueprint.sh \
+bash /tmp/ensure_blueprint.sh \
   /tmp/blueprint.json \
   '${local.ambari_blueprint_name}'
 EOF
@@ -119,7 +121,7 @@ EOF
 
 resource "null_resource" "cloudbreak_cluster" {
   triggers {
-    setup_updated = "${sha1(file(local.create_cluster_path))}"
+    setup_updated = "${sha1(file(local.ensure_cluster_path))}"
     id_updated    = "${local.cluster_name}"                    // implies a change to the blueprint, etc.
   }
 
@@ -140,14 +142,14 @@ resource "null_resource" "cloudbreak_cluster" {
   }
 
   provisioner "file" {
-    source      = "${local.create_cluster_path}"
-    destination = "/tmp/create_cluster.sh"
+    source      = "${local.ensure_cluster_path}"
+    destination = "/tmp/ensure_cluster.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
       <<EOF
-bash /tmp/create_cluster.sh \
+bash /tmp/ensure_cluster.sh \
   /tmp/cluster.json \
   ${local.cluster_name}
 EOF

@@ -7,12 +7,12 @@ main() {
 
     set -eux
 
-    until update-hive-database-connection; do sleep 10 ; done
+    until ensure-hive; do sleep 10; done
 }
 
-update-hive-database-connection() {
-    timeout 10 cb database list | grep -qw ${HIVE_DB_NAME} \
-        || timeout 10 cb database create postgres \
+ensure-hive() {
+    cb database list | grep -qw ${HIVE_DB_NAME} \
+        || cb database create postgres \
             --name ${HIVE_DB_NAME} \
             --type HIVE \
             --url ${HIVE_DB_URL} \

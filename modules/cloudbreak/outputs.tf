@@ -22,3 +22,8 @@ output "cloudbreak_credential_name" {
   description = "The name of the IAM credential to attach to the clusters."
   value       = "${local.cb_credential_name}"
 }
+
+output "cloudbreak_ready" {
+  description = "A reasonably decent signal that cloudbreak is ready for use"
+  value       = "${null_resource.cloudbreak.id}"
+}

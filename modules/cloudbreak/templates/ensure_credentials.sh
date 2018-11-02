@@ -9,7 +9,7 @@ main() {
     set -eux
 
     create-credential-file
-    until update-default-credentials; do sleep 10 ; done
+    until ensure-default-credentials; do sleep 10; done
 }
 
 create-credential-file() {
@@ -28,7 +28,7 @@ EOF
     trap "rm -rf ${CREDENTIAL_FILE}" EXIT
 }
 
-update-default-credentials() {
+ensure-default-credentials() {
     cb credential describe --name ${CREDENTIAL_NAME} \
         || cb credential create from-file \
             --cli-input-json ${CREDENTIAL_FILE} \
