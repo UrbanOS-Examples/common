@@ -51,6 +51,14 @@ variable "cloudbreak_ready" {
   description = "The cloudbreak readiness state, so we can depend on it"
 }
 
+variable "datalake_dns_zone_id" {
+  description = "The DNS Zone for the datalake hostname"
+}
+
+variable "alb_certificate" {
+  description = "The certificate for TLS on the datalake"
+}
+
 variable "hive_db_multi_az" {
   description = "Should the Hive DB be multi-az?"
   default     = true

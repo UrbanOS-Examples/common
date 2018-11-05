@@ -172,7 +172,7 @@
         "path": "${AMBARI_GATEWAY_PATH}",
         "topologies": [
           {
-            "topologyName": "dp-proxy",
+            "topologyName": "knox",
             "exposedServices": [
               "ALL"
             ]

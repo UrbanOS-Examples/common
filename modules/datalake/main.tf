@@ -122,7 +122,7 @@ EOF
 resource "null_resource" "cloudbreak_cluster" {
   triggers {
     setup_updated = "${sha1(file(local.ensure_cluster_path))}"
-    id_updated    = "${local.cluster_name}"                    // implies a change to the blueprint, etc.
+    cluster_name  = "${local.cluster_name}"                    // implies a change to the blueprint, etc.
   }
 
   depends_on = [
