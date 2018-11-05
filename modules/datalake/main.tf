@@ -47,7 +47,7 @@ data "template_file" "cloudbreak_cluster" {
 
 resource "null_resource" "cloudbreak_hive_db" {
   triggers {
-    setup_updated    = "${sha1(file(local.ensure_hive_path))}"
+    setup_updated    = "${sha1(file(local.ensure_db_path))}"
     id_updated       = "${local.hive_db_name}"
     cloudbreak_ready = "${var.cloudbreak_ready}"
   }
@@ -59,19 +59,34 @@ resource "null_resource" "cloudbreak_hive_db" {
   }
 
   provisioner "file" {
-    source      = "${local.ensure_hive_path}"
-    destination = "/tmp/ensure_hive_db.sh"
+    source      = "${local.ensure_db_path}"
+    destination = "/tmp/ensure_databases.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
       <<EOF
-bash /tmp/ensure_hive_db.sh \
+bash /tmp/ensure_databases.sh \
   jdbc:postgresql://${aws_db_instance.hive_db.endpoint}/${aws_db_instance.hive_db.name} \
   ${local.hive_db_name} \
-  ${aws_db_instance.hive_db.password}
+  ${aws_db_instance.hive_db.password} \
+  HIVE
 EOF
       ,
+      <<EOF
+bash /tmp/ensure_databases.sh \
+  jdbc:postgresql://${aws_db_instance.ranger_db.endpoint}/${aws_db_instance.ranger_db.name} \
+  ${local.ranger_db_name} \
+  ${aws_db_instance.ranger_db.password} \
+  RANGER
+EOF
+      ,
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      
     ]
   }
 

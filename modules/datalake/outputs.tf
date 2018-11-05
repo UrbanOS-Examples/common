@@ -3,6 +3,11 @@ output "hive_db_endpoint" {
   value       = "${aws_db_instance.hive_db.endpoint}"
 }
 
+output "ranger_db_endpoint" {
+  description = "The FQDN:Port of the Ranger RDS database."
+  value       = "${aws_db_instance.ranger_db.endpoint}"
+}
+
 output "blueprint_name" {
   description = "The name of the blueprint that is deployed for a given blueprint iteration."
   value       = "${local.ambari_blueprint_name}"

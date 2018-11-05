@@ -3,12 +3,13 @@ locals {
   ambari_blueprint_sha     = "${substr(sha1(file(local.ambari_blueprint_path)), 0, 12)}"
   deployment_template_sha  = "${substr(sha1(data.template_file.cloudbreak_cluster.rendered), 0, 12)}"
   hive_db_name             = "hive"            // at present we don't trigger updates based on RDS changes
+  ranger_db_name           = "ranger"
   ambari_blueprint_name    = "SCOS DataLake ${local.ambari_blueprint_sha}"
   ambari_gateway_path      = "scos-datalake"
   ambari_username          = "admin"
   cluster_subnet           = "${random_shuffle.private_subnet.result[0]}"
   cluster_name             = "hdp-${local.deployment_template_sha}"
-  ensure_hive_path         = "${path.module}/templates/ensure_hive_db.sh"
+  ensure_db_path           = "${path.module}/templates/ensure_databases.sh"
   ensure_cluster_path      = "${path.module}/templates/ensure_cluster.sh"
   ensure_blueprint_path    = "${path.module}/templates/ensure_blueprint.sh"
 }
@@ -64,8 +65,18 @@ variable "hive_db_multi_az" {
   default     = true
 }
 
+variable "ranger_db_multi_az" {
+  description = "Should the Ranger DB be multi-az?"
+  default     = true
+}
+
 variable "hive_db_apply_immediately" {
   description = "Should changes to the Hive DB be applied immediately?"
+  default     = false
+}
+
+variable "ranger_db_apply_immediately" {
+  description = "Should changes to the Ranger DB be applied immediately?"
   default     = false
 }
 
