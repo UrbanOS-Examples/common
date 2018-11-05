@@ -19,7 +19,7 @@ resource "aws_alb_target_group" "datalake" {
 data "aws_instance" "datalake" {
   filter {
     name   = "tag:CloudbreakClusterName"
-    values = ["${null_resource.cloudbreak_cluster.triggers.cluster_name}"]
+    values = ["${local.cluster_name}"]
   }
 
   filter {
@@ -27,9 +27,7 @@ data "aws_instance" "datalake" {
     values = ["management"]
   }
 
-  tags {
-    trigger = "${null_resource.cloudbreak_cluster.id}"
-  }
+  depends_on = ["null_resource.cloudbreak_cluster"]
 }
 
 resource "aws_alb_target_group_attachment" "datalake" {
