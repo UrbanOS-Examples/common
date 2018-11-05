@@ -35,13 +35,15 @@ data "template_file" "cloudbreak_cluster" {
     BROKER_NODE_COUNT          = "${var.broker_node_count}"
     WORKER_NODE_COUNT          = "${var.worker_node_count}"
 
-    SSH_KEY               = "${var.ssh_key}"
-    CREDENTIAL_NAME       = "${var.cloudbreak_credential_name}"
-    HIVE_CONNECTION_NAME  = "${local.hive_db_name}"
-    AMBARI_BLUEPRINT_NAME = "${local.ambari_blueprint_name}"
-    AMBARI_GATEWAY_PATH   = "${local.ambari_gateway_path}"
-    AMBARI_USERNAME       = "${local.ambari_username}"
-    AMBARI_PASSWORD       = "${random_string.ambari_admin_password.result}"
+    SSH_KEY                = "${var.ssh_key}"
+    CREDENTIAL_NAME        = "${var.cloudbreak_credential_name}"
+    HIVE_CONNECTION_NAME   = "${local.hive_db_name}"
+    RANGER_CONNECTION_NAME = "${local.ranger_db_name}"
+    LDAP_CONNECTION_NAME   = "${local.ldap_connection_name}"
+    AMBARI_BLUEPRINT_NAME  = "${local.ambari_blueprint_name}"
+    AMBARI_GATEWAY_PATH    = "${local.ambari_gateway_path}"
+    AMBARI_USERNAME        = "${local.ambari_username}"
+    AMBARI_PASSWORD        = "${random_string.ambari_admin_password.result}"
   }
 }
 
@@ -84,9 +86,42 @@ EOF
     ]
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "null_resource" "cloudbreak_ldap_connection" {
+  triggers {
+    setup_updated    = "${sha1(file(local.ensure_ldap_path))}"
+    id_updated       = "${local.ldap_connection_name}"
+    cloudbreak_ready = "${var.cloudbreak_ready}"
+  }
+
+  connection {
+    type = "ssh"
+    host = "${var.cloudbreak_ip}"
+    user = "ec2-user"
+  }
+
+  provisioner "file" {
+    source      = "${local.ensure_ldap_path}"
+    destination = "/tmp/ensure_ldap.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
-      
+      <<EOF
+bash /tmp/ensure_ldap.sh \
+  ${local.ldap_connection_name} \
+  ${var.ldap_server} \
+  ${var.ldap_port} \
+  ${var.ldap_domain} \
+  ${var.ldap_bind_user} \
+  ${var.ldap_bind_password} \
+  ${var.ldap_admin_group}
+EOF
+      ,
     ]
   }
 

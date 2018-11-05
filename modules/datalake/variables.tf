@@ -4,6 +4,7 @@ locals {
   deployment_template_sha  = "${substr(sha1(data.template_file.cloudbreak_cluster.rendered), 0, 12)}"
   hive_db_name             = "hive"            // at present we don't trigger updates based on RDS changes
   ranger_db_name           = "ranger"
+  ldap_connection_name     = "ldap"
   ambari_blueprint_name    = "SCOS DataLake ${local.ambari_blueprint_sha}"
   ambari_gateway_path      = "scos-datalake"
   ambari_username          = "admin"
@@ -12,6 +13,7 @@ locals {
   ensure_db_path           = "${path.module}/templates/ensure_databases.sh"
   ensure_cluster_path      = "${path.module}/templates/ensure_cluster.sh"
   ensure_blueprint_path    = "${path.module}/templates/ensure_blueprint.sh"
+  ensure_ldap_path         = "${path.module}/templates/ensure_ldap.sh"
 }
 
 variable "vpc_id" {
@@ -113,4 +115,31 @@ variable "worker_node_count" {
 variable "broker_node_count" {
   description = "Number of broker (zookeeper) nodes to include in the cluster."
   default     = 1
+}
+
+variable "ldap_server" {
+  description = "The address of the ldap server"
+}
+
+variable "ldap_port" {
+  description = "The port on which to connect to ldap"
+  default     = 389
+}
+
+variable "ldap_domain" {
+  description = "The ldap domain in domain component format"
+}
+
+variable "ldap_bind_user" {
+  description = "The non-privileged ldap user for directory integration"
+  default     = "binduser"
+}
+
+variable "ldap_bind_password" {
+  description = "Password for the non-privileged ldap bind user"
+}
+
+variable "ldap_admin_group" {
+  description = "The group that will administer the hdp cluster"
+  default     = "specialgroup"
 }

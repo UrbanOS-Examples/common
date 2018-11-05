@@ -12,4 +12,22 @@ module "datalake" {
   cloudbreak_security_group  = "${module.cloudbreak.cloudbreak_security_group}"
   cloudbreak_credential_name = "${module.cloudbreak.cloudbreak_credential_name}"
   cloudbreak_ready           = "${module.cloudbreak.cloudbreak_ready}"
+  ldap_server                = "${var.ldap_server}"
+  ldap_domain                = "${var.ldap_domain}"
+  ldap_bind_password         = "${var.ldap_bind_password}"
+}
+
+variable "ldap_server" {
+  description = "The address of the ldap server"
+  default     = "iam-master.alm.internal.smartcolumbusos.com"
+}
+
+variable "ldap_domain" {
+  description = "The ldap domain in domain component format"
+  default     = "dc=internal,dc=smartcolumbusos,dc=com"
+}
+
+variable "ldap_bind_password" {
+  description = "Password for the non-privileged ldap bind user"
+  default     = "foobarbilly79"
 }
