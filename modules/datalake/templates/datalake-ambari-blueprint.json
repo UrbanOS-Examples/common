@@ -133,6 +133,14 @@
             }
         },
         {
+            "ranger-admin-site": {
+                "properties": {
+                    "ranger.ldap.user.searchfilter": "(uid={0})",
+                    "ranger.ldap.group.searchfilter": "(cn={0})"
+                }
+            }
+        },
+        {
             "capacity-scheduler": {
                 "properties": {
                     "yarn.scheduler.capacity.root.queues": "default,llap",

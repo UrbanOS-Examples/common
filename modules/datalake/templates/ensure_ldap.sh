@@ -18,7 +18,7 @@ ensure-ldap() {
     cb ldap list | grep -qw ${LDAP_NAME} \
         || cb ldap create \
             --name ${LDAP_NAME} \
-            --ldap-server ${LDAP_SERVER}:${LDAP_PORT} \
+            --ldap-server ldap://${LDAP_SERVER}:${LDAP_PORT} \
             --ldap-domain ${LDAP_DOMAIN} \
             --ldap-bind-dn uid=${LDAP_BIND_USER},cn=users,cn=accounts,${LDAP_DOMAIN} \
             --ldap-directory-type LDAP \

@@ -148,7 +148,7 @@
       "locations": [
         {
           "value": "s3a://${BUCKET_CLOUD_STORAGE}/scos-hdp-datalake/apps/ranger/audit/scos-hdp-datalake",
-          "propertyFile": "ranger-env",
+          "propertyFile": "ranger-hive-audit",
           "propertyName": "xasecure.audit.destination.hdfs.dir"
         },
         {
@@ -166,7 +166,7 @@
       "${HIVE_CONNECTION_NAME}",
       "${RANGER_CONNECTION_NAME}"
     ],
-    "ldapConfigName": "${LDAP_CONNECTION_NAME}"
+    "ldapConfigName": "${LDAP_CONNECTION_NAME}",
     "ambari": {
       "blueprintName": "${AMBARI_BLUEPRINT_NAME}",
       "validateBlueprint" : false,
