@@ -147,12 +147,12 @@
     "cloudStorage": {
       "locations": [
         {
-          "value": "s3a://${BUCKET_CLOUD_STORAGE}/scos-hdp-datalake/apps/ranger/audit/scos-hdp-datalake",
+          "value": "s3a://${CLOUD_STORAGE_BUCKET}/scos-hdp-datalake/apps/ranger/audit/scos-hdp-datalake",
           "propertyFile": "ranger-hive-audit",
           "propertyName": "xasecure.audit.destination.hdfs.dir"
         },
         {
-          "value": "s3a://${BUCKET_CLOUD_STORAGE}/scos-hdp-datalake/apps/hive/warehouse",
+          "value": "s3a://${CLOUD_STORAGE_BUCKET}/scos-hdp-datalake/apps/hive/warehouse",
           "propertyFile": "hive-site",
           "propertyName": "hive.metastore.warehouse.dir"
         }

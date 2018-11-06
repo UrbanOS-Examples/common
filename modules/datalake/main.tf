@@ -15,11 +15,19 @@ resource "random_string" "ambari_admin_password" {
   special = false
 }
 
+data "template_file" "cloudbreak_blueprint" {
+  template = "${file("${path.module}/templates/datalake-ambari-blueprint.json.tpl")}"
+
+  vars {
+    CLOUD_STORAGE_BUCKET = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
+  }
+}
+
 data "template_file" "cloudbreak_cluster" {
   template = "${file("${path.module}/templates/datalake-cluster-template.json.tpl")}"
 
   vars {
-    BUCKET_CLOUD_STORAGE               = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
+    CLOUD_STORAGE_BUCKET               = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
     INSTANCE_PROFILE_FOR_BUCKET_ACCESS = "${aws_iam_instance_profile.cloudstorage_bucket_access.arn}"
     CLUSTER_REGION                     = "${var.region}"
     CLUSTER_VPC                        = "${var.vpc_id}"
@@ -137,6 +145,10 @@ resource "null_resource" "cloudbreak_blueprint" {
     cloudbreak_ready = "${var.cloudbreak_ready}"
   }
 
+  depends_on = [
+    "aws_s3_bucket.hadoop_cloud_storage"
+  ]
+
   connection {
     type = "ssh"
     host = "${var.cloudbreak_ip}"
@@ -144,7 +156,7 @@ resource "null_resource" "cloudbreak_blueprint" {
   }
 
   provisioner "file" {
-    source      = "${local.ambari_blueprint_path}"
+    content     = "${data.template_file.cloudbreak_blueprint.rendered}"
     destination = "/tmp/blueprint.json"
   }
 

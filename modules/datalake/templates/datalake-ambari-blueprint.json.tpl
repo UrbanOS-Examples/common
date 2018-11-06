@@ -57,6 +57,7 @@
             "hive-site": {
                 "properties": {
                     "hive.metastore.uris": "thrift://%HOSTGROUP::master_namenode1%:9083,thrift://%HOSTGROUP::master_namenode2%:9083",
+                    "hive.metastore.warehouse.dir": "s3a://${CLOUD_STORAGE_BUCKET}/scos-hdp-datalake/apps/hive/warehouse",
                     "hive.exec.compress.output": "true",
                     "hive.merge.mapfiles": "true",
                     "hive.server2.tez.initialize.default.sessions": "false",
@@ -129,6 +130,13 @@
                     "yarn.resourcemanager.webapp.https.address": "%HOSTGROUP::master_namenode1%:8090",
                     "yarn.resourcemanager.webapp.https.address.rm1": "%HOSTGROUP::master_namenode1%:8090",
                     "yarn.resourcemanager.webapp.https.address.rm2": "%HOSTGROUP::master_namenode2%:8090"
+                }
+            }
+        },
+        {
+            "ranger-hive-audit": {
+                "properties": {
+                    "xasecure.audit.destination.hdfs.dir": "s3a://${CLOUD_STORAGE_BUCKET}/scos-hdp-datalake/apps/ranger/audit/scos-hdp-datalake"
                 }
             }
         },

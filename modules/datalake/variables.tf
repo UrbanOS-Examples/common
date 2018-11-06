@@ -1,5 +1,5 @@
 locals {
-  ambari_blueprint_path    = "${path.module}/templates/datalake-ambari-blueprint.json"
+  ambari_blueprint_path    = "${path.module}/templates/datalake-ambari-blueprint.json.tpl"
   ambari_blueprint_sha     = "${substr(sha1(file(local.ambari_blueprint_path)), 0, 12)}"
   deployment_template_sha  = "${substr(sha1(data.template_file.cloudbreak_cluster.rendered), 0, 12)}"
   hive_db_name             = "hive"            // at present we don't trigger updates based on RDS changes
