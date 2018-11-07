@@ -27,3 +27,13 @@ output "cloudbreak_ready" {
   description = "A reasonably decent signal that cloudbreak is ready for use"
   value       = "${null_resource.cloudbreak.id}"
 }
+
+output "cloudbreak_cluster_secret_id" {
+  description = "The resource ID of the cloudbreak cluster secret"
+  value       = "${aws_secretsmanager_secret_version.cloudbreak_cluster_secret.arn}"
+}
+
+output "cloudbreak_admin_password_id" {
+  description = "The resource ID of the cloudbreak admin password secret"
+  value       = "${aws_secretsmanager_secret_version.cloudbreak_admin_password.arn}"
+}

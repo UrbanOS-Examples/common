@@ -15,11 +15,30 @@ resource "random_string" "ambari_admin_password" {
   special = false
 }
 
+resource "aws_secretsmanager_secret" "ambari_admin_password" {
+  name = "${terraform.workspace}-ambari-admin-password"
+}
+
+resource "aws_secretsmanager_secret_version" "ambari_admin_password" {
+  secret_id     = "${aws_secretsmanager_secret.ambari_admin_password.id}"
+  secret_string = "${random_string.ambari_admin_password.result}"
+}
+
+data "template_file" "cloudbreak_blueprint" {
+  template = "${file("${path.module}/templates/datalake-ambari-blueprint.json.tpl")}"
+
+  vars {
+    CLOUD_STORAGE_BUCKET = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
+    AMBARI_PASSWORD      = "${random_string.ambari_admin_password.result}"
+    RANGER_DB_ENDPOINT   = "${aws_db_instance.ranger_db.endpoint}"
+  }
+}
+
 data "template_file" "cloudbreak_cluster" {
   template = "${file("${path.module}/templates/datalake-cluster-template.json.tpl")}"
 
   vars {
-    BUCKET_CLOUD_STORAGE               = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
+    CLOUD_STORAGE_BUCKET               = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
     INSTANCE_PROFILE_FOR_BUCKET_ACCESS = "${aws_iam_instance_profile.cloudstorage_bucket_access.arn}"
     CLUSTER_REGION                     = "${var.region}"
     CLUSTER_VPC                        = "${var.vpc_id}"
@@ -35,19 +54,21 @@ data "template_file" "cloudbreak_cluster" {
     BROKER_NODE_COUNT          = "${var.broker_node_count}"
     WORKER_NODE_COUNT          = "${var.worker_node_count}"
 
-    SSH_KEY               = "${var.ssh_key}"
-    CREDENTIAL_NAME       = "${var.cloudbreak_credential_name}"
-    HIVE_CONNECTION_NAME  = "${local.hive_db_name}"
-    AMBARI_BLUEPRINT_NAME = "${local.ambari_blueprint_name}"
-    AMBARI_GATEWAY_PATH   = "${local.ambari_gateway_path}"
-    AMBARI_USERNAME       = "${local.ambari_username}"
-    AMBARI_PASSWORD       = "${random_string.ambari_admin_password.result}"
+    SSH_KEY                = "${var.ssh_key}"
+    CREDENTIAL_NAME        = "${var.cloudbreak_credential_name}"
+    HIVE_CONNECTION_NAME   = "${local.hive_db_name}"
+    RANGER_CONNECTION_NAME = "${local.ranger_db_name}"
+    LDAP_CONNECTION_NAME   = "${local.ldap_connection_name}"
+    AMBARI_BLUEPRINT_NAME  = "${local.ambari_blueprint_name}"
+    AMBARI_GATEWAY_PATH    = "${local.ambari_gateway_path}"
+    AMBARI_USERNAME        = "${local.ambari_username}"
+    AMBARI_PASSWORD        = "${random_string.ambari_admin_password.result}"
   }
 }
 
 resource "null_resource" "cloudbreak_hive_db" {
   triggers {
-    setup_updated    = "${sha1(file(local.ensure_hive_path))}"
+    setup_updated    = "${sha1(file(local.ensure_db_path))}"
     id_updated       = "${local.hive_db_name}"
     cloudbreak_ready = "${var.cloudbreak_ready}"
   }
@@ -59,17 +80,65 @@ resource "null_resource" "cloudbreak_hive_db" {
   }
 
   provisioner "file" {
-    source      = "${local.ensure_hive_path}"
-    destination = "/tmp/ensure_hive_db.sh"
+    source      = "${local.ensure_db_path}"
+    destination = "/tmp/ensure_databases.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
       <<EOF
-bash /tmp/ensure_hive_db.sh \
+bash /tmp/ensure_databases.sh \
   jdbc:postgresql://${aws_db_instance.hive_db.endpoint}/${aws_db_instance.hive_db.name} \
   ${local.hive_db_name} \
-  ${aws_db_instance.hive_db.password}
+  ${aws_db_instance.hive_db.password} \
+  HIVE
+EOF
+      ,
+      <<EOF
+bash /tmp/ensure_databases.sh \
+  jdbc:postgresql://${aws_db_instance.ranger_db.endpoint}/${aws_db_instance.ranger_db.name} \
+  ${local.ranger_db_name} \
+  ${aws_db_instance.ranger_db.password} \
+  RANGER
+EOF
+      ,
+    ]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "null_resource" "cloudbreak_ldap_connection" {
+  triggers {
+    setup_updated    = "${sha1(file(local.ensure_ldap_path))}"
+    id_updated       = "${local.ldap_connection_name}"
+    cloudbreak_ready = "${var.cloudbreak_ready}"
+  }
+
+  connection {
+    type = "ssh"
+    host = "${var.cloudbreak_ip}"
+    user = "ec2-user"
+  }
+
+  provisioner "file" {
+    source      = "${local.ensure_ldap_path}"
+    destination = "/tmp/ensure_ldap.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      <<EOF
+bash /tmp/ensure_ldap.sh \
+  ${local.ldap_connection_name} \
+  ${var.ldap_server} \
+  ${var.ldap_port} \
+  ${var.ldap_domain} \
+  ${var.ldap_bind_user} \
+  ${var.ldap_bind_password} \
+  ${var.ldap_admin_group}
 EOF
       ,
     ]
@@ -87,6 +156,10 @@ resource "null_resource" "cloudbreak_blueprint" {
     cloudbreak_ready = "${var.cloudbreak_ready}"
   }
 
+  depends_on = [
+    "aws_s3_bucket.hadoop_cloud_storage"
+  ]
+
   connection {
     type = "ssh"
     host = "${var.cloudbreak_ip}"
@@ -94,7 +167,7 @@ resource "null_resource" "cloudbreak_blueprint" {
   }
 
   provisioner "file" {
-    source      = "${local.ambari_blueprint_path}"
+    content     = "${data.template_file.cloudbreak_blueprint.rendered}"
     destination = "/tmp/blueprint.json"
   }
 
