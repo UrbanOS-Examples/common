@@ -149,6 +149,20 @@
             }
         },
         {
+            "ranger-env": {
+                "properties": {
+                    "ranger-hdfs-plugin-enabled" : "Yes",
+                    "ranger-knox-plugin-enabled" : "Yes",
+                    "ranger-hive-plugin-enabled" : "Yes",
+                    "ranger-yarn-plugin-enabled" : "Yes",
+                    "ranger_admin_password": "${AMBARI_PASSWORD}",
+                    "admin_password": "${AMBARI_PASSWORD}",
+                    "ranger_privelege_user_jdbc_url": "jdbc:postgresql://${RANGER_DB_ENDPOINT}",
+                    "create_db_dbuser": "false"
+                }
+            }
+        },
+        {
             "capacity-scheduler": {
                 "properties": {
                     "yarn.scheduler.capacity.root.queues": "default,llap",

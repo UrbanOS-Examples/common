@@ -31,3 +31,23 @@ variable "ldap_bind_password" {
   description = "Password for the non-privileged ldap bind user"
   default     = "foobarbilly79"
 }
+
+output "hive_db_endpoint" {
+  description = "The FQDN:Port of the Hive RDS database."
+  value       = "${module.datalake.hive_db_endpoint}"
+}
+
+output "ranger_db_endpoint" {
+  description = "The FQDN:Port of the Ranger RDS database."
+  value       = "${module.datalake.ranger_db_endpoint}"
+}
+
+output "blueprint_name" {
+  description = "The name of the blueprint that is deployed for a given blueprint iteration."
+  value       = "${module.datalake.blueprint_name}"
+}
+
+output "cluster_name" {
+  description = "The name of the cluster resulting from a given deployment with unique value hashing."
+  value       = "${module.datalake.cluster_name}"
+}

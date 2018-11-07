@@ -141,5 +141,5 @@ variable "ldap_bind_password" {
 
 variable "ldap_admin_group" {
   description = "The group that will administer the hdp cluster"
-  default     = "specialgroup"
+  default     = "hadoop"
 }
