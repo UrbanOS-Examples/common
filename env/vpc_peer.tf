@@ -1,25 +1,3 @@
-provider "aws" {
-  version = "1.39"
-  alias   = "alm"
-  region  = "${var.alm_region}"
-
-  assume_role {
-    role_arn = "${var.alm_role_arn}"
-  }
-}
-
-data "terraform_remote_state" "alm_remote_state" {
-  backend   = "s3"
-  workspace = "${var.alm_workspace}"
-
-  config {
-    bucket   = "${var.alm_state_bucket_name}"
-    key      = "alm"
-    region   = "us-east-2"
-    role_arn = "${var.alm_role_arn}"
-  }
-}
-
 resource "aws_vpc_peering_connection" "env_to_alm" {
   vpc_id        = "${module.vpc.vpc_id}"
   peer_vpc_id   = "${data.terraform_remote_state.alm_remote_state.vpc_id}"

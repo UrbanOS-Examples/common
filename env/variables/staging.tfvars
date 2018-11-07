@@ -10,7 +10,6 @@ enabled_features = ["eks-cluster",
                     "joomla",
                     "load_balancer",
                     "streaming-data-aggregator",
-                    "cloudbreak",
                     "datalake",
                    ]
 

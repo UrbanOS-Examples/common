@@ -24,7 +24,7 @@ resource "aws_db_subnet_group" "hive_db_subnet_group" {
 
 resource "aws_db_instance" "hive_db" {
   identifier              = "${terraform.workspace}-hive"
-  name                    = "hive"
+  name                    = "${local.hive_db_name}"
   instance_class          = "db.t2.small"
   vpc_security_group_ids  = ["${aws_security_group.hive_security_group.id}", "${aws_security_group.db_allow_hadoop.id}"]
   db_subnet_group_name    = "${aws_db_subnet_group.hive_db_subnet_group.name}"
@@ -32,7 +32,7 @@ resource "aws_db_instance" "hive_db" {
   engine_version          = "10.4"
   allocated_storage       = 100 # The allocated storage in gibibytes.
   storage_type            = "gp2"
-  username                = "hive"
+  username                = "${local.hive_db_name}"
   password                = "${random_string.hive_db_password.result}"
   multi_az                = "${var.hive_db_multi_az}"
   backup_window           = "04:54-05:24"
