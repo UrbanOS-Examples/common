@@ -12,6 +12,7 @@ enabled_features = ["eks-cluster",
                     "streaming-data-aggregator",
                     "cloudbreak",
                     "datalake",
+                    "kylo",
                    ]
 
 vpc_name = "test"
