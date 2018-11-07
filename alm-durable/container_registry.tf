@@ -68,6 +68,18 @@ module "cota_producer_smoke_test_repository" {
   repository_name = "cota-producer-smoke-test"
 }
 
+module "sculler_repository" {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "sculler"
+}
+
+module "sculler_configs_smoke_test_repository" {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "sculler-configs-smoke-test"
+}
+
 module "cota_streaming_ui_repository" {
   source          = "../modules/ecr"
   alm_account_id  = "${var.alm_account_id}"
@@ -97,6 +109,7 @@ module "micro_service_watchinator_repository" {
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "micro-service-watchinator"
 }
+
 module "discovery_api_repository" {
   source          = "../modules/ecr"
   alm_account_id  = "${var.alm_account_id}"
@@ -108,6 +121,7 @@ module "discovery_ui_repository" {
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "discovery-ui"
 }
+
 module streaming_data_aggregator {
   source          = "../modules/ecr"
   alm_account_id  = "${var.alm_account_id}"
