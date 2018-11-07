@@ -11,9 +11,27 @@ resource "random_string" "cloudbreak_cluster_secret" {
   special = false
 }
 
+resource "aws_secretsmanager_secret" "cloudbreak_cluster_secret" {
+  name = "${terraform.workspace}-cloudbreak-cluster-secret"
+}
+
+resource "aws_secretsmanager_secret_version" "cloudbreak_cluster_secret" {
+  secret_id     = "${aws_secretsmanager_secret.cloudbreak_cluster_secret.id}"
+  secret_string = "${random_string.cloudbreak_cluster_secret.result}"
+}
+
 resource "random_string" "cloudbreak_admin_password" {
   length  = 40
   special = false
+}
+
+resource "aws_secretsmanager_secret" "cloudbreak_admin_password" {
+  name = "${terraform.workspace}-cloudbreak-admin-password"
+}
+
+resource "aws_secretsmanager_secret_version" "cloudbreak_admin_password" {
+  secret_id     = "${aws_secretsmanager_secret.cloudbreak_admin_password.id}"
+  secret_string = "${random_string.cloudbreak_admin_password.result}"
 }
 
 data "template_file" "cloudbreak_profile" {

@@ -15,6 +15,15 @@ resource "random_string" "ambari_admin_password" {
   special = false
 }
 
+resource "aws_secretsmanager_secret" "ambari_admin_password" {
+  name = "${terraform.workspace}-ambari-admin-password"
+}
+
+resource "aws_secretsmanager_secret_version" "ambari_admin_password" {
+  secret_id     = "${aws_secretsmanager_secret.ambari_admin_password.id}"
+  secret_string = "${random_string.ambari_admin_password.result}"
+}
+
 data "template_file" "cloudbreak_blueprint" {
   template = "${file("${path.module}/templates/datalake-ambari-blueprint.json.tpl")}"
 

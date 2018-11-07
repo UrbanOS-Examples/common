@@ -22,3 +22,8 @@ output "rendered_cluster_template" {
   description = "The rendered output of the terraform variables fed to the cluster_template.tpl"
   value       = "${data.template_file.cloudbreak_cluster.rendered}"
 }
+
+output "ambari_admin_password_id" {
+  description = "The resource ID of the ambari admin password"
+  value       = "${aws_secretsmanager_secret_version.ambari_admin_password.arn}"
+}

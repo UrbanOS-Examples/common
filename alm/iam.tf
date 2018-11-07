@@ -30,3 +30,7 @@ output "freeipa_server_ips" {
 output "keycloak_server_ip" {
   value = "${module.iam_stack.keycloak_server_ip}"
 }
+
+output "bind_user_password_secret_id" {
+  value = "${module.iam_stack.bind_user_password_secret_id}"
+}
