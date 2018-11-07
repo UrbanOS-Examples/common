@@ -2,18 +2,6 @@ locals {
   public_hosted_zone_name = "${lower(terraform.workspace)}.${lower(var.root_dns_zone)}"
 }
 
-data "terraform_remote_state" "durable" {
-  backend   = "s3"
-  workspace = "${var.alm_workspace}"
-
-  config {
-    bucket   = "${var.alm_state_bucket_name}"
-    key      = "alm-durable"
-    region   = "us-east-2"
-    role_arn = "${var.alm_role_arn}"
-  }
-}
-
 resource "aws_route53_zone" "public_hosted_zone" {
   name          = "${local.public_hosted_zone_name}"
   force_destroy = true

@@ -1,16 +1,19 @@
 locals {
-  ambari_blueprint_path    = "${path.module}/templates/datalake-ambari-blueprint.json"
+  ambari_blueprint_path    = "${path.module}/templates/datalake-ambari-blueprint.json.tpl"
   ambari_blueprint_sha     = "${substr(sha1(file(local.ambari_blueprint_path)), 0, 12)}"
   deployment_template_sha  = "${substr(sha1(data.template_file.cloudbreak_cluster.rendered), 0, 12)}"
   hive_db_name             = "hive"            // at present we don't trigger updates based on RDS changes
+  ranger_db_name           = "ranger"
+  ldap_connection_name     = "ldap"
   ambari_blueprint_name    = "SCOS DataLake ${local.ambari_blueprint_sha}"
   ambari_gateway_path      = "scos-datalake"
   ambari_username          = "admin"
   cluster_subnet           = "${random_shuffle.private_subnet.result[0]}"
   cluster_name             = "hdp-${local.deployment_template_sha}"
-  ensure_hive_path         = "${path.module}/templates/ensure_hive_db.sh"
+  ensure_db_path           = "${path.module}/templates/ensure_databases.sh"
   ensure_cluster_path      = "${path.module}/templates/ensure_cluster.sh"
   ensure_blueprint_path    = "${path.module}/templates/ensure_blueprint.sh"
+  ensure_ldap_path         = "${path.module}/templates/ensure_ldap.sh"
 }
 
 variable "vpc_id" {
@@ -64,8 +67,18 @@ variable "hive_db_multi_az" {
   default     = true
 }
 
+variable "ranger_db_multi_az" {
+  description = "Should the Ranger DB be multi-az?"
+  default     = true
+}
+
 variable "hive_db_apply_immediately" {
   description = "Should changes to the Hive DB be applied immediately?"
+  default     = false
+}
+
+variable "ranger_db_apply_immediately" {
+  description = "Should changes to the Ranger DB be applied immediately?"
   default     = false
 }
 
@@ -102,4 +115,31 @@ variable "worker_node_count" {
 variable "broker_node_count" {
   description = "Number of broker (zookeeper) nodes to include in the cluster."
   default     = 1
+}
+
+variable "ldap_server" {
+  description = "The address of the ldap server"
+}
+
+variable "ldap_port" {
+  description = "The port on which to connect to ldap"
+  default     = 389
+}
+
+variable "ldap_domain" {
+  description = "The ldap domain in domain component format"
+}
+
+variable "ldap_bind_user" {
+  description = "The non-privileged ldap user for directory integration"
+  default     = "binduser"
+}
+
+variable "ldap_bind_password" {
+  description = "Password for the non-privileged ldap bind user"
+}
+
+variable "ldap_admin_group" {
+  description = "The group that will administer the hdp cluster"
+  default     = "hadoop"
 }

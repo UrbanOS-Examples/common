@@ -179,3 +179,31 @@ resource "aws_security_group" "hive_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "ranger_security_group" {
+  name   = "Ranger Security Group"
+  vpc_id = "${var.vpc_id}"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
+    description = "Allow traffic from self"
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.remote_management_cidr}"]
+    description = "Allow all traffic from admin VPC"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}

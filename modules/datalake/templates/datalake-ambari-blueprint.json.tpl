@@ -57,6 +57,7 @@
             "hive-site": {
                 "properties": {
                     "hive.metastore.uris": "thrift://%HOSTGROUP::master_namenode1%:9083,thrift://%HOSTGROUP::master_namenode2%:9083",
+                    "hive.metastore.warehouse.dir": "s3a://${CLOUD_STORAGE_BUCKET}/scos-hdp-datalake/apps/hive/warehouse",
                     "hive.exec.compress.output": "true",
                     "hive.merge.mapfiles": "true",
                     "hive.server2.tez.initialize.default.sessions": "false",
@@ -73,7 +74,8 @@
             "hive-env": {
                 "properties" : {
                     "hive_database" : "Existing {{{ rds.hive.subprotocol }}} Database",
-                    "hive_database_type" : "{{{ rds.hive.databaseEngine }}}"
+                    "hive_database_type" : "{{{ rds.hive.databaseEngine }}}",
+                    "hive_security_authorization": "Ranger"
                 }
             }
         },
@@ -128,6 +130,35 @@
                     "yarn.resourcemanager.webapp.https.address": "%HOSTGROUP::master_namenode1%:8090",
                     "yarn.resourcemanager.webapp.https.address.rm1": "%HOSTGROUP::master_namenode1%:8090",
                     "yarn.resourcemanager.webapp.https.address.rm2": "%HOSTGROUP::master_namenode2%:8090"
+                }
+            }
+        },
+        {
+            "ranger-hive-audit": {
+                "properties": {
+                    "xasecure.audit.destination.hdfs.dir": "s3a://${CLOUD_STORAGE_BUCKET}/scos-hdp-datalake/apps/ranger/audit/scos-hdp-datalake"
+                }
+            }
+        },
+        {
+            "ranger-admin-site": {
+                "properties": {
+                    "ranger.ldap.user.searchfilter": "(uid={0})",
+                    "ranger.ldap.group.searchfilter": "(cn={0})"
+                }
+            }
+        },
+        {
+            "ranger-env": {
+                "properties": {
+                    "ranger-hdfs-plugin-enabled" : "Yes",
+                    "ranger-knox-plugin-enabled" : "Yes",
+                    "ranger-hive-plugin-enabled" : "Yes",
+                    "ranger-yarn-plugin-enabled" : "Yes",
+                    "ranger_admin_password": "${AMBARI_PASSWORD}",
+                    "admin_password": "${AMBARI_PASSWORD}",
+                    "ranger_privelege_user_jdbc_url": "jdbc:postgresql://${RANGER_DB_ENDPOINT}",
+                    "create_db_dbuser": "false"
                 }
             }
         },
