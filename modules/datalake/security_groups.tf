@@ -207,3 +207,20 @@ resource "aws_security_group" "ranger_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "datalake_metrics" {
+  name_prefix = "datalake_metrics_"
+  vpc_id = "${var.vpc_id}"
+
+  ingress {
+    from_port = 6188
+    to_port   = 6188
+    protocol  = "tcp"
+    security_groups = ["${var.eks_worker_node_security_group}"]
+    description = "Allow traffic from EKS for metric visualization"
+  }
+
+  tags {
+    Name = "datalake-metrics-${terraform.workspace}"
+  }
+}
