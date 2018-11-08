@@ -11,6 +11,7 @@ enabled_features = ["eks-cluster",
                     "load_balancer",
                     "streaming-data-aggregator",
                     "datalake",
+                    "kylo",
                    ]
 
 vpc_name = "test"
@@ -41,3 +42,6 @@ ckan_external_instance_ebs_optimized = false
 #Jupyterhub EKS Workers
 min_num_of_jupyterhub_workers=3
 max_num_of_jupyterhub_workers=5
+
+kylo_db_multi_az=false
+kylo_db_instance_class="db.t2.small"

@@ -11,6 +11,7 @@ enabled_features = ["eks-cluster",
                     "load_balancer",
                     "streaming-data-aggregator",
                     "datalake",
+                    "kylo",
                    ]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
@@ -43,3 +44,6 @@ ckan_external_instance_ebs_optimized = false
 #Jupyterhub EKS Workers
 min_num_of_jupyterhub_workers=3
 max_num_of_jupyterhub_workers=4
+
+kylo_db_multi_az=false
+kylo_db_instance_class="db.t2.small"
