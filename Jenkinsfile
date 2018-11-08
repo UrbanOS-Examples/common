@@ -208,15 +208,11 @@ def applyInfraHelmCharts(environment) {
         def terraformOutputs = scos.terraformOutput(environment)
         def eks_cluster_name = terraformOutputs.eks_cluster_name.value
         def aws_region = terraformOutputs.aws_region.value
-        def subnets = terraformOutputs.public_subnets.value.join(', ')
-        def albToClusterSG = terraformOutputs.allow_all_security_group.value
 
         sh("""#!/bin/bash
             export EKS_CLUSTER_NAME="${eks_cluster_name}"
             export AWS_REGION="${aws_region}"
             export DNS_ZONE="${environment}.internal.smartcolumbusos.com"
-            export SUBNETS="${subnets}"
-            export SECURITY_GROUPS="${albToClusterSG}"
 
             for i in \$(seq 1 5); do
                 [ \$i -gt 1 ] && sleep 15
