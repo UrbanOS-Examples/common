@@ -44,3 +44,6 @@ ckan_external_instance_ebs_optimized = false
 #Jupyterhub EKS Workers
 min_num_of_jupyterhub_workers=3
 max_num_of_jupyterhub_workers=4
+
+kylo_db_multi_az=false
+kylo_db_instance_class="db.t2.small"

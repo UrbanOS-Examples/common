@@ -86,3 +86,7 @@ output "kylo_rds_username" {
 output "kylo_rds_password" {
   value = "${random_string.kylo_db_password.result}"
 }
+
+output "kylo_db_instance_id" {
+    value = "${aws_db_instance.kylo.id}"
+}
