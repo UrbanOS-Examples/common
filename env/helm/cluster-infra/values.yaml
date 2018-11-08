@@ -6,7 +6,7 @@ resourceLimits:
   memory: 256Mi
 
 calico:
-  enabled: false
+  enabled: true
   name: calico
   crdGroup: crd.projectcalico.org
   service:
