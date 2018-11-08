@@ -117,6 +117,9 @@ variable "broker_node_count" {
   default     = 1
 }
 
+variable "eks_worker_node_security_group" {
+  description = "Security group for the EKS worker nodes"
+}
 variable "ldap_server" {
   description = "The address of the ldap server"
 }

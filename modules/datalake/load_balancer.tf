@@ -16,6 +16,24 @@ resource "aws_alb_target_group" "datalake" {
   }
 }
 
+resource "aws_alb_target_group" "datalake_metrics" {
+  name     = "datalake-metrics-lb-tg-${terraform.workspace}"
+  port     = 6188
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc_id}"
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    interval            = 30
+    path                = "/jmx"
+    protocol            = "HTTP"
+    matcher             = "200"
+    port                = 6188
+  }
+}
+
 data "aws_instance" "datalake" {
   filter {
     name   = "tag:CloudbreakClusterName"
@@ -36,12 +54,29 @@ resource "aws_alb_target_group_attachment" "datalake" {
   port             = 8443
 }
 
+resource "aws_alb_target_group_attachment" "datalake_metrics" {
+  target_group_arn = "${aws_alb_target_group.datalake_metrics.arn}"
+  target_id        = "${data.aws_instance.datalake.id}"
+  port             = 6188
+}
+
 resource "aws_alb" "datalake" {
   name               = "datalake-lb-${terraform.workspace}"
   load_balancer_type = "application"
   internal           = true
   subnets            = ["${var.subnets}"]
-  security_groups    = ["${var.cloudbreak_security_group}"]
+  security_groups    = ["${var.cloudbreak_security_group}", "${aws_security_group.datalake_metrics.id}"]
+}
+
+resource "aws_alb_listener" "datalake_metrics" {
+  load_balancer_arn = "${aws_alb.datalake.arn}"
+  port              = 6188
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = "${aws_alb_target_group.datalake_metrics.arn}"
+  }
 }
 
 resource "aws_alb_listener" "datalake_https" {
