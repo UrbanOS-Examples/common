@@ -150,12 +150,6 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
                 stage("Deploy ${environment}") {
                     terraform.apply()
                 }
-                stage("Deploy tiller service for ${environment}") {
-                    createTillerService(environment)
-                }
-                stage("Execute infrastructure Helm charts for ${environment}") {
-                    applyInfraHelmCharts(environment)
-                }
                 stage('Tag') {
                     if (environment == 'staging') {
                         scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
@@ -187,51 +181,5 @@ def doPlan(terraform, environment, publicKey, terraformOverrides) {
         terraform.plan(terraform.defaultVarFile, overrides)
 
         archiveArtifacts artifacts: 'plan-*.txt', allowEmptyArchive: false
-    }
-}
-
-def createTillerService(environment) {
-    scos.withEksCredentials(environment) {
-        /* Assumes this is running on the infrastructure node */
-        sh('''#!/usr/bin/env bash
-            set -e
-
-            kubectl apply -f k8s/tiller-role/
-
-            helm init --service-account tiller
-        ''')
-    }
-}
-
-def applyInfraHelmCharts(environment) {
-    scos.withEksCredentials(environment) {
-        def terraformOutputs = scos.terraformOutput(environment)
-        def eks_cluster_name = terraformOutputs.eks_cluster_name.value
-        def aws_region = terraformOutputs.aws_region.value
-
-        sh("""#!/bin/bash
-            export EKS_CLUSTER_NAME="${eks_cluster_name}"
-            export AWS_REGION="${aws_region}"
-            export DNS_ZONE="${environment}.internal.smartcolumbusos.com"
-
-            for i in \$(seq 1 5); do
-                [ \$i -gt 1 ] && sleep 15
-                [ \$(kubectl get pods --namespace kube-system -l name='tiller' | grep -ic Running) -gt 0 ] && break
-                echo "Running Tiller Pod not found"
-                [ \$i -eq 5 ] && exit 1
-            done
-
-            # label the dns namespace to later select for network policy rules; overwrite = no-op
-            kubectl get namespaces | egrep '^cluster-infra ' || kubectl create namespace cluster-infra
-            kubectl label namespace cluster-infra name=cluster-infra --overwrite
-
-            helm upgrade --install cluster-infra helm/cluster-infra \
-                --namespace=cluster-infra \
-                --set externalDns.args."domain\\-filter"="\${DNS_ZONE}" \
-                --set albIngress.extraEnv."AWS\\_REGION"="\${AWS_REGION}" \
-                --set albIngress.extraEnv."CLUSTER\\_NAME"="\${EKS_CLUSTER_NAME}" \
-                --values helm/cluster-infra/run-config.yaml
-
-        """.trim())
     }
 }
