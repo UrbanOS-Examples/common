@@ -10,8 +10,8 @@
   "parameters": {},
   "inputs": {},
   "customDomain": {
-    "clusterNameAsSubdomain": false,
-    "hostgroupNameAsHostname": false
+    "clusterNameAsSubdomain": true,
+    "hostgroupNameAsHostname": true
   },
   "tags": {
     "userDefinedTags": {}
