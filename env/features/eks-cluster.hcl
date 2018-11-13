@@ -114,6 +114,49 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
 EOF
 }
 
+resource "null_resource" "eks_infrastructure" {
+  depends_on = ["data.external.helm_file_change_check", "module.eks-cluster"]
+  provisioner "local-exec" {
+    
+    command = <<EOF
+set -e
+export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
+kubectl apply -f ${path.module}/k8s/tiller-role/
+helm init --service-account tiller
+
+for i in $(seq 1 5); do
+    [ $i -gt 1 ] && sleep 15
+    [ $(kubectl get pods --namespace kube-system -l name='tiller' | grep -ic Running) -gt 0 ] && break
+    echo "Running Tiller Pod not found"
+    [ $i -eq 5 ] && exit 1
+done
+
+# label the dns namespace to later select for network policy rules; overwrite = no-op
+kubectl get namespaces | egrep '^cluster-infra ' || kubectl create namespace cluster-infra
+kubectl label namespace cluster-infra name=cluster-infra --overwrite
+
+helm upgrade --install cluster-infra ${path.module}/helm/cluster-infra \
+    --namespace=cluster-infra \
+    --set externalDns.args."domain\-filter"="${var.root_dns_zone}" \
+    --set albIngress.extraEnv."AWS\_REGION"="${var.region}" \
+    --set albIngress.extraEnv."CLUSTER\_NAME"="${local.kubernetes_cluster_name}" \
+    --values ${path.module}/helm/cluster-infra/run-config.yaml
+
+EOF
+  }
+
+  triggers {
+    helm_file_change_check = "${data.external.helm_file_change_check.result.md5_result}"
+  }
+}
+
+data "external" "helm_file_change_check" {
+  program = [
+    "${path.module}/../scripts/helm_file_change_check.sh",
+    "${path.module}/helm"
+    ]
+}
+
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   role       = "${module.eks-cluster.worker_iam_role_name}"
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
@@ -139,15 +182,6 @@ variable "max_num_of_jupyterhub_workers" {
   default = 5
 }
 
-variable "min_num_of_nifi_workers" {
-  description = "Minimum number of NiFi workers to be created on eks cluster"
-  default = 2
-}
-
-variable "max_num_of_nifi_workers" {
-  description = "Maximum number of NiFi workers to be created on eks cluster"
-  default = 2
-}
 output "eks_cluster_kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
   value       = "${module.eks-cluster.kubeconfig}"
