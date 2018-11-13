@@ -21,7 +21,7 @@ module "eks-cluster" {
       name                 = "Workers"
       asg_min_size         = "${var.min_num_of_workers}"
       asg_max_size         = "${var.max_num_of_workers}"
-      instance_type        = "t2.large"
+      instance_type        = "t2.xlarge"
       key_name             = "${aws_key_pair.cloud_key.key_name}"
       pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
@@ -33,7 +33,7 @@ module "eks-cluster" {
       key_name             = "${aws_key_pair.cloud_key.key_name}"
       kubelet_extra_args   = "--register-with-taints=scos.run.jupyterhub=true:NoExecute --node-labels=scos.run.jupyterhub=true"
       pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
-    }
+    },
   ]
 
   tags = {
@@ -121,22 +121,32 @@ resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
 
 variable "min_num_of_workers" {
   description = "Minimum number of workers to be created on eks cluster"
-  default = 9
+  default = 6
 }
 
 variable "max_num_of_workers" {
   description = "Maximum number of workers to be created on eks cluster"
-  default = 18
+  default = 12
 }
 
 variable "min_num_of_jupyterhub_workers" {
-  description = "Minimum number of workers to be created on eks cluster"
+  description = "Minimum number of JupyterHub workers to be created on eks cluster"
   default = 3
 }
 
 variable "max_num_of_jupyterhub_workers" {
-  description = "Maximum number of workers to be created on eks cluster"
+  description = "Maximum number of JupyterHub workers to be created on eks cluster"
   default = 5
+}
+
+variable "min_num_of_nifi_workers" {
+  description = "Minimum number of NiFi workers to be created on eks cluster"
+  default = 2
+}
+
+variable "max_num_of_nifi_workers" {
+  description = "Maximum number of NiFi workers to be created on eks cluster"
+  default = 2
 }
 output "eks_cluster_kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
