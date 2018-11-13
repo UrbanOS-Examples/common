@@ -6,7 +6,7 @@ resource "aws_db_instance" "kylo" {
   skip_final_snapshot       = false
   engine                    = "mysql"
   engine_version            = "${var.kylo_db_engine_version}"
-  parameter_group_name      = "${aws_db_parameter_group.kylo_db_parameter_group.name}"
+  parameter_group_name      = "${aws_db_parameter_group.kylo_db_parameter_group_namespaced.name}"
   allocated_storage         = "${var.kylo_db_allocated_storage}"
   storage_type              = "gp2"
   username                  = "sysadmin"
@@ -38,10 +38,21 @@ resource "aws_db_subnet_group" "kylo" {
   }
 }
 
-resource "aws_db_parameter_group" "kylo_db_parameter_group" {
+resource "aws_db_parameter_group" "kylo_db_parameter_group_namespaced" {
   #Bug in kylo requiring modification of global mysql property:
   #https://kylo-io.atlassian.net/browse/KYLO-1169
   name   = "kylo-parameter-group-${terraform.workspace}"
+  family = "mysql5.7"
+
+  parameter {
+    name  = "log_bin_trust_function_creators"
+    value = "1"
+  }
+}
+resource "aws_db_parameter_group" "kylo_db_parameter_group" {
+  #Bug in kylo requiring modification of global mysql property:
+  #https://kylo-io.atlassian.net/browse/KYLO-1169
+  name   = "kylo-parameter-group"
   family = "mysql5.7"
 
   parameter {
