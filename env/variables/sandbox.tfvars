@@ -83,3 +83,6 @@ max_num_of_jupyterhub_workers=2
 # LDAP datalake settings
 ldap_server = "iam-master.alm.sandbox.internal.smartcolumbusos.com"
 ldap_domain = "dc=sandbox,dc=internal,dc=smartcolumbusos,dc=com"
+
+kylo_db_multi_az=false
+kylo_db_instance_class="db.t2.small"
