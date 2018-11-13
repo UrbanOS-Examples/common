@@ -42,6 +42,7 @@ data "template_file" "cloudbreak_profile" {
     UAA_DEFAULT_USER_PW    = "${random_string.cloudbreak_admin_password.result}"
     UAA_DEFAULT_USER_EMAIL = "admin@smartcolumbusos.com"
     PUBLIC_IP              = "cloudbreak.${var.cloudbreak_dns_zone_name}"
+    CB_HOST_DISCOVERY_CUSTOM_DOMAIN = "${var.cloudbreak_dns_zone_name}"
 
     DATABASE_HOST     = "${aws_db_instance.cloudbreak_db.address}"
     DATABASE_PORT     = "${aws_db_instance.cloudbreak_db.port}"
