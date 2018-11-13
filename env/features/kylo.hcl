@@ -2,7 +2,7 @@ resource "aws_db_instance" "kylo" {
   identifier                = "${terraform.workspace}-kylo"
   instance_class            = "${var.kylo_db_instance_class}"
   vpc_security_group_ids    = ["${module.eks-cluster.worker_security_group_id}"]
-  db_subnet_group_name      = "${aws_db_subnet_group.default.name}"
+  db_subnet_group_name      = "${aws_db_subnet_group.kylo.name}"
   skip_final_snapshot       = false
   engine                    = "mysql"
   engine_version            = "${var.kylo_db_engine_version}"
@@ -28,10 +28,20 @@ resource "aws_db_instance" "kylo" {
   }
 }
 
+resource "aws_db_subnet_group" "kylo" {
+  name        = "kylo db subnet group for ${terraform.workspace}"
+  description = "DB Subnet Group for Kylo"
+  subnet_ids  = ["${module.vpc.private_subnets}"]
+
+  tags {
+    Name = "kylo db subnet group for ${terraform.workspace}"
+  }
+}
+
 resource "aws_db_parameter_group" "kylo_db_parameter_group" {
   #Bug in kylo requiring modification of global mysql property:
   #https://kylo-io.atlassian.net/browse/KYLO-1169
-  name   = "kylo-parameter-group"
+  name   = "kylo-parameter-group-${terraform.workspace}"
   family = "mysql5.7"
 
   parameter {
