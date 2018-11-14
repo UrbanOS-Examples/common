@@ -45,7 +45,7 @@ cat <<EOF > /usr/bin/cert-renew
 #!/usr/bin/env bash
 set -xe
 
-sleep \$(( \${RANDOM} % 3600 ))
+sleep \$(( \$RANDOM % 3600 ))
 /certbot-auto renew
 systemctl reload nginx
 EOF
