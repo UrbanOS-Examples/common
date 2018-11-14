@@ -41,10 +41,20 @@ server {
 }
 EOF
 
+cat <<EOF > /usr/bin/cert-renew
+#!/usr/bin/env bash
+set -xe
+
+sleep \$(( \${RANDOM} % 3600 ))
+/certbot-auto renew
+systemctl reload nginx
+EOF
+chmod +x /usr/bin/cert-renew
+
 ln -s /etc/nginx/sites-available/jenkins-relay /etc/nginx/sites-enabled/jenkins-relay
 rm -rf /etc/nginx/site-available/default
 
 service nginx restart
 
-echo "0 0 1 */2 * python -c 'import random; import time; time.sleep(random.random() * 3600)' && /certbot-auto renew && systemctl reload nginx" >> /root/cert-renew.cron
+echo "0 0 * * 0 /usr/bin/cert-renew" > /root/cert-renew.cron
 crontab /root/cert-renew.cron
