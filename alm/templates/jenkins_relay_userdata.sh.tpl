@@ -1,4 +1,5 @@
 #!/bin/bash
+## TODO - replace me
 
 #fetch certbot to use lets encrypt
 wget https://dl.eff.org/certbot-auto
