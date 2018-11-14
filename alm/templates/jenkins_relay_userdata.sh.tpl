@@ -12,14 +12,6 @@ apt-get install -y nginx
 
 cat <<EOF >/etc/nginx/sites-available/jenkins-relay
 server {
-  listen 80;
-
-  server_name ${dns_name};
-
-  return 301 https://\$server_name\$request_uri;
-}
-
-server {
   listen 443 ssl;
 
   server_name ${dns_name};
@@ -50,8 +42,9 @@ server {
 EOF
 
 ln -s /etc/nginx/sites-available/jenkins-relay /etc/nginx/sites-enabled/jenkins-relay
+rm -rf /etc/nginx/site-available/default
 
 service nginx restart
 
-echo "0 0,12 * * * python -c 'import random; import time; time.sleep(random.random() * 3600)' && /certbot-auto renew" >> /root/cert-renew.cron
+echo "0 0 1 */2 * python -c 'import random; import time; time.sleep(random.random() * 3600)' && /certbot-auto renew && systemctl reload nginx" >> /root/cert-renew.cron
 crontab /root/cert-renew.cron
