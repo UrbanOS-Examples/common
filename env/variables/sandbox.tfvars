@@ -73,6 +73,9 @@ cloudbreak_db_apply_immediately = true
 ambari_db_apply_immediately = true
 hive_db_apply_immediately = true
 
+#EKS Workers
+min_num_of_workers = 1
+
 #Jupyterhub EKS Workers
 min_num_of_jupyterhub_workers=0
 max_num_of_jupyterhub_workers=2
