@@ -43,3 +43,7 @@ variable "hosted_zone_name" {
 output "hosted_zone_id" {
     value = "${aws_route53_zone.internal.zone_id}"
 }
+
+output "hosted_zone_name" {
+    value = "${aws_route53_zone.internal.name}"
+}
