@@ -54,3 +54,8 @@ variable "cloudbreak_tag" {
   default     = "1.0.0"
 }
 
+variable "final_db_snapshot" {
+  description = "Should the databases take a final snapshot or not"
+  default     = false
+}
+

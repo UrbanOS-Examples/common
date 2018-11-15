@@ -40,6 +40,7 @@ resource "aws_db_instance" "ranger_db" {
   storage_encrypted       = true
   kms_key_id              = "${aws_kms_key.ranger_db_key.arn}"
   apply_immediately       = "${var.ranger_db_apply_immediately}"
+  skip_final_snapshot     = "${var.final_db_snapshot}"
 
   lifecycle = {
     prevent_destroy = true

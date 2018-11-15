@@ -77,6 +77,16 @@ resource "aws_security_group" "allow_all" {
   }
 }
 
+resource "aws_db_subnet_group" "default" {
+  name        = "environment db ${terraform.workspace} subnet group"
+  description = "DB Subnet Group"
+  subnet_ids  = ["${module.vpc.private_subnets}"]
+
+  tags {
+    Name = "Subnet Group for Environment ${terraform.workspace} VPC"
+  }
+}
+
 variable "vpc_cidr" {
   description = "The CIDR block for the VPC"
   default     = ""

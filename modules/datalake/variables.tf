@@ -146,3 +146,8 @@ variable "ldap_admin_group" {
   description = "The group that will administer the hdp cluster"
   default     = "hadoop"
 }
+
+variable "final_db_snapshot" {
+  description = "Should the databases take a final snapshot or not"
+  default     = false
+}
