@@ -15,6 +15,7 @@ module "cloudbreak" {
   cloudbreak_dns_zone_name = "${aws_route53_zone.public_hosted_zone.name}"
   cloudbreak_tag           = "1.0.0"
   ssh_key                  = "${aws_key_pair.cloud_key.key_name}"
+  final_db_snapshot              = "${var.final_db_snapshot}"
 }
 
 module "datalake" {
@@ -35,6 +36,7 @@ module "datalake" {
   ldap_domain                    = "${var.ldap_domain}"
   ldap_bind_password             = "${data.aws_secretsmanager_secret_version.bind_user_password.secret_string}"
   eks_worker_node_security_group = "${module.eks-cluster.worker_security_group_id}"
+  final_db_snapshot              = "${var.final_db_snapshot}"
 }
 
 variable "ldap_server" {

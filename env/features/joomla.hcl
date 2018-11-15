@@ -34,16 +34,6 @@ resource "aws_db_instance" "joomla_db" {
   }
 }
 
-resource "aws_db_subnet_group" "default" {
-  name        = "environment db ${terraform.workspace} subnet group"
-  description = "DB Subnet Group"
-  subnet_ids  = ["${module.vpc.private_subnets}"]
-
-  tags {
-    Name = "Subnet Group for Environment ${terraform.workspace} VPC"
-  }
-}
-
 resource "aws_iam_instance_profile" "joomla" {
   name = "${terraform.workspace}_joomla"
   role = "${aws_iam_role.joomla_ec2.name}"
