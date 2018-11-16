@@ -34,10 +34,48 @@ data "template_file" "cloudbreak_blueprint" {
   }
 }
 
+resource "random_pet" "hadoop" {
+  prefix = "hdp"
+  keepers = {
+    CLOUD_STORAGE_BUCKET               = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
+    INSTANCE_PROFILE_FOR_BUCKET_ACCESS = "${aws_iam_instance_profile.cloudstorage_bucket_access.arn}"
+    CLUSTER_REGION                     = "${var.region}"
+    CLUSTER_VPC                        = "${var.vpc_id}"
+    CLUSTER_SUBNET                     = "${local.cluster_subnet}"
+    CLUSTER_AZ                         = "${data.aws_subnet.az_selector.availability_zone}"
+
+    MGMT_GROUP_INSTANCE_TYPE   = "${var.mgmt_group_instance_type}"
+    MASTER_GROUP_INSTANCE_TYPE = "${var.master_group_instance_type}"
+    BROKER_GROUP_INSTANCE_TYPE = "${var.broker_group_instance_type}"
+    WORKER_GROUP_INSTANCE_TYPE = "${var.worker_group_instance_type}"
+    MASTER_NODES_SG            = "${aws_security_group.datalake_master.id}"
+    WORKER_NODES_SG            = "${aws_security_group.datalake_worker.id}"
+    BROKER_NODE_COUNT          = "${var.broker_node_count}"
+    WORKER_NODE_COUNT          = "${var.worker_node_count}"
+
+    SSH_KEY                = "${var.ssh_key}"
+    CREDENTIAL_NAME        = "${var.cloudbreak_credential_name}"
+    HIVE_CONNECTION_NAME   = "${local.hive_db_name}"
+    RANGER_CONNECTION_NAME = "${local.ranger_db_name}"
+    LDAP_CONNECTION_NAME   = "${local.ldap_connection_name}"
+    AMBARI_BLUEPRINT_NAME  = "${local.ambari_blueprint_name}"
+    AMBARI_GATEWAY_PATH    = "${local.ambari_gateway_path}"
+    AMBARI_USERNAME        = "${local.ambari_username}"
+    AMBARI_PASSWORD        = "${random_string.ambari_admin_password.result}"
+  }
+}
+
+resource "aws_route53_zone" "hadoop" {
+  name   =  "${local.cluster_name}.${var.domain_name}"
+  vpc_id = "${var.vpc_id}"
+}
+
 data "template_file" "cloudbreak_cluster" {
   template = "${file("${path.module}/templates/datalake-cluster-template.json.tpl")}"
 
+  #if you add a new variable here, you probably need to add a new keeper to random_pet.hadoop
   vars {
+    HDP_CLUSTER_NAME                   = "${random_pet.hadoop.id}"
     CLOUD_STORAGE_BUCKET               = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
     INSTANCE_PROFILE_FOR_BUCKET_ACCESS = "${aws_iam_instance_profile.cloudstorage_bucket_access.arn}"
     CLUSTER_REGION                     = "${var.region}"
