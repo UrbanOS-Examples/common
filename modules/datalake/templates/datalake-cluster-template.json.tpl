@@ -1,6 +1,6 @@
 {
   "general": {
-    "name": "",
+    "name": "${HDP_CLUSTER_NAME}",
     "credentialName": "${CREDENTIAL_NAME}"
   },
   "placement": {

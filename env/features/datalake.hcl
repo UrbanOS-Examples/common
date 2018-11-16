@@ -37,7 +37,9 @@ module "datalake" {
   ldap_bind_password             = "${data.aws_secretsmanager_secret_version.bind_user_password.secret_string}"
   eks_worker_node_security_group = "${module.eks-cluster.worker_security_group_id}"
   final_db_snapshot              = "${var.final_db_snapshot}"
+  domain_name                    = "${lower(terraform.workspace)}.${lower(var.root_dns_zone)}"
 }
+
 
 variable "ldap_server" {
   description = "The address of the ldap server"
