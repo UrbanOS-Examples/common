@@ -9,13 +9,16 @@ locals {
   ambari_gateway_path      = "scos-datalake"
   ambari_username          = "admin"
   cluster_subnet           = "${random_shuffle.private_subnet.result[0]}"
-  cluster_name             = "hdp-${local.deployment_template_sha}"
+  cluster_name             = "${random_pet.hadoop.id}"
   ensure_db_path           = "${path.module}/templates/ensure_databases.sh"
   ensure_cluster_path      = "${path.module}/templates/ensure_cluster.sh"
   ensure_blueprint_path    = "${path.module}/templates/ensure_blueprint.sh"
   ensure_ldap_path         = "${path.module}/templates/ensure_ldap.sh"
 }
 
+variable "domain_name" {
+  description = "Subdomain that we create the hadoop cluster subdomain in"
+}
 variable "vpc_id" {
   description = "The VPC to deploy the datalake into."
 }
