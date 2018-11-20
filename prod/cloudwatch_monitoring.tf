@@ -91,6 +91,7 @@ resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
 
 //---------ALARMS---------//
 resource "aws_cloudwatch_metric_alarm" "joomla_high_mem" {
+  count = "${var.joomla_alarms_enabled}"
   alarm_name                            = "Joomla - High Memory Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -107,6 +108,7 @@ resource "aws_cloudwatch_metric_alarm" "joomla_high_mem" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_cpu" {
+  count = "${var.ckan_alarms_enabled}"
   alarm_name                            = "CKAN Internal - High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -123,6 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_mem" {
+  count = "${var.ckan_alarms_enabled}"
   alarm_name                            = "CKAN Internal - High Memory Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -139,6 +142,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_mem" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_high_cpu_util" {
+  count = "${var.ckan_alarms_enabled}"
   alarm_name                            = "Production CKAN - RDS High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -155,6 +159,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_high_cpu_util" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_instance_status_check_failed" {
+  count = "${var.ckan_alarms_enabled}"
   alarm_name                            = "CKAN - Instance Status Check Failed"
   comparison_operator                   = "GreaterThanThreshold"
   evaluation_periods                    = "1"
@@ -171,6 +176,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_instance_status_check_failed" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_high_mem" {
+  count = "${var.ckan_alarms_enabled}"
   alarm_name                            = "CKAN - High Memory Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -187,6 +193,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_high_mem" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_high_cpu" {
+  count = "${var.ckan_alarms_enabled}"
   alarm_name                            = "CKAN - High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -203,6 +210,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_high_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_internal_instance_status_check_failed" {
+  count = "${var.ckan_alarms_enabled}"
   alarm_name                            = "CKAN Internal - Instance Status Check Failed"
   comparison_operator                   = "GreaterThanThreshold"
   evaluation_periods                    = "1"
@@ -219,6 +227,7 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_instance_status_check_fail
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_free_storage_space_low" {
+  count = "${var.kong_alarms_enabled}"
   alarm_name                            = "Production Kong - RDS Free Storage Space Low"
   comparison_operator                   = "LessThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -235,6 +244,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_free_storage_space_low" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_high_cpu_util" {
+  count = "${var.kong_alarms_enabled}"
   alarm_name                            = "Production Kong - RDS High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -251,6 +261,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_high_cpu_util" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "kong_high_mem" {
+  count = "${var.kong_alarms_enabled}"
   alarm_name                            = "Kong - High Memory Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -267,6 +278,7 @@ resource "aws_cloudwatch_metric_alarm" "kong_high_mem" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "kong_instance_status_check_failed" {
+  count = "${var.kong_alarms_enabled}"
   alarm_name                            = "Kong - Instance Status Check Failed"
   comparison_operator                   = "GreaterThanThreshold"
   evaluation_periods                    = "1"
@@ -283,6 +295,7 @@ resource "aws_cloudwatch_metric_alarm" "kong_instance_status_check_failed" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "kong_high_cpu" {
+  count = "${var.kong_alarms_enabled}"
   alarm_name                            = "Kong - High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -299,6 +312,7 @@ resource "aws_cloudwatch_metric_alarm" "kong_high_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_free_storage_space_low" {
+  count = "${var.joomla_alarms_enabled}"
   alarm_name                            = "Production Joomla - RDS Free Storage Space Low"
   comparison_operator                   = "LessThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -315,6 +329,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_free_storage_space_low" 
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_high_cpu_util" {
+  count = "${var.joomla_alarms_enabled}"
   alarm_name                            = "Production Joomla - RDS High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -348,6 +363,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_scos_elb_no_healthy_hosts" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_free_storage_space_low" {
+  count = "${var.ckan_alarms_enabled}"
   alarm_name                            = "Production CKAN - RDS Free Storage Space Low"
   comparison_operator                   = "LessThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -363,6 +379,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_free_storage_space_low" {
   treat_missing_data                    = "breaching"
 }
 resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
+  count = "${var.joomla_alarms_enabled}"
   alarm_name                            = "Joomla - High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -379,6 +396,7 @@ resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "joomla_instance_status_check_failed" {
+  count = "${var.joomla_alarms_enabled}"
   alarm_name                            = "Joomla - Instance Status Check Failed"
   comparison_operator                   = "GreaterThanThreshold"
   evaluation_periods                    = "1"
@@ -412,6 +430,7 @@ resource "aws_cloudwatch_metric_alarm" "watchintor_cota_streaming_consumer_open_
 
 
 resource "aws_cloudwatch_metric_alarm" "prod_kylo_rds_free_storage_space_low" {
+  count = "${var.kylo_alarms_enabled}"
   alarm_name                            = "Production Kylo - RDS Free Storage Space Low"
   comparison_operator                   = "LessThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -428,6 +447,7 @@ resource "aws_cloudwatch_metric_alarm" "prod_kylo_rds_free_storage_space_low" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_kylo_rds_high_cpu_util" {
+  count = "${var.kylo_alarms_enabled}"
   alarm_name                            = "Production Kylo - RDS High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
@@ -452,4 +472,24 @@ variable "slack_path" {
 
 variable "slack_channel_name" {
   description = "Name of the Slack channel"
+}
+
+variable "joomla_alarms_enabled" {
+  description = "Enables Joomla Cloudwatch alarms. Defaults to true."
+  default = true
+}
+
+variable "ckan_alarms_enabled" {
+  description = "Enables CKAN Cloudwatch alarms. Defaults to true."
+  default = true
+}
+
+variable "kong_alarms_enabled" {
+  description = "Enables Kong Cloudwatch alarms. Defaults to true."
+  default = true
+}
+
+variable "kylo_alarms_enabled" {
+  description = "Enables Kylo Cloudwatch alarms. Defaults to true."
+  default = true
 }

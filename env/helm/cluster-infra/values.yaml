@@ -98,7 +98,7 @@ albIngress:
   name: alb-ingress
   image:
     repository: quay.io/coreos/alb-ingress-controller
-    tag: 1.0-beta.6
+    tag: v1.0.0
     pullPolicy: Always
   args: {}
   extraEnv:
