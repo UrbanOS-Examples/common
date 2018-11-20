@@ -16,9 +16,14 @@ locals {
   ensure_ldap_path         = "${path.module}/templates/ensure_ldap.sh"
 }
 
-variable "domain_name" {
+variable "parent_hosted_zone_name" {
   description = "Subdomain that we create the hadoop cluster subdomain in"
 }
+
+variable "parent_hosted_zone_id" {
+  description = "Zone ID of the parent hosted zone"
+}
+
 variable "vpc_id" {
   description = "The VPC to deploy the datalake into."
 }

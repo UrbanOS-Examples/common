@@ -27,3 +27,8 @@ output "ambari_admin_password_id" {
   description = "The resource ID of the ambari admin password"
   value       = "${aws_secretsmanager_secret_version.ambari_admin_password.arn}"
 }
+
+output "public_hosted_zone_id" {
+  description = "The Zone ID of the public route53 zone"
+  value       = "${aws_route53_zone.public_hosted_zone.id}"
+}
