@@ -117,7 +117,7 @@ EOF
 resource "null_resource" "eks_infrastructure" {
   depends_on = ["data.external.helm_file_change_check", "module.eks-cluster"]
   provisioner "local-exec" {
-    
+
     command = <<EOF
 set -e
 export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
@@ -160,6 +160,10 @@ data "external" "helm_file_change_check" {
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   role       = "${module.eks-cluster.worker_iam_role_name}"
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
+}
+
+locals {
+  eks_worker_security_group_id = "${module.eks-cluster.worker_security_group_id}"
 }
 
 variable "min_num_of_workers" {
