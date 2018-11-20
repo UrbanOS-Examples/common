@@ -44,7 +44,6 @@ module "datalake" {
   domain_name                    = "${lower(terraform.workspace)}.${lower(var.root_dns_zone)}"
 }
 
-
 variable "ldap_server" {
   description = "The address of the ldap server"
   default     = "iam-master.alm.internal.smartcolumbusos.com"

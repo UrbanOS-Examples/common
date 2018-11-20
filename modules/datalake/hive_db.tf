@@ -46,3 +46,47 @@ resource "aws_db_instance" "hive_db" {
     prevent_destroy = true
   }
 }
+
+resource "null_resource" "cloudbreak_hive_db" {
+  triggers {
+    setup_updated    = "${sha1(file(local.ensure_db_path))}"
+    id_updated       = "${local.hive_db_name}"
+    cloudbreak_ready = "${var.cloudbreak_ready}"
+  }
+
+  connection {
+    type = "ssh"
+    host = "${var.cloudbreak_ip}"
+    user = "ec2-user"
+  }
+
+  provisioner "file" {
+    source      = "${local.ensure_db_path}"
+    destination = "/tmp/ensure_databases.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      <<EOF
+bash /tmp/ensure_databases.sh \
+  jdbc:postgresql://${aws_db_instance.hive_db.endpoint}/${aws_db_instance.hive_db.name} \
+  ${local.hive_db_name} \
+  ${aws_db_instance.hive_db.password} \
+  HIVE
+EOF
+      ,
+      <<EOF
+bash /tmp/ensure_databases.sh \
+  jdbc:postgresql://${aws_db_instance.ranger_db.endpoint}/${aws_db_instance.ranger_db.name} \
+  ${local.ranger_db_name} \
+  ${aws_db_instance.ranger_db.password} \
+  RANGER
+EOF
+      ,
+    ]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
