@@ -86,3 +86,5 @@ ldap_domain = "dc=sandbox,dc=internal,dc=smartcolumbusos,dc=com"
 
 kylo_db_multi_az=false
 kylo_db_instance_class="db.t2.small"
+
+final_db_snapshot = true

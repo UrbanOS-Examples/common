@@ -1,0 +1,22 @@
+{
+  "nodeCount": ${COUNT},
+  "group": "${GROUP}",
+  "type": "${TYPE}",
+  "parameters": {},
+  "template": {
+    "volumeCount": 1,
+    "volumeSize": 100,
+    "rootVolumeSize": 50,
+    "parameters": {
+      "encrypted": false
+    },
+    "volumeType": "standard",
+    "instanceType": "${INSTANCE_TYPE}"
+  },
+  "securityGroup": {
+    "securityGroupId": "${SECURITY_GROUP}",
+    "securityRules": []
+  },
+  "recipeNames": [],
+  "recoveryMode": "MANUAL"
+}
