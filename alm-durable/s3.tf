@@ -61,6 +61,32 @@ resource "aws_s3_bucket_policy" "scospy-repository-policy" {
 POLICY
 }
 
+resource "aws_s3_bucket" "helm-repository" {
+  bucket = "${var.helm_repo_name}"
+  acl    = "public-read"
+  tags {
+    Name        = "helm-repository"
+    Environment = "${terraform.workspace}"
+  }
+}
+
+resource "aws_s3_bucket_policy" "helm-repository-policy" {
+  bucket = "${aws_s3_bucket.helm-repository.id}"
+  policy =<<POLICY
+{
+  "Version":"2012-10-17",
+  "Statement":[{
+      "Sid":"AddPerm",
+      "Effect":"Allow",
+      "Principal": "*",
+      "Action":["s3:GetObject"],
+      "Resource":["${aws_s3_bucket.helm-repository.arn}/*"]
+    }
+  ]
+}
+POLICY
+}
+
 resource "aws_s3_bucket" "build_artifacts_repository" {
   bucket = "${var.build_artifacts_repo_name}"
   acl    = "public-read"
@@ -94,6 +120,10 @@ variable "build_artifacts_repo_name" {
 variable "scospy_repo_name" {
   default = "scospy-repository"
   description = "Bucket name to archive scospy build artifacts"
+}
+variable "helm_repo_name" {
+  default = "scos-helm-repository"
+  description = "Bucket name to archive scos helm charts"
 }
 
 output "smart_os_initial_state_bucket_name" {
