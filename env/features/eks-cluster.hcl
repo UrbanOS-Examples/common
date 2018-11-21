@@ -10,8 +10,7 @@ module "eks-cluster" {
   kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
   kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
 
-
-  worker_additional_security_group_ids = ["${aws_security_group.allow_ssh_from_alm.id}"]
+  worker_additional_security_group_ids = ["${aws_security_group.chatter.id}", "${aws_security_group.allow_ssh_from_alm.id}"]
 
   # THIS COUNT NEEDS TO MATCH THE LENGTH OF THE PROVIDED LIST OR IT WILL NOT WORK
   # as of Terraform v0.11.7, computing this value is not seemingly supported
@@ -52,15 +51,6 @@ resource "aws_security_group" "allow_ssh_from_alm" {
     # datablock from vpc_peer.tf
     cidr_blocks = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
   }
-}
-
-resource "aws_security_group_rule" "allow_all_sg_to_eks_worker_sg" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  security_group_id        = "${module.eks-cluster.worker_security_group_id}"
-  source_security_group_id = "${aws_security_group.allow_all.id}"
 }
 
 resource "aws_iam_policy" "eks_work_alb_permissions" {
@@ -160,10 +150,6 @@ data "external" "helm_file_change_check" {
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   role       = "${module.eks-cluster.worker_iam_role_name}"
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
-}
-
-locals {
-  eks_worker_security_group_id = "${module.eks-cluster.worker_security_group_id}"
 }
 
 variable "min_num_of_workers" {

@@ -1,7 +1,7 @@
 resource "aws_db_instance" "kylo" {
   identifier                = "${terraform.workspace}-kylo"
   instance_class            = "${var.kylo_db_instance_class}"
-  vpc_security_group_ids    = ["${module.eks-cluster.worker_security_group_id}"]
+  vpc_security_group_ids    = ["${aws_security_group.chatter.id}"]
   db_subnet_group_name      = "${aws_db_subnet_group.kylo.name}"
   skip_final_snapshot       = false
   engine                    = "mysql"

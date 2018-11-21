@@ -35,14 +35,14 @@ resource "aws_security_group" "allow_kubernetes_internet" {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
-    security_groups = ["${module.eks-cluster.worker_security_group_id}"]
+    security_groups = ["${aws_security_group.chatter.id}"]
   }
 
   ingress {
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
-    security_groups = ["${module.eks-cluster.worker_security_group_id}"]
+    security_groups = ["${aws_security_group.chatter.id}"]
   }
 }
 

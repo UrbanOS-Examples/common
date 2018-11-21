@@ -35,7 +35,7 @@ module "datalake" {
   ldap_server                    = "${var.ldap_server}"
   ldap_domain                    = "${var.ldap_domain}"
   ldap_bind_password             = "${data.aws_secretsmanager_secret_version.bind_user_password.secret_string}"
-  eks_worker_node_security_group = "${local.eks_worker_security_group_id}"
+  eks_worker_node_security_group = "${aws_security_group.chatter.id}"
   final_db_snapshot              = "${var.final_db_snapshot}"
   parent_hosted_zone_name        = "${aws_route53_zone.public_hosted_zone.name}"
   parent_hosted_zone_id          = "${aws_route53_zone.public_hosted_zone.id}"
