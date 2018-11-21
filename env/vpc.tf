@@ -37,6 +37,9 @@ module "vpc" {
   enable_dynamodb_endpoint = "${var.vpc_enable_dynamodb_endpoint}"
   enable_dns_hostnames     = "${var.vpc_enable_dns_hostnames}"
 
+  enable_dhcp_options      = "${var.vpc_enable_dhcp_options}"
+  dhcp_options_domain_name = "${terraform.workspace}.${var.vpc_domain_name}"
+
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = ""
     "kubernetes.io/role/alb-ingress"  = ""
@@ -98,6 +101,16 @@ variable "vpc_enable_dynamodb_endpoint" {
 variable "vpc_enable_dns_hostnames" {
   description = "Should be true to enable DNS hostnames in the VPC"
   default     = true
+}
+
+variable "vpc_enable_dhcp_options" {
+  description = "Toggle setting of DHCP server options for the VPC"
+  default     = true
+}
+
+variable "vpc_domain_name" {
+  description = "The domain name to set on the DHCP options for the VPC, prepended by terraform workspace."
+  default     = "internal.smartcolumbusos.com"
 }
 
 variable "owner" {
