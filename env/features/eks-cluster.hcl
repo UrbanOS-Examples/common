@@ -10,8 +10,7 @@ module "eks-cluster" {
   kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
   kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
 
-  worker_security_group_id = "${aws_security_group.chatter.id}"
-  worker_additional_security_group_ids = ["${aws_security_group.allow_ssh_from_alm.id}"]
+  worker_additional_security_group_ids = ["${aws_security_group.chatter.id}", "${aws_security_group.allow_ssh_from_alm.id}"]
 
   # THIS COUNT NEEDS TO MATCH THE LENGTH OF THE PROVIDED LIST OR IT WILL NOT WORK
   # as of Terraform v0.11.7, computing this value is not seemingly supported
