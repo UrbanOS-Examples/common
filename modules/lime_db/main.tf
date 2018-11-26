@@ -33,7 +33,7 @@ resource "aws_db_subnet_group" "lime_db_subnet_group" {
 
 resource "aws_security_group" "lime_security_group" {
   name_prefix = "allow_postgres_"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     from_port   = 0
@@ -47,7 +47,7 @@ resource "aws_security_group" "lime_security_group" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = ["${aws_security_group.chatter.id}"]
+    security_groups = ["${var.app_compute_security_group}"]
     description     = "Allow ingress from EKS-deployed app to its database"
   }
 

@@ -1,3 +1,8 @@
+variable "app_compute_security_group" {
+  description = "The security group of the infrastructure running the lime app."
+}
+
+
 variable "vpc_id" {
   description = "The vpc into which the database is deployed"
 }

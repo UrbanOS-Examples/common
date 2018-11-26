@@ -1,8 +1,9 @@
 module "lime_db" {
   source = "../modules/lime_db"
 
-  vpc_id  = "${module.vpc.vpc_id}"
-  subnets = "${module.vpc.private_subnets}"
+  app_compute_security_group = "${aws_security_group.chatter.id}"
+  vpc_id                     = "${module.vpc.vpc_id}"
+  subnets                    = "${module.vpc.private_subnets}"
 }
 
 output "lime_db_address" {
