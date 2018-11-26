@@ -12,6 +12,7 @@ enabled_features = ["eks-cluster",
                     "streaming-data-aggregator",
                     "datalake",
                     "kylo",
+                    "lime_db",
                    ]
 
 vpc_name = "test"

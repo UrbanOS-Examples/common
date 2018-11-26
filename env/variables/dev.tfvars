@@ -12,6 +12,7 @@ enabled_features = ["eks-cluster",
                     "streaming-data-aggregator",
                     "datalake",
                     "kylo",
+                    "lime_db",
                    ]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
