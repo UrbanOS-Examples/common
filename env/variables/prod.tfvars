@@ -29,3 +29,10 @@ joomla_db_multi_az = true
 ckan_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:rds:prod-production-ckan-2018-09-24-05-00"
 
 final_db_snapshot = true
+
+# Lime DB override settings
+lime_db_size = "db.t2.small"
+lime_db_storage = 100
+lime_db_multi_az = true
+lime_db_apply_immediately = true
+lime_final_db_snapshot = true

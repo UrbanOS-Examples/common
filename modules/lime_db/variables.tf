@@ -17,6 +17,16 @@ variable "lime_db_name" {
   default     = "lime_survey"
 }
 
+variable "lime_db_size" {
+  description = "The ec2 instance size to assign to the db."
+  default     = "db.t2.small"
+}
+
+variable "lime_db_storage" {
+  description = "The disk size, in gigabytes to assign to the lime rds."
+  default     = 100
+}
+
 variable "lime_db_multi_az" {
   description = "Should the Lime DB be multi-az?"
   default     = true

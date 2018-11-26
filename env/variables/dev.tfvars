@@ -52,3 +52,10 @@ max_num_of_jupyterhub_workers=4
 
 kylo_db_multi_az=false
 kylo_db_instance_class="db.t2.small"
+
+# Lime DB override settings
+lime_db_size = "db.t2.small"
+lime_db_storage = 20
+lime_db_multi_az = false
+lime_db_apply_immediately = true
+lime_final_db_snapshot = false

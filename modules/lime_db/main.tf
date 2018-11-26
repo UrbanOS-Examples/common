@@ -62,12 +62,12 @@ resource "aws_security_group" "lime_security_group" {
 resource "aws_db_instance" "lime_db" {
   identifier              = "${terraform.workspace}-lime"
   name                    = "${var.lime_db_name}"
-  instance_class          = "db.t2.small"
+  instance_class          = "${var.lime_db_size}"
   vpc_security_group_ids  = ["${aws_security_group.lime_security_group.id}"]
   db_subnet_group_name    = "${aws_db_subnet_group.lime_db_subnet_group.name}"
   engine                  = "postgres"
   engine_version          = "10.4"
-  allocated_storage       = 100 # in gigabytes
+  allocated_storage       = "${var.lime_db_storage}"
   storage_type            = "gp2"
   username                = "${var.lime_db_name}"
   password                = "${random_string.lime_db_password.result}"
