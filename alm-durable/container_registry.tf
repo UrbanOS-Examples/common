@@ -133,3 +133,9 @@ module "mockylo_repository" {
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "mockylo"
 }
+
+module "lime_survey" {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "lime-survey"
+}
