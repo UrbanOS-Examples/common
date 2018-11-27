@@ -150,3 +150,7 @@ variable "ckan_external_instance_type" {
 output "ckan_external_instance_id" {
   value = "${aws_instance.ckan_external.id}"
 }
+
+output "ckan_external_private_ip" {
+  value = "${aws_instance.ckan_external.private_ip}"
+}
