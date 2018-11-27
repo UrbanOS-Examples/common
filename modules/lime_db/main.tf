@@ -14,6 +14,7 @@ resource "random_string" "lime_db_password" {
 
 resource "aws_secretsmanager_secret" "lime_db_password" {
   name = "${terraform.workspace}-lime-db-password"
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "lime_db_password" {
@@ -78,6 +79,7 @@ resource "aws_db_instance" "lime_db" {
   kms_key_id              = "${aws_kms_key.lime_db_key.arn}"
   apply_immediately       = "${var.lime_db_apply_immediately}"
   skip_final_snapshot     = "${var.final_db_snapshot}"
+  final_snapshot_identifier = "lime-${sha1(timestamp())}"
 
   lifecycle = {
     prevent_destroy = true
