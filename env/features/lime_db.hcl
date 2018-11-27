@@ -9,6 +9,7 @@ module "lime_db" {
   lime_db_multi_az           = "${var.lime_db_multi_az}"
   lime_db_apply_immediately  = "${var.lime_db_apply_immediately}"
   final_db_snapshot          = "${var.lime_final_db_snapshot}"
+  secret_recovery_window     =  "${var.lime_secret_recovery_window}"
 }
 
 variable "lime_db_size" {
@@ -31,8 +32,9 @@ variable "lime_final_db_snapshot" {
   description = "Whether or not to force creation of a final snapshot on the db."
 }
 
-variable "secret_recovery_window" {
+variable "lime_secret_recovery_window" {
   description = "How long to allow secrets to be recovered if they are deleted"
+  default = 0
 }
 
 output "lime_db_address" {
