@@ -95,4 +95,3 @@ lime_db_storage = 20
 lime_db_multi_az = false
 lime_db_apply_immediately = true
 lime_final_db_snapshot = false
-lime_secret_recovery_window = 0
