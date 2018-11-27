@@ -79,12 +79,13 @@
                     "arn:aws:iam::${alm_account_id}:user/aganesh",
                     "arn:aws:iam::${alm_account_id}:user/bcromer",
                     "arn:aws:iam::${alm_account_id}:user/rboyapati",
-                    "arn:aws:iam::${alm_account_id}:user/amarkley",
                     "arn:aws:iam::${alm_account_id}:user/bbrewer",
                     "arn:aws:iam::${alm_account_id}:user/jolson",
                     "arn:aws:iam::${alm_account_id}:user/plinville",
                     "arn:aws:iam::${alm_account_id}:user/nstevens",
-                    "arn:aws:iam::${alm_account_id}:user/akucera"
+                    "arn:aws:iam::${alm_account_id}:user/akucera",
+                    "arn:aws:iam::${alm_account_id}:user/tregan",
+                    "arn:aws:iam::${alm_account_id}:user/asauer"
                 ]
             },
             "Action": [
