@@ -6,10 +6,6 @@ enabled_features = [
                     "eks-cluster"
                    ]
 
-credentials_profile = "sandbox"
-
-accepter_credentials_profile = "sandbox"
-
 root_dns_zone = "sandbox.internal.smartcolumbusos.com"
 
 alm_account_id = "068920858268"

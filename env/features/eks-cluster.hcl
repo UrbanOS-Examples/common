@@ -105,7 +105,7 @@ EOF
 }
 
 resource "null_resource" "eks_infrastructure" {
-  depends_on = ["data.external.helm_file_change_check", "module.eks-cluster"]
+  depends_on = ["data.external.helm_file_change_check"]
   provisioner "local-exec" {
 
     command = <<EOF
@@ -114,12 +114,14 @@ export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace
 kubectl apply -f ${path.module}/k8s/tiller-role/
 helm init --service-account tiller
 
-for i in $(seq 1 5); do
+LOOP_COUNT=10
+for i in $(seq 1 $LOOP_COUNT); do
     [ $i -gt 1 ] && sleep 15
-    [ $(kubectl get pods --namespace kube-system -l name='tiller' | grep -ic Running) -gt 0 ] && break
+    [ $(kubectl get pods --namespace kube-system -l name='tiller' | grep -i Running | grep -ic '1/1') -gt 0 ] && break
     echo "Running Tiller Pod not found"
-    [ $i -eq 5 ] && exit 1
+    [ $i -eq $LOOP_COUNT ] && exit 1
 done
+echo "Identified Running Tiller Pod..."
 
 # label the dns namespace to later select for network policy rules; overwrite = no-op
 kubectl get namespaces | egrep '^cluster-infra ' || kubectl create namespace cluster-infra
@@ -129,7 +131,7 @@ helm upgrade --install cluster-infra ${path.module}/helm/cluster-infra \
     --namespace=cluster-infra \
     --set externalDns.args."domain\-filter"="${var.root_dns_zone}" \
     --set albIngress.extraEnv."AWS\_REGION"="${var.region}" \
-    --set albIngress.extraEnv."CLUSTER\_NAME"="${local.kubernetes_cluster_name}" \
+    --set albIngress.extraEnv."CLUSTER\_NAME"="${module.eks-cluster.cluster_id}" \
     --values ${path.module}/helm/cluster-infra/run-config.yaml
 
 EOF
@@ -137,6 +139,17 @@ EOF
 
   triggers {
     helm_file_change_check = "${data.external.helm_file_change_check.result.md5_result}"
+  }
+}
+
+resource "null_resource" "tear_down_load_balancers" {
+  provisioner "local-exec" {
+    when = "destroy"
+    command = <<EOF
+    set -e
+    echo "Destroying load balancers..."
+    ${path.module}/../scripts/destroy_albs_created_via_kubernetes.sh ${module.vpc.vpc_id} ${var.region} ${var.role_arn}
+  EOF
   }
 }
 

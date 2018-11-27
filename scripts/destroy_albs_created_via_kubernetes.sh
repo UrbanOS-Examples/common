@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 
-environment=$1
-vpc_id=$2
-./setup_aws_creds.sh $environment $vpc_id
+vpc_id=$1
+region=$2
+role_arn=$3
+
+awsconfig=$(mktemp)
+
+cat << EOF >> ${awsconfig}
+[profile ${AWS_PROFILE}]
+region = ${region}
+role_arn = ${role_arn}
+source_profile = ${AWS_PROFILE}
+EOF
+
+export AWS_CONFIG_FILE=${awsconfig}
 
 LoadBalancersInVpc=$(aws elbv2 describe-load-balancers | jq '[.LoadBalancers[] | select(.VpcId == "'"$vpc_id"'").LoadBalancerArn]' | jq -r '.[]')
 
