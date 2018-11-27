@@ -31,6 +31,10 @@ variable "lime_final_db_snapshot" {
   description = "Whether or not to force creation of a final snapshot on the db."
 }
 
+variable "secret_recovery_window" {
+  description = "How long to allow secrets to be recovered if they are deleted"
+}
+
 output "lime_db_address" {
   value = "${module.lime_db.lime_db_address}"
 }
