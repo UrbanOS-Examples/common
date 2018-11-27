@@ -13,6 +13,7 @@ resource "random_string" "cloudbreak_cluster_secret" {
 
 resource "aws_secretsmanager_secret" "cloudbreak_cluster_secret" {
   name = "${terraform.workspace}-cloudbreak-cluster-secret"
+  recovery_window_in_days = "${var.recovery_window_in_days}"
 }
 
 resource "aws_secretsmanager_secret_version" "cloudbreak_cluster_secret" {
@@ -27,6 +28,7 @@ resource "random_string" "cloudbreak_admin_password" {
 
 resource "aws_secretsmanager_secret" "cloudbreak_admin_password" {
   name = "${terraform.workspace}-cloudbreak-admin-password"
+  recovery_window_in_days = "${var.recovery_window_in_days}"
 }
 
 resource "aws_secretsmanager_secret_version" "cloudbreak_admin_password" {

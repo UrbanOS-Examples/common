@@ -14,7 +14,7 @@ resource "random_string" "lime_db_password" {
 
 resource "aws_secretsmanager_secret" "lime_db_password" {
   name = "${terraform.workspace}-lime-db-password"
-  recovery_window_in_days = "${var.secret_recovery_window}"
+  recovery_window_in_days = "${var.recovery_window_in_days}"
 }
 
 resource "aws_secretsmanager_secret_version" "lime_db_password" {

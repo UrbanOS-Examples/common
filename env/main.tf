@@ -77,6 +77,11 @@ variable "final_db_snapshot" {
   default     = false
 }
 
+variable "recovery_window_in_days" {
+  description = "How long to allow secrets to be recovered if they are deleted"
+  default     = 30
+}
+
 output "key_pair_name" {
   description = "Name of the keypair to use for env deployments"
   value       = "${aws_key_pair.cloud_key.key_name}"

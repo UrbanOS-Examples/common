@@ -159,3 +159,7 @@ variable "final_db_snapshot" {
   description = "Should the databases take a final snapshot or not"
   default     = false
 }
+
+variable "recovery_window_in_days" {
+  description = "How long to allow secrets to be recovered if they are deleted"
+}

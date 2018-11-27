@@ -59,3 +59,7 @@ variable "final_db_snapshot" {
   default     = false
 }
 
+variable "recovery_window_in_days" {
+  description = "How long to allow secrets to be recovered if they are deleted"
+}
+
