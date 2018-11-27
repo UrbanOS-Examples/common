@@ -72,8 +72,3 @@ variable "alm_workspace" {
   description = "Workspace for the ALM state"
   default     = "alm"
 }
-
-variable "accepter_credentials_profile" {
-  description = "The AWS credentials profile to use for accepting peering"
-  default     = "jenkins"
-}

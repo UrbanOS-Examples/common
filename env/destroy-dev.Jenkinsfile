@@ -26,13 +26,8 @@ node('master') {
 def destroyEnv(environment) {
     def vpc_id = sh(script: "terraform output vpc_id", returnStdout: true)
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_jenkins_user', variable: 'AWS_ACCESS_KEY_ID']]) {
-        sh("../scripts/destroy_albs_created_via_kubernetes.sh ${environment} ${vpc_id}")
-        retry(30) {
-            sh("../scripts/zero_elb_count.sh ${environment} ${vpc_id}")
-        }
         echo "Destroying environment attached to VPC ${vpc_id}"
         sh("terraform destroy -var-file=variables/${environment}.tfvars -auto-approve")
-        sh("../scripts/delete_vpc.sh ${environment} ${vpc_id}")
     }
 }
 
