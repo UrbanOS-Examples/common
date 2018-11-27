@@ -16,6 +16,7 @@ module "cloudbreak" {
   cloudbreak_tag           = "1.0.0"
   ssh_key                  = "${aws_key_pair.cloud_key.key_name}"
   final_db_snapshot        = "${var.final_db_snapshot}"
+  recovery_window_in_days  = "${var.recovery_window_in_days}"
 }
 
 module "datalake" {
@@ -39,6 +40,7 @@ module "datalake" {
   final_db_snapshot              = "${var.final_db_snapshot}"
   parent_hosted_zone_name        = "${aws_route53_zone.public_hosted_zone.name}"
   parent_hosted_zone_id          = "${aws_route53_zone.public_hosted_zone.id}"
+  recovery_window_in_days        = "${var.recovery_window_in_days}"
 }
 
 variable "ldap_server" {

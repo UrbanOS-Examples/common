@@ -5,6 +5,7 @@ resource "random_string" "ambari_admin_password" {
 
 resource "aws_secretsmanager_secret" "ambari_admin_password" {
   name = "${terraform.workspace}-ambari-admin-password"
+  recovery_window_in_days = "${var.recovery_window_in_days}"
 }
 
 resource "aws_secretsmanager_secret_version" "ambari_admin_password" {

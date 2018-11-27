@@ -9,7 +9,7 @@ module "lime_db" {
   lime_db_multi_az           = "${var.lime_db_multi_az}"
   lime_db_apply_immediately  = "${var.lime_db_apply_immediately}"
   final_db_snapshot          = "${var.lime_final_db_snapshot}"
-  secret_recovery_window     =  "${var.lime_secret_recovery_window}"
+  recovery_window_in_days    = "${var.recovery_window_in_days}"
 }
 
 variable "lime_db_size" {
