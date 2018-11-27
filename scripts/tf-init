@@ -8,7 +8,7 @@ to help with the flags and file state requirements for running a terraform init,
 users select a workspace before attempting to manipulate resources.
 
 Options:
---sandbox                    Initialize Terraform to use the sandbox backend config.  If not
+-s, --sandbox                    Initialize Terraform to use the sandbox backend config.  If not
                              passed, the alm backend config will be used
 -w, --workspace <workspace>  The workspace to select/create after being initialized. If
                              not passed, you will be prompted to select or create a workspace
@@ -49,7 +49,7 @@ backend_config="${git_root}/backends/alm.conf"
 
 until [ ${#} -eq 0 ]; do
     case "${1}" in
-        --sandbox)
+        -s|--sandbox)
             backend_config="${git_root}/backends/sandbox-alm.conf"
             ;;
         -w|--workspace)
