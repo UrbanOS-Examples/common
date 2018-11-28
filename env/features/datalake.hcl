@@ -74,6 +74,16 @@ output "cluster_name" {
 }
 
 output "ldap_bind_password" {
-  description = "The ldap bind password."
-  value       = "${module.datalake.ldap_bind_password}"
+  description = "The LDAP bind password."
+  value       = "${data.aws_secretsmanager_secret_version.bind_user_password.secret_string}"
+}
+
+output "ldap_server" {
+  description = "The LDAP server"
+  value       = "${var.ldap_server}"
+}
+
+output "ldap_domain" {
+  description = "The LDAP domain"
+  value       = "${var.ldap_domain}"
 }
