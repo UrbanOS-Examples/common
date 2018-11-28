@@ -72,3 +72,8 @@ output "cluster_name" {
   description = "The name of the cluster resulting from a given deployment with unique value hashing."
   value       = "${module.datalake.cluster_name}"
 }
+
+output "ldap_bind_password" {
+  description = "The ldap bind password."
+  value       = "${module.datalake.ldap_bind_password}"
+}
