@@ -41,6 +41,7 @@ module "datalake" {
   parent_hosted_zone_name        = "${aws_route53_zone.public_hosted_zone.name}"
   parent_hosted_zone_id          = "${aws_route53_zone.public_hosted_zone.id}"
   recovery_window_in_days        = "${var.recovery_window_in_days}"
+  role_arn                       = "${var.role_arn}"
 }
 
 variable "ldap_server" {

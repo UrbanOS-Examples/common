@@ -49,17 +49,6 @@ resource "aws_db_parameter_group" "kylo_db_parameter_group_namespaced" {
     value = "1"
   }
 }
-resource "aws_db_parameter_group" "kylo_db_parameter_group" {
-  #Bug in kylo requiring modification of global mysql property:
-  #https://kylo-io.atlassian.net/browse/KYLO-1169
-  name   = "kylo-parameter-group"
-  family = "mysql5.7"
-
-  parameter {
-    name  = "log_bin_trust_function_creators"
-    value = "1"
-  }
-}
 
 resource "random_string" "kylo_db_password" {
   length  = 40

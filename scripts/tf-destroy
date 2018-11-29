@@ -1,0 +1,52 @@
+#! /bin/bash
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NO_COLOR='\033[0m'
+
+workspace=$1
+PREVENT_DESTROY_FALSE="prevent_destroy = false"
+
+terraform_state=$(terraform state list)
+
+if [ -z "${workspace}" ]; then
+    echo "Workspace name is required"
+    echo
+    exit 1
+fi
+
+# git changes need stashed, if they exist
+CHANGE_COUNT=$(git diff --numstat HEAD | wc -l)
+
+if [ "${CHANGE_COUNT}" -ne 0 ]; then
+    printf "\n${GREEN}Stashing Changes${NO_COLOR}\n\n"
+    git stash save "Destroy script stash changes"
+fi
+
+tf-init --sandbox -a -w "${workspace}"
+
+if [ -n "${terraform_state}" ]; then
+    terraform plan --var-file=variables/sandbox.tfvars -destroy -out destroy.plan
+fi
+
+printf "\n\nRunning in ${GREEN}${PWD}${NO_COLOR}\n"
+read -p "Type \"${workspace}\" to confirm descrution: " confirmation
+
+if [[ "${confirmation}" -eq "${workspace}" ]]; then
+    if [ -n "${terraform_state}" ]; then
+        find ../ -name \*.tf -exec sed -i "" -e "s/prevent_destroy.*true.*/${PREVENT_DESTROY_FALSE}/" {} \;
+
+        terraform apply destroy.plan
+    fi
+
+    terraform workspace select default
+    terraform workspace delete "${workspace}"
+else
+    printf "\n${RED}Aborting destruction of ${workspace}!${NO_COLOR}\n"
+fi
+
+git checkout ..
+if [ "${CHANGE_COUNT}" -ne 0 ]; then
+    echo "Popping Stashed Changes"
+    git stash pop
+fi

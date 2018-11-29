@@ -163,3 +163,7 @@ variable "final_db_snapshot" {
 variable "recovery_window_in_days" {
   description = "How long to allow secrets to be recovered if they are deleted"
 }
+
+variable "role_arn" {
+  description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"
+}
