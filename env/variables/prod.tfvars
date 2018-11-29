@@ -9,7 +9,8 @@ enabled_features = ["eks-cluster",
                     "joomla",
                     "kong",
                     "load_balancer",
-                    "streaming-data-aggregator"
+                    "streaming-data-aggregator",
+                    "lime_db"
                    ]
 
 role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
