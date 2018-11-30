@@ -1,6 +1,6 @@
 locals {
-  host_zone_acct = "199837183662" # ALM account where the reverse lookup zone resides
-  assume_role    = "jenkins_role"
+  host_zone_acct = "${var.alm_account_id}" # ALM account where the reverse lookup zone resides
+  assume_role    = "${element(split("/", var.role_arn), 1)}" # The 'admin' role is called admin in sandbox and jenkins everywhere else :(
   zone_id        = "${data.terraform_remote_state.alm_remote_state.reverse_dns_zone_id}"
   cli_flags      = "--hosted-zone-id ${local.zone_id} --vpc VPCRegion=${var.region},VPCId=${module.vpc.vpc_id}"
 }
