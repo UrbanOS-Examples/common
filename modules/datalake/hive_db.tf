@@ -12,6 +12,27 @@ resource "random_string" "hive_db_password" {
   special = false
 }
 
+resource "aws_secretsmanager_secret" "hive_db_password" {
+  name = "${terraform.workspace}-hive-db-password"
+  recovery_window_in_days = "${var.recovery_window_in_days}"
+}
+
+resource "aws_secretsmanager_secret_version" "hive_db_password" {
+  secret_id     = "${aws_secretsmanager_secret.hive_db_password.id}"
+  secret_string = "${random_string.hive_db_password.result}"
+}
+
+resource "aws_secretsmanager_secret" "hive_thrift_password" {
+  name = "${terraform.workspace}-hive-thrift-password"
+  recovery_window_in_days = "${var.recovery_window_in_days}"
+}
+
+resource "aws_secretsmanager_secret_version" "hive_thrift_password" {
+  secret_id     = "${aws_secretsmanager_secret.hive_thrift_password.id}"
+  secret_string = "isnotsetinambariblueprint"
+}
+
+
 resource "aws_db_subnet_group" "hive_db_subnet_group" {
   name        = "hive db ${terraform.workspace} subnet group"
   description = "DB Subnet Group"
