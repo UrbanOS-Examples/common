@@ -49,7 +49,8 @@
                     "dfs.namenode.rpc-address.cluster.namenode1": "%HOSTGROUP::master_namenode1%:8020",
                     "dfs.namenode.rpc-address.cluster.namenode2": "%HOSTGROUP::master_namenode2%:8020",
                     "dfs.namenode.shared.edits.dir": "qjournal://%HOSTGROUP::master_namenode1%:8485;%HOSTGROUP::master_namenode2%:8485;%HOSTGROUP::management%:8485/cluster",
-                    "dfs.nameservices": "cluster"
+                    "dfs.nameservices": "cluster",
+                    "dfs.replication": "1"
                 }
             }
         },
@@ -107,7 +108,7 @@
         {
             "yarn-site": {
                 "properties": {
-                    "hadoop.registry.rm.enabled": "true",
+                    "hadoop.registry.rm.enabled": "false",
                     "hadoop.registry.zk.quorum": "%HOSTGROUP::master_namenode1%:2181,%HOSTGROUP::master_namenode2%:2181,%HOSTGROUP::management%:2181",
                     "yarn.acl.enable": "true",
                     "yarn.log.server.url": "http://%HOSTGROUP::master_namenode2%:19888/jobhistory/logs",

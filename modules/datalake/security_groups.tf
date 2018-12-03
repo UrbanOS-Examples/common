@@ -1,11 +1,11 @@
 resource "aws_security_group" "datalake_worker" {
   name_prefix = "datalake_worker_"
-  vpc_id = "${var.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["${var.remote_management_cidr}"]
     description = "Allow internal ssh"
   }
@@ -34,6 +34,14 @@ resource "aws_security_group" "datalake_worker" {
     description     = "All inbound from the Hadoop Master nodes"
   }
 
+  ingress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = ["${var.eks_worker_node_security_group}"]
+    description     = "All inbound from the EKS worker nodes"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -48,7 +56,7 @@ resource "aws_security_group" "datalake_worker" {
 
 resource "aws_security_group" "datalake_master" {
   name_prefix = "datalake_master_"
-  vpc_id = "${var.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   tags {
     Name = "datalake-master-${terraform.workspace}"
@@ -115,6 +123,16 @@ resource "aws_security_group_rule" "hdp_cloudbreak_to_master" {
   security_group_id        = "${aws_security_group.datalake_master.id}"
 }
 
+resource "aws_security_group_rule" "hdp_allow_eks_to_datalake" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = "${var.eks_worker_node_security_group}"
+  description              = "Allow EKS to access the datalake"
+  security_group_id        = "${aws_security_group.datalake_master.id}"
+}  
+
 resource "aws_security_group_rule" "hdp_master_egress" {
   type              = "egress"
   from_port         = 0
@@ -137,18 +155,18 @@ resource "aws_security_group_rule" "hdp_worker_to_master" {
 // The following group needs to be converted to a rule attached to the db_allow_hadoop group created in the cloudbreak module
 resource "aws_security_group" "db_allow_hadoop" {
   name_prefix = "db_allow_hadoop"
-  vpc_id = "${var.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   tags {
     Name = "Postgres Allow Hadoop"
   }
 
   ingress {
-    from_port = 5432
-    to_port   = 5432
-    protocol  = "tcp"
-    security_groups = ["${aws_security_group.datalake_master.id}", "${var.cloudbreak_security_group}"]
-    description = "Allow postgres traffic from Hadoop"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.datalake_master.id}", "${var.cloudbreak_security_group}", "${var.eks_worker_node_security_group}"]
+    description     = "Allow postgres traffic from Hadoop"
   }
 }
 
@@ -210,14 +228,14 @@ resource "aws_security_group" "ranger_security_group" {
 
 resource "aws_security_group" "datalake_metrics" {
   name_prefix = "datalake_metrics_"
-  vpc_id = "${var.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
-    from_port = 6188
-    to_port   = 6188
-    protocol  = "tcp"
+    from_port       = 6188
+    to_port         = 6188
+    protocol        = "tcp"
     security_groups = ["${var.eks_worker_node_security_group}"]
-    description = "Allow traffic from EKS for metric visualization"
+    description     = "Allow traffic from EKS for metric visualization"
   }
 
   tags {
