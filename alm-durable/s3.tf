@@ -112,9 +112,31 @@ resource "aws_s3_bucket_policy" "build_artifacts_repository_policy" {
 }
 POLICY
 }
+
+resource "aws_s3_bucket" "jenkins_backup_repository" {
+  bucket = "${var.jenkins_backup_repo_name}"
+  acl    = "private"
+  tags {
+    Name        = "jenkins-backup-repository"
+    Environment = "${terraform.workspace}"
+  }
+  lifecycle_rule {
+    id = "backup_retention"
+    enabled = true
+    expiration {
+      days = 14
+    }
+  }
+}
+
 variable "build_artifacts_repo_name" {
   default = "os-build-artifacts-repository"
   description = "Bucket name to archive build artifacts"
+}
+
+variable "jenkins_backup_repo_name" {
+  default = "scos-alm-jenkins-backups"
+  description = "Bucket name for the Jenkins backups"
 }
 
 variable "scospy_repo_name" {
