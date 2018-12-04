@@ -120,6 +120,13 @@ resource "aws_s3_bucket" "jenkins_backup_repository" {
     Name        = "jenkins-backup-repository"
     Environment = "${terraform.workspace}"
   }
+  lifecycle_rule {
+    id = "backup_retention"
+    enabled = true
+    expiration {
+      days = 14
+    }
+  }
 }
 
 variable "build_artifacts_repo_name" {
