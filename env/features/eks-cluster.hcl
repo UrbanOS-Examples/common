@@ -86,7 +86,9 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "route53:ListHostedZones",
                 "route53:ListResourceRecordSets",
 
-                "cloudwatch:PutMetricData"
+                "cloudwatch:PutMetricData",
+                "s3:Get*",
+                "s3:List*"
             ],
             "Resource": "*"
         },

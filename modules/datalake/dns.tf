@@ -99,3 +99,47 @@ resource "aws_route53_record" "cb_cluster_management" {
   ttl     = 300
   records = ["${data.aws_instance.cb_cluster_management.private_ip}"]
 }
+
+resource "aws_route53_record" "datalake_dns" {
+  zone_id = "${var.datalake_dns_zone_id}"
+  name    = "datalake"
+  type    = "A"
+
+  alias {
+    name                   = "${aws_alb.datalake.dns_name}"
+    zone_id                = "${aws_alb.datalake.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+# TODO - simplify cluster to not be HA and just access these either through Knox or single, non round-robin records
+resource "aws_route53_record" "datalake_hive_dns" {
+  zone_id = "${var.datalake_dns_zone_id}"
+  name    = "datalake-hive"
+  type    = "A"
+  ttl     = 300
+
+  records = [
+    "${data.aws_instance.cb_cluster_master_namenode1.private_ip}",
+    "${data.aws_instance.cb_cluster_master_namenode2.private_ip}"
+  ]
+}
+
+# as far as we know, hadoop cannot DNS round-robin or load balance a namenode
+resource "aws_route53_record" "datalake_master-namenode1_dns" {
+  zone_id = "${var.datalake_dns_zone_id}"
+  name    = "datalake-master-namenode1"
+  type    = "CNAME"
+  ttl     = 300
+
+  records = ["${aws_route53_record.cb_cluster_master_namenode1.fqdn}"]
+}
+
+resource "aws_route53_record" "datalake_master-namenode2_dns" {
+  zone_id = "${var.datalake_dns_zone_id}"
+  name    = "datalake-master-namenode2"
+  type    = "CNAME"
+  ttl     = 300
+
+  records = ["${aws_route53_record.cb_cluster_master_namenode2.fqdn}"]
+}

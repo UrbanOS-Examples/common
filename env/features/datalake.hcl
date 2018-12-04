@@ -53,9 +53,32 @@ variable "ldap_domain" {
   default     = "dc=internal,dc=smartcolumbusos,dc=com"
 }
 
-output "hive_db_endpoint" {
-  description = "The FQDN:Port of the Hive RDS database."
-  value       = "${module.datalake.hive_db_endpoint}"
+output "hive_metastore_url" {
+  value       = "${module.datalake.hive_metastore_url}"
+}
+
+output "hive_metastore_username" {
+  value = "${module.datalake.hive_metastore_username}"
+}
+
+output "hive_metastore_password_secret_id" {
+  value = "${module.datalake.hive_metastore_password_secret_id}"
+}
+
+output "hive_thrift_url" {
+  value = "${module.datalake.hive_thrift_url}"
+}
+
+output "hive_thrift_username" {
+  value = "${module.datalake.hive_thrift_username}"
+}
+
+output "hive_thrift_password_secret_id" {
+  value = "${module.datalake.hive_thrift_password_secret_id}"
+}
+
+output "datalake_master_address_list" {
+  value = "${module.datalake.master_address_list}"
 }
 
 output "ranger_db_endpoint" {

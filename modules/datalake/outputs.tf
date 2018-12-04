@@ -1,6 +1,54 @@
-output "hive_db_endpoint" {
-  description = "The FQDN:Port of the Hive RDS database."
-  value       = "${aws_db_instance.hive_db.endpoint}"
+output "hive_metastore_address" {
+  description = "The address of the Hive meta database."
+  value       = "${aws_db_instance.hive_db.address}"
+}
+
+output "hive_metastore_url" {
+  description = "The URL of the Hive metastore database."
+  value       = "jdbc:postgresql://${aws_db_instance.hive_db.endpoint}/hive?createDatabaseIfNotExist=true"
+}
+
+output "hive_metastore_username" {
+  value = "${aws_db_instance.hive_db.username}"
+}
+
+output "hive_metastore_password" {
+  sensitive = true
+  value = "${aws_db_instance.hive_db.password}"
+}
+
+output "hive_metastore_password_secret_id" {
+  value = "${aws_secretsmanager_secret_version.hive_db_password.arn}"
+}
+
+output "hive_thrift_address" {
+  description = "The address of the Hive database."
+  value = "${aws_route53_record.datalake_hive_dns.fqdn}"
+}
+
+output "hive_thrift_url" {
+  description = "The URL of the Hive database."
+  value = "jdbc:hive2://${aws_route53_record.datalake_hive_dns.fqdn}:10001/hive;transportMode=http;httpPath=cliservice"
+}
+
+output "hive_thrift_username" {
+  value = "hive"
+}
+
+output "hive_thrift_password" {
+  sensitive = true
+  value = ""
+}
+
+output "hive_thrift_password_secret_id" {
+  value = "${aws_secretsmanager_secret_version.hive_thrift_password.arn}"
+}
+
+output "master_address_list" {
+  value = [
+    "${aws_route53_record.datalake_master-namenode1_dns.fqdn}",
+    "${aws_route53_record.datalake_master-namenode2_dns.fqdn}"
+  ]
 }
 
 output "ranger_db_endpoint" {
