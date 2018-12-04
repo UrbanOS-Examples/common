@@ -12,6 +12,7 @@ Options:
                              passed, the alm backend config will be used
 -w, --workspace <workspace>  The workspace to select/create after being initialized. If
                              not passed, you will be prompted to select or create a workspace
+-a, --all-features           Enables all features
 -h, --help
 EOF
 }
@@ -41,11 +42,21 @@ _json2hcl() {
     "${json2hcl}" "${@}"
 }
 
+_enable_feature() {
+    feature=$1
+    echo "enabling feature ${feature}"
+    feature_file=$(_file ${PWD}/"features/${feature}.hcl") ||
+        _die "Cannot find file for feature \"${feature}\" (${feature_file})"
+
+    ln -s "${feature_file}" _feature_"${feature}".tf || _die "failed adding feature"
+}
+
 set -o pipefail
 
 git_root=$(git rev-parse --show-toplevel) || _die "Failed to resolve git_root.  Are you in a git repository?"
 
 backend_config="${git_root}/backends/alm.conf"
+all_features=false
 
 until [ ${#} -eq 0 ]; do
     case "${1}" in
@@ -56,6 +67,9 @@ until [ ${#} -eq 0 ]; do
             workspace=${2}
             shift
             ;;
+        -a|--all-features)
+            all_features=true
+            ;;
         -h|--help)
             help
             exit 0
@@ -64,17 +78,20 @@ until [ ${#} -eq 0 ]; do
     shift
 done
 
-varfile=$(_file "variables/${workspace}.tfvars" || _file "variables/sandbox.tfvars") ||
-    _die "Failed to find a tfvars file for the workspace \"${workspace}\""
-echo "Using \"${varfile}\""
-
 rm -f _feature*.tf
-for feature in $(_get_tfvar "${varfile}" enabled_features | jq --raw-output '.[]'); do
-    echo "enabling feature ${feature}"
-    feature_file=$(_file ${PWD}/"features/${feature}.hcl") ||
-        _die "Cannot find file for feature \"${feature}\" (${feature_file})"
 
-    ln -s "${feature_file}" _feature_"${feature}".tf || _die "failed adding feature"
+if ${all_features}; then
+    enabled_features=$(ls features/ | cut -d '.' -f 1)
+else
+    varfile=$(_file "variables/${workspace}.tfvars" || _file "variables/sandbox.tfvars") ||
+        _die "Failed to find a tfvars file for the workspace \"${workspace}\""
+    echo "Using \"${varfile}\""
+
+    enabled_features=$(_get_tfvar "${varfile}" enabled_features | jq --raw-output '.[]')
+fi
+
+for feature in ${enabled_features}; do
+    _enable_feature $feature
 done
 
 echo "removing .terraform"

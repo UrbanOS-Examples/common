@@ -200,3 +200,18 @@ EOF
     create_before_destroy = true
   }
 }
+
+resource "null_resource" "tear_down_cloudbreak_ec2_instances" {
+  provisioner "local-exec" {
+    when = "destroy"
+    command = <<EOF
+set -e
+echo "Destroying cloudbreak ec2 instances..."
+${path.module}/../../scripts/destroy_ec2_instances.sh \
+  --vpc_id ${var.vpc_id} \
+  --region ${var.region} \
+  --role_arn ${var.role_arn} \
+  --tag_to_delete CloudbreakClusterName
+EOF
+  }
+}

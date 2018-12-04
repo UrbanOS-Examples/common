@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NO_COLOR='\033[0m'
+PREVENT_DESTROY_FALSE="prevent_destroy = false"
+
+help() {
+    cat <<EOF
+Usage: ${0} [OPTIONS]
+Specialized Terraform deletion script for the Smart Columbus Operating System.
+
+Options:
+-w, --workspace <workspace>  The workspace to destroy. If not passed, you will
+                             be prompted to select or create a workspace
+-h, --help
+EOF
+}
+
+_stash_changes() {
+    if [ "${CHANGE_COUNT}" -ne 0 ]; then
+        printf "\n${GREEN}Stashing Changes${NO_COLOR}\n\n"
+        git stash save "Destroy script stash changes"
+    fi
+}
+
+_unstash_changes() {
+    if [ "${CHANGE_COUNT}" -ne 0 ]; then
+        echo "Popping Stashed Changes"
+        git stash pop
+    fi
+}
+
+_terraform_plan() {
+    if [ -n "${TERRAFORM_STATE}" ]; then
+        find ../ -name \*.tf -exec sed -i "" -e "s/prevent_destroy.*true.*/${PREVENT_DESTROY_FALSE}/" {} \;
+        terraform plan --var-file=variables/sandbox.tfvars -destroy -out destroy.plan
+    fi
+}
+
+_terraform_destroy() {
+    if [ -n "${TERRAFORM_STATE}" ]; then
+        terraform apply destroy.plan
+    fi
+}
+
+_prompt_user() {
+    printf "\n\nRunning in ${GREEN}${PWD}${NO_COLOR}\n"
+    read -p "Type \"${workspace}\" to confirm descrution: " confirmation
+}
+
+until [ ${#} -eq 0 ]; do
+    case "${1}" in
+        -w|--workspace)
+            workspace=${2}
+            shift
+            ;;
+        -h|--help)
+            help
+            exit 0
+            ;;
+    esac
+    shift
+done
+
+if [ -z "${workspace}" ]; then
+    workspaces=$(terraform workspace list | cut -c 3- | sort -f | tail -n +2) || _die "Failed to list workspaces"
+    echo "Workspaces available:"
+    echo "${workspaces}"
+    echo
+
+    read -p "Select a workspace or name a new one to be created: " workspace
+fi
+
+# git changes need stashed, if they exist
+CHANGE_COUNT=$(git diff --numstat HEAD | wc -l)
+
+_stash_changes
+
+tf-init --sandbox -a -w "${workspace}"
+
+TERRAFORM_STATE=$(terraform state list)
+
+_terraform_plan
+
+# _prompt_user
+printf "\n\nRunning in ${GREEN}${PWD}${NO_COLOR}\n"
+read -p "Type \"${workspace}\" to confirm descrution: " confirmation
+
+echo "${confirmation}"
+
+if [ "${confirmation}" = "${workspace}" ]; then
+    _terraform_destroy
+    terraform workspace select default
+    terraform workspace delete "${workspace}"
+else
+    printf "\n${RED}Aborting destruction of ${workspace}!${NO_COLOR}\n"
+fi
+
+git checkout ..
+
+_unstash_changes

@@ -16,7 +16,6 @@ provider "aws" {
     role_arn = "${var.alm_role_arn}"
   }
 }
-
 terraform {
   backend "s3" {
     key     = "operating-system"
