@@ -1,11 +1,31 @@
 #!/usr/bin/env bash
 
-echo "In Destroy EC2 Script..."
+until [ ${#} -eq 0 ]; do
+    case "${1}" in
+        --vpc_id)
+            vpc_id="${2}"
+            shift
+            ;;
+        --region)
+            region="${2}"
+            shift
+            ;;
+        --role_arn)
+            role_arn="${2}"
+            shift
+            ;;
+        --tag_to_delete)
+            tag_to_delete="${2}"
+            shift
+            ;;
+    esac
+    shift
+done
 
-vpc_id=$1
-region=$2
-role_arn=$3
-tag_to_delete="CloudbreakClusterName"
+if [[ -z ${vpc_id} || -z ${region} || -z ${role_arn} || -z ${tag_to_delete} ]]; then
+  echo 'Missing arguments, include vpc_id, region, role_arn, and tag_to_delete'
+  exit 1
+fi
 
 awsconfig=$(mktemp)
 
@@ -19,6 +39,8 @@ EOF
 export AWS_CONFIG_FILE=${awsconfig}
 
 InstanceIdsInVpc=$(aws ec2 describe-instances --filters Name=vpc-id,Values=${vpc_id} Name=tag-key,Values=$tag_to_delete | jq -r '.Reservations[].Instances[].InstanceId' | tr '\n' ' ')
+
+echo "Terminating EC2 instances..."
 
 aws ec2 terminate-instances --instance-ids $InstanceIdsInVpc
 
