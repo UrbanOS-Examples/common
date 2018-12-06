@@ -1,2 +1,3 @@
 config-map-aws-auth*
 kubeconfig*
+aws.yaml
