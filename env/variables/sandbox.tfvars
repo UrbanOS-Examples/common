@@ -71,6 +71,7 @@ hive_db_apply_immediately = true
 
 #EKS Workers
 min_num_of_workers = 1
+k8s_instance_size = "t2.medium"
 
 #Jupyterhub EKS Workers
 min_num_of_jupyterhub_workers=0

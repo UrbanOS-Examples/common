@@ -20,7 +20,7 @@ module "eks-cluster" {
       name                 = "Workers"
       asg_min_size         = "${var.min_num_of_workers}"
       asg_max_size         = "${var.max_num_of_workers}"
-      instance_type        = "t2.xlarge"
+      instance_type        = "${var.k8s_instance_size}"
       key_name             = "${aws_key_pair.cloud_key.key_name}"
       pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
@@ -165,6 +165,11 @@ data "external" "helm_file_change_check" {
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   role       = "${module.eks-cluster.worker_iam_role_name}"
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
+}
+
+variable "k8s_instance_size" {
+  description = "EC2 instance type"
+  default = "t2.xlarge"
 }
 
 variable "min_num_of_workers" {
