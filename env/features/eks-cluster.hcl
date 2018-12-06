@@ -106,8 +106,18 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
 EOF
 }
 
+resource "local_file" "aws_props" {
+    content = <<EOF
+aws:
+  publicSubnets: ${jsonencode(module.vpc.public_subnets)}
+  allowWebTrafficSecurityGroup: ${aws_security_group.allow_all.id}
+  certificateArn: "${module.tls_certificate.arn}"
+EOF
+    filename = "${path.module}/aws.yaml"
+}
+
 resource "null_resource" "eks_infrastructure" {
-  depends_on = ["data.external.helm_file_change_check"]
+  depends_on = ["data.external.helm_file_change_check", "local_file.aws_props"]
   provisioner "local-exec" {
 
     command = <<EOF
@@ -134,13 +144,15 @@ helm upgrade --install cluster-infra ${path.module}/helm/cluster-infra \
     --set externalDns.args."domain\-filter"="${var.root_dns_zone}" \
     --set albIngress.extraEnv."AWS\_REGION"="${var.region}" \
     --set albIngress.extraEnv."CLUSTER\_NAME"="${module.eks-cluster.cluster_id}" \
-    --values ${path.module}/helm/cluster-infra/run-config.yaml
+    --values ${path.module}/helm/cluster-infra/run-config.yaml \
+    --values ${local_file.aws_props.filename}
 
 EOF
   }
 
   triggers {
     helm_file_change_check = "${data.external.helm_file_change_check.result.md5_result}"
+    aws_props = "${local_file.aws_props.content}"
   }
 }
 
