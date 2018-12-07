@@ -5,6 +5,16 @@ resourceLimits:
   cpu: 100m
   memory: 256Mi
 
+aws:
+  publicSubnets: []
+#     # can be a name
+#     - subnet-name
+#     # or an id
+#     - subnet-0046bac608cb368f4
+#   allowWebTrafficSecurityGroup: sg-066f9bfe7b3f2ef7e
+#   # ARN for the domain certificate
+#   certificateArn: arn:aws:acm:us-west-2:073132350570:certificate/9674edaa-523a-4f0c-89a3-0fab8aa78b99
+
 calico:
   enabled: false
   name: calico

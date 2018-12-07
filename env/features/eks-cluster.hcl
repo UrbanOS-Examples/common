@@ -20,7 +20,7 @@ module "eks-cluster" {
       name                 = "Workers"
       asg_min_size         = "${var.min_num_of_workers}"
       asg_max_size         = "${var.max_num_of_workers}"
-      instance_type        = "t2.xlarge"
+      instance_type        = "${var.k8s_instance_size}"
       key_name             = "${aws_key_pair.cloud_key.key_name}"
       pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
@@ -106,8 +106,18 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
 EOF
 }
 
+resource "local_file" "aws_props" {
+    content = <<EOF
+aws:
+  publicSubnets: ${jsonencode(module.vpc.public_subnets)}
+  allowWebTrafficSecurityGroup: ${aws_security_group.allow_all.id}
+  certificateArn: "${module.tls_certificate.arn}"
+EOF
+    filename = "${path.module}/aws.yaml"
+}
+
 resource "null_resource" "eks_infrastructure" {
-  depends_on = ["data.external.helm_file_change_check"]
+  depends_on = ["data.external.helm_file_change_check", "local_file.aws_props"]
   provisioner "local-exec" {
 
     command = <<EOF
@@ -134,13 +144,15 @@ helm upgrade --install cluster-infra ${path.module}/helm/cluster-infra \
     --set externalDns.args."domain\-filter"="${var.root_dns_zone}" \
     --set albIngress.extraEnv."AWS\_REGION"="${var.region}" \
     --set albIngress.extraEnv."CLUSTER\_NAME"="${module.eks-cluster.cluster_id}" \
-    --values ${path.module}/helm/cluster-infra/run-config.yaml
+    --values ${path.module}/helm/cluster-infra/run-config.yaml \
+    --values ${local_file.aws_props.filename}
 
 EOF
   }
 
   triggers {
     helm_file_change_check = "${data.external.helm_file_change_check.result.md5_result}"
+    aws_props = "${local_file.aws_props.content}"
   }
 }
 
@@ -165,6 +177,11 @@ data "external" "helm_file_change_check" {
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   role       = "${module.eks-cluster.worker_iam_role_name}"
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
+}
+
+variable "k8s_instance_size" {
+  description = "EC2 instance type"
+  default = "t2.xlarge"
 }
 
 variable "min_num_of_workers" {
