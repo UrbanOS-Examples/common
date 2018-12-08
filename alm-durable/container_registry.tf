@@ -145,3 +145,8 @@ module "aws_cost_exporter" {
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "aws-cost-exporter"
 }
+module "kylo" {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "kylo"
+}
