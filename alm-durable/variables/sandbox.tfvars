@@ -15,3 +15,5 @@ scospy_repo_name = "sandbox-scospy-repository"
 build_artifacts_repo_name = "sandbox-os-build-artifacts-repository"
 
 jenkins_backup_repo_name = "scos-sandbox-jenkins-backup"
+
+helm_repo_name = "scos-sandbox-helm-repository"
