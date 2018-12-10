@@ -47,6 +47,8 @@ data "terraform_remote_state" "durable" {
   }
 }
 
+resource "random_pet" "rebuild_again_please" {}
+
 resource "aws_key_pair" "cloud_key" {
   key_name   = "${terraform.workspace}_env_cloud_key"
   public_key = "${var.key_pair_public_key}"

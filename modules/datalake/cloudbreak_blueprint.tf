@@ -20,6 +20,7 @@ data "template_file" "cloudbreak_blueprint" {
     CLOUD_STORAGE_BUCKET = "${aws_s3_bucket.hadoop_cloud_storage.bucket}"
     AMBARI_PASSWORD      = "${random_string.ambari_admin_password.result}"
     RANGER_DB_ENDPOINT   = "${aws_db_instance.ranger_db.endpoint}"
+    REGION               = "${var.region}"
   }
 }
 
