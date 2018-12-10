@@ -8,7 +8,7 @@ module "lime_db" {
   lime_db_storage            = "${var.lime_db_storage}"
   lime_db_multi_az           = "${var.lime_db_multi_az}"
   lime_db_apply_immediately  = "${var.lime_db_apply_immediately}"
-  final_db_snapshot          = "${var.lime_final_db_snapshot}"
+  skip_final_db_snapshot     = "${var.skip_final_db_snapshot}"
   recovery_window_in_days    = "${var.recovery_window_in_days}"
 }
 
@@ -26,10 +26,6 @@ variable "lime_db_multi_az" {
 
 variable "lime_db_apply_immediately" {
   description = "Whether or not to apply code changes to the db immediately (vs. waiting for maint. window)"
-}
-
-variable "lime_final_db_snapshot" {
-  description = "Whether or not to force creation of a final snapshot on the db."
 }
 
 variable "lime_secret_recovery_window" {

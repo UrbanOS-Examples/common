@@ -155,7 +155,7 @@ variable "ldap_admin_group" {
   default     = "hadoop"
 }
 
-variable "final_db_snapshot" {
+variable "skip_final_db_snapshot" {
   description = "Should the databases take a final snapshot or not"
   default     = false
 }

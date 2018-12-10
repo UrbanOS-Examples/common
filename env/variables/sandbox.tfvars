@@ -84,13 +84,12 @@ ldap_domain = "dc=sandbox,dc=internal,dc=smartcolumbusos,dc=com"
 kylo_db_multi_az=false
 kylo_db_instance_class="db.t2.small"
 
-final_db_snapshot = true
+skip_final_db_snapshot = true
 
 # Lime DB override settings
 lime_db_size = "db.t2.small"
 lime_db_storage = 20
 lime_db_multi_az = false
 lime_db_apply_immediately = true
-lime_final_db_snapshot = false
 
 recovery_window_in_days = 0

@@ -78,7 +78,7 @@ resource "aws_db_instance" "lime_db" {
   storage_encrypted       = true
   kms_key_id              = "${aws_kms_key.lime_db_key.arn}"
   apply_immediately       = "${var.lime_db_apply_immediately}"
-  skip_final_snapshot     = "${var.final_db_snapshot}"
+  skip_final_snapshot     = "${var.skip_final_db_snapshot}"
   final_snapshot_identifier = "lime-${sha1(timestamp())}"
 
   lifecycle = {
