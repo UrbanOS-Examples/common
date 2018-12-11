@@ -71,7 +71,7 @@ variable "vpc_name" {
   default     = ""
 }
 
-variable "final_db_snapshot" {
+variable "skip_final_db_snapshot" {
   description = "Should the databases take a final snapshot or not"
   default     = false
 }

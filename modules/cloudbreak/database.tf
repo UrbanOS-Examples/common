@@ -39,7 +39,7 @@ resource "aws_db_instance" "cloudbreak_db" {
   storage_encrypted       = true
   kms_key_id              = "${aws_kms_key.cloudbreak_db_key.arn}"
   apply_immediately       = "${var.cloudbreak_db_apply_immediately}"
-  skip_final_snapshot     = "${var.final_db_snapshot}"
+  skip_final_snapshot     = "${var.skip_final_db_snapshot}"
 
   lifecycle = {
     prevent_destroy = true
