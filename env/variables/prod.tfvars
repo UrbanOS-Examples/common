@@ -10,7 +10,8 @@ enabled_features = ["eks-cluster",
                     "kong",
                     "load_balancer",
                     "streaming-data-aggregator",
-                    "lime_db"
+                    "lime_db",
+                    "grafana",
                    ]
 
 role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
