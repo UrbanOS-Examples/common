@@ -81,6 +81,10 @@ variable "recovery_window_in_days" {
   default     = 30
 }
 
+variable "is_public_facing" {
+  description = "false to utilize private/internal loadbalancers; true to use public"
+}
+
 output "key_pair_name" {
   description = "Name of the keypair to use for env deployments"
   value       = "${aws_key_pair.cloud_key.key_name}"
@@ -89,4 +93,8 @@ output "key_pair_name" {
 output "aws_region" {
   description = "Name of aws region"
   value       = "${var.region}"
+}
+
+variable "is_public_facing" {
+  description = "false to utilize private/internal loadbalancers; true to use public"
 }
