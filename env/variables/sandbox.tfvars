@@ -11,7 +11,6 @@ enabled_features = [
                     "kong"
                    ]
 
-root_dns_zone = "sandbox.internal.smartcolumbusos.com"
 
 alm_account_id = "068920858268"
 
@@ -99,4 +98,9 @@ lime_db_apply_immediately = true
 
 recovery_window_in_days = 0
 
+#DNS
 is_public_facing = false
+
+internal_root_dns_zone = "sandbox.internal.smartcolumbusos.com"
+
+root_dns_zone = "sandbox-smartos.com"

@@ -81,14 +81,14 @@ resource "aws_alb_target_group_attachment" "kong_shared_alb" {
 }
 
 resource "aws_route53_record" "kong_public_dns" {
-  zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
+  zone_id = "${aws_route53_zone.internal_public_hosted_zone.zone_id}"
   name    = "api"
   type    = "A"
   count   = 1
 
   alias {
-    name                   = "${module.load_balancer_private.dns_name}"
-    zone_id                = "${module.load_balancer_private.zone_id}"
+    name                   = "${aws_alb.shared_alb.dns_name}"
+    zone_id                = "${aws_alb.shared_alb.zone_id}"
     evaluate_target_health = false
   }
 }
