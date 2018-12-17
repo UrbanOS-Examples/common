@@ -115,6 +115,13 @@ resource "aws_alb_target_group_attachment" "ckan_external_private" {
   port             = 80
 }
 
+resource "aws_alb_target_group_attachment" "ckan_external_shared" {
+  target_group_arn = "${local.shared_target_group_arns["CKAN"]}"
+  target_id        = "${aws_instance.ckan_external.id}"
+  port             = 80
+}
+
+
 resource "aws_route53_record" "ckan_external_public_dns" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
   name    = "ckan"
