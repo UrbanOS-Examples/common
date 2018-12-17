@@ -3,7 +3,12 @@
 # if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = [
-                    "eks-cluster"
+                    "load_balancer",
+                    "load_balancer_shared",
+                    "ckan_external",
+                    "ckan_internal",
+                    "ckan_shared",
+                    "kong"
                    ]
 
 root_dns_zone = "sandbox.internal.smartcolumbusos.com"
@@ -93,3 +98,5 @@ lime_db_multi_az = false
 lime_db_apply_immediately = true
 
 recovery_window_in_days = 0
+
+is_public_facing = false

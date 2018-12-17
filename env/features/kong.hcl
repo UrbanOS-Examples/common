@@ -74,6 +74,11 @@ resource "aws_alb_target_group_attachment" "kong_private" {
   target_id        = "${aws_instance.kong.id}"
   port             = 80
 }
+resource "aws_alb_target_group_attachment" "kong_shared_alb" {
+  target_group_arn = "${local.shared_target_group_arns["Kong"]}"
+  target_id        = "${aws_instance.kong.id}"
+  port             = 80
+}
 
 resource "aws_route53_record" "kong_public_dns" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"

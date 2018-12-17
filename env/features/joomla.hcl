@@ -216,6 +216,12 @@ resource "aws_lb_target_group_attachment" "joomla_private" {
   port             = 80
 }
 
+resource "aws_lb_target_group_attachment" "joomla_shared_alb" {
+  target_group_arn = "${local.shared_target_group_arns["Joomla"]}"
+  target_id        = "${aws_instance.joomla.id}"
+  port             = 80
+}
+
 resource "aws_route53_record" "joomla_public_dns" {
   zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
   name    = ""
