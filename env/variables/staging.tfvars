@@ -66,4 +66,4 @@ recovery_window_in_days = 0
 #DNS
 is_public_facing = false
 
-root_dns_zone = "staging-smart.com"
+root_dns_zone = "staging-smartos.com"
