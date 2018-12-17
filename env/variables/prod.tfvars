@@ -9,6 +9,7 @@ enabled_features = ["eks-cluster",
                     "joomla",
                     "kong",
                     "load_balancer",
+                    "load_balancer_shared",
                     "streaming-data-aggregator",
                     "lime_db"
                    ]
