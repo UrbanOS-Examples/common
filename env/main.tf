@@ -94,7 +94,3 @@ output "aws_region" {
   description = "Name of aws region"
   value       = "${var.region}"
 }
-
-variable "is_public_facing" {
-  description = "false to utilize private/internal loadbalancers; true to use public"
-}

@@ -9,6 +9,7 @@ enabled_features = ["eks-cluster",
                     "kong",
                     "joomla",
                     "load_balancer",
+                    "load_balancer_shared",
                     "streaming-data-aggregator",
                     "datalake",
                     "kylo",
@@ -62,3 +63,5 @@ lime_db_multi_az = false
 lime_db_apply_immediately = true
 
 recovery_window_in_days = 0
+
+is_public_facing = false

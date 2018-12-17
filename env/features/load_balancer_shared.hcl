@@ -39,9 +39,7 @@ locals {
       health_check_matcher = "200"
     },
   ]
-
-  target_group_arns = "${zipmap(aws_alb_target_group.all_target_groups.*.name, aws_alb_target_group.all_target_groups.*.arn)}"
-  target_group_arn_suffix = "${zipmap(aws_alb_target_group.all_target_groups.*.name, aws_alb_target_group.all_target_groups.*.arn_suffix)}"
+  shared_target_group_arns = "${zipmap(aws_alb_target_group.all_target_groups.*.name, aws_alb_target_group.all_target_groups.*.arn)}"
 }
 
 resource "aws_alb_target_group" "all_target_groups" {
@@ -58,7 +56,7 @@ resource "aws_alb_target_group" "all_target_groups" {
   }
 }
 
-resource "aws_alb" "alb" {
+resource "aws_alb" "shared_alb" {
   name               = "${terraform.workspace}-scos-shared-elb"
   internal           = "${!var.is_public_facing}"
   load_balancer_type = "application"
@@ -70,7 +68,7 @@ resource "aws_alb" "alb" {
 }
 
 resource "aws_alb_listener" "https" {
-  load_balancer_arn = "${aws_alb.alb.arn}"
+  load_balancer_arn = "${aws_alb.shared_alb.arn}"
   certificate_arn   = "${module.tls_certificate.arn}"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   port              = 443
@@ -78,18 +76,18 @@ resource "aws_alb_listener" "https" {
 
   default_action {
     type             = "forward"
-    target_group_arn = "${local.target_group_arns["Joomla"]}"
+    target_group_arn = "${local.shared_target_group_arns["Joomla"]}"
   }
 }
 
 resource "aws_alb_listener" "http" {
-  load_balancer_arn = "${aws_alb.alb.arn}"
+  load_balancer_arn = "${aws_alb.shared_alb.arn}"
   port              = 80
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = "${local.target_group_arns["Joomla"]}"
+    target_group_arn = "${local.shared_target_group_arns["Joomla"]}"
   }
 }
 
@@ -100,7 +98,7 @@ resource "aws_alb_listener_rule" "http" {
   action {
     type = "forward"
 
-    target_group_arn = "${local.target_group_arns[lookup(local.lb_rules[count.index], "name")]}"
+    target_group_arn = "${local.shared_target_group_arns[lookup(local.lb_rules[count.index], "name")]}"
   }
 
   condition {
@@ -115,7 +113,7 @@ resource "aws_alb_listener_rule" "https" {
 
   action {
     type             = "forward"
-    target_group_arn = "${local.target_group_arns[lookup(local.lb_rules[count.index], "name")]}"
+    target_group_arn = "${local.shared_target_group_arns[lookup(local.lb_rules[count.index], "name")]}"
   }
 
   condition {
