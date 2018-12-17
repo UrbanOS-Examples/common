@@ -14,6 +14,7 @@ enabled_features = ["eks-cluster",
                     "datalake",
                     "kylo",
                     "lime_db",
+                    "grafana",
                    ]
 
 vpc_name = "test"
