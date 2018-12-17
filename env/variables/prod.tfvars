@@ -36,3 +36,5 @@ lime_db_size = "db.t2.small"
 lime_db_storage = 100
 lime_db_multi_az = true
 lime_db_apply_immediately = true
+
+is_public_facing = true
