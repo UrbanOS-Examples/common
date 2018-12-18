@@ -67,7 +67,9 @@
                     "javax.jdo.option.ConnectionURL": "{{{ rds.hive.connectionURL }}}",
                     "javax.jdo.option.ConnectionDriverName": "{{{ rds.hive.connectionDriver }}}",
                     "javax.jdo.option.ConnectionUserName": "{{{ rds.hive.connectionUserName }}}",
-                    "javax.jdo.option.ConnectionPassword": "{{{ rds.hive.connectionPassword }}}"
+                    "javax.jdo.option.ConnectionPassword": "{{{ rds.hive.connectionPassword }}}",
+                    "hive.server2.authentication": "NOSASL",
+                    "hive.server2.transport.mode": "binary"
                 }
             }
         },
