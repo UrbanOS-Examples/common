@@ -129,8 +129,8 @@ resource "aws_route53_record" "ckan_external_public_dns" {
   count   = 1
 
   alias {
-    name                   = "${aws_alb.shared_alb.dns_name}"
-    zone_id                = "${aws_alb.shared_alb.zone_id}"
+    name                   = "${module.load_balancer_private.dns_name}"
+    zone_id                = "${module.load_balancer_private.zone_id}"
     evaluate_target_health = false
   }
 }
