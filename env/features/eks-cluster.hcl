@@ -81,6 +81,11 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "acm:ListCertificates",
                 "iam:ListServerCertificates",
 
+                "ce:GetReservationUtilization",
+                "ce:GetDimensionValues",
+                "ce:GetCostAndUsage",
+                "ce:GetTags",
+
                 "elasticloadbalancing:*",
 
                 "route53:ListHostedZones",

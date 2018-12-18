@@ -9,8 +9,10 @@ enabled_features = ["eks-cluster",
                     "joomla",
                     "kong",
                     "load_balancer",
+                    "load_balancer_shared",
                     "streaming-data-aggregator",
-                    "lime_db"
+                    "lime_db",
+                    "grafana",
                    ]
 
 role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
@@ -29,11 +31,12 @@ joomla_db_multi_az = true
 
 ckan_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:rds:prod-production-ckan-2018-09-24-05-00"
 
-final_db_snapshot = true
+skip_final_db_snapshot = false
 
 # Lime DB override settings
 lime_db_size = "db.t2.small"
 lime_db_storage = 100
 lime_db_multi_az = true
 lime_db_apply_immediately = true
-lime_final_db_snapshot = true
+
+is_public_facing = true

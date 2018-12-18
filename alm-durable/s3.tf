@@ -129,6 +129,28 @@ resource "aws_s3_bucket" "jenkins_backup_repository" {
   }
 }
 
+resource "aws_s3_bucket" "scos-third-party-repository" {
+  bucket = "scos-third-party-repository"
+  acl    = "public-read"
+}
+
+resource "aws_s3_bucket_policy" "scos-third-party-repository-policy" {
+  bucket = "${aws_s3_bucket.scos-third-party-repository.id}"
+  policy =<<POLICY
+{
+  "Version":"2012-10-17",
+  "Statement":[{
+      "Sid":"AddPerm",
+      "Effect":"Allow",
+      "Principal": "*",
+      "Action":["s3:GetObject"],
+      "Resource":["${aws_s3_bucket.scos-third-party-repository.arn}/*"]
+    }
+  ]
+}
+POLICY
+}
+
 variable "build_artifacts_repo_name" {
   default = "os-build-artifacts-repository"
   description = "Bucket name to archive build artifacts"

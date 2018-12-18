@@ -71,7 +71,7 @@ variable "vpc_name" {
   default     = ""
 }
 
-variable "final_db_snapshot" {
+variable "skip_final_db_snapshot" {
   description = "Should the databases take a final snapshot or not"
   default     = false
 }
@@ -79,6 +79,10 @@ variable "final_db_snapshot" {
 variable "recovery_window_in_days" {
   description = "How long to allow secrets to be recovered if they are deleted"
   default     = 30
+}
+
+variable "is_public_facing" {
+  description = "false to utilize private/internal loadbalancers; true to use public"
 }
 
 output "key_pair_name" {
