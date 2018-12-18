@@ -123,7 +123,20 @@ resource "aws_alb_target_group_attachment" "ckan_external_shared" {
 
 
 resource "aws_route53_record" "ckan_external_public_dns" {
-  zone_id = "${aws_route53_zone.internal_public_hosted_zone.zone_id}"
+  zone_id = "${aws_route53_zone.internal_root_public_hosted_zone.zone_id}"
+  name    = "ckan"
+  type    = "A"
+  count   = 1
+
+  alias {
+    name                   = "${aws_alb.shared_alb.dns_name}"
+    zone_id                = "${aws_alb.shared_alb.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "ckan_external_root_public_dns" {
+  zone_id = "${aws_route53_zone.root_public_hosted_zone.zone_id}"
   name    = "ckan"
   type    = "A"
   count   = 1

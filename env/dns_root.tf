@@ -14,7 +14,7 @@ resource "aws_route53_record" "cota_root_record" {
   name    = "cota"
   type    = "CNAME"
   ttl     = 300
-  records = ["cota.${aws_route53_zone.internal_public_hosted_zone.name}"]
+  records = ["cota.${aws_route53_zone.internal_root_public_hosted_zone.name}"]
   lifecycle = { ignore_changes = ["allow_overwrite"] }
 }
 
@@ -23,7 +23,7 @@ resource "aws_route53_record" "jupyter_root_record" {
   name    = "jupyter"
   type    = "CNAME"
   ttl     = 300
-  records = ["jupyter.${aws_route53_zone.internal_public_hosted_zone.name}"]
+  records = ["jupyter.${aws_route53_zone.internal_root_public_hosted_zone.name}"]
   lifecycle = { ignore_changes = ["allow_overwrite"] }
 }
 
@@ -32,7 +32,16 @@ resource "aws_route53_record" "streaming_root_record" {
   name    = "streaming"
   type    = "CNAME"
   ttl     = 300
-  records = ["socket.${aws_route53_zone.internal_public_hosted_zone.name}"]
+  records = ["socket.${aws_route53_zone.internal_root_public_hosted_zone.name}"]
+  lifecycle = { ignore_changes = ["allow_overwrite"] }
+}
+
+resource "aws_route53_record" "survey_root_record" {
+  zone_id = "${aws_route53_zone.root_public_hosted_zone.zone_id}"
+  name    = "survey"
+  type    = "CNAME"
+  ttl     = 300
+  records = ["survey.${aws_route53_zone.internal_root_public_hosted_zone.name}"]
   lifecycle = { ignore_changes = ["allow_overwrite"] }
 }
 

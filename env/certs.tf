@@ -1,9 +1,9 @@
 module "tls_certificate" {
   source = "github.com/azavea/terraform-aws-acm-certificate?ref=0.1.0"
 
-  domain_name               = "${coalesce(var.tls_certificate_dns_name_override, local.internal_public_hosted_zone_name)}"
-  subject_alternative_names = ["*.${coalesce(var.tls_certificate_dns_name_override, local.internal_public_hosted_zone_name)}"]
-  hosted_zone_id            = "${coalesce(var.tls_certificate_public_hosted_zone_id_override, aws_route53_zone.internal_public_hosted_zone.zone_id)}"
+  domain_name               = "${coalesce(var.tls_certificate_dns_name_override, local.internal_root_public_hosted_zone_name)}"
+  subject_alternative_names = ["*.${coalesce(var.tls_certificate_dns_name_override, local.internal_root_public_hosted_zone_name)}"]
+  hosted_zone_id            = "${coalesce(var.tls_certificate_public_hosted_zone_id_override, aws_route53_zone.internal_root_public_hosted_zone.zone_id)}"
   validation_record_ttl     = "60"
 }
 
