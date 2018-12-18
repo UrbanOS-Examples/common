@@ -4,10 +4,14 @@ data "aws_secretsmanager_secret_version" "bind_user_password" {
   secret_id = "${data.terraform_remote_state.alm_remote_state.bind_user_password_secret_id}"
 }
 
+locals {
+  hdp_subnets                    = "${slice(module.vpc.private_subnets,3,6)}"
+}
+
 module "cloudbreak" {
   source = "../modules/cloudbreak"
   vpc_id                   = "${module.vpc.vpc_id}"
-  subnets                  = "${slice(module.vpc.private_subnets,3,6)}"
+  subnets                  = "${local.hdp_subnets}"
   remote_management_cidr   = "${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"
   alb_certificate          = "${module.tls_certificate.arn}"
   cloudbreak_dns_zone_id   = "${aws_route53_zone.public_hosted_zone.zone_id}"
@@ -23,7 +27,7 @@ module "datalake" {
 
   region                         = "${var.region}"
   vpc_id                         = "${module.vpc.vpc_id}"
-  subnets                        = "${slice(module.vpc.private_subnets,3,6)}"
+  subnets                        = "${local.hdp_subnets}"
   remote_management_cidr         = "${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"
   ssh_key                        = "${aws_key_pair.cloud_key.key_name}"
   alb_certificate                = "${module.tls_certificate.arn}"
