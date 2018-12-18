@@ -69,7 +69,7 @@ resource "aws_alb" "shared_alb" {
 
 resource "aws_alb_listener" "https" {
   load_balancer_arn = "${aws_alb.shared_alb.arn}"
-  certificate_arn   = "${module.tls_certificate.arn}"
+  certificate_arn   = "${module.root_tls_certificate.arn}"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   port              = 443
   protocol          = "HTTPS"
