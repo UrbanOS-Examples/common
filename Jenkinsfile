@@ -20,7 +20,7 @@ properties(
                 description: 'Environments in which to deploy common/env'),
             string(
                 name: 'joomla_backup_ami',
-                defaultValue: 'ami-05c3ff4f743a1dd71',
+                defaultValue: '',
                 description: 'The AMI for the Joomla EC2 instance snapshot to deploy'),
             string(
                 name: 'joomla_backup_file_name',
@@ -28,11 +28,11 @@ properties(
                 description: 'The backup file name in the global backups S3 bucket'),
             string(
                 name: 'ckan_internal_backup_ami',
-                defaultValue: 'ami-0f157ced15f5ad29d',
+                defaultValue: '',
                 description: 'The AMI for the CKAN Internal EC2 instance snapshot to deploy'),
             string(
                 name: 'ckan_external_backup_ami',
-                defaultValue: 'ami-0124f020e940d4a10',
+                defaultValue: '',
                 description: 'The AMI for the CKAN External EC2 instance snapshot to deploy'),
             string(
                 name: 'ckan_db_snapshot_id',
@@ -40,11 +40,11 @@ properties(
                 description: 'The Snapshot ID for the CKAN database to deploy'),
             string(
                 name: 'kong_backup_ami',
-                defaultValue: 'ami-0eea495ff529dec4e',
+                defaultValue: '',
                 description: 'The AMI for the Kong Internal EC2 instance snapshot to deploy'),
             string(
                 name: 'kong_db_snapshot_id',
-                defaultValue: 'arn:aws:rds:us-west-2:374013108165:snapshot:prod-kong-0-13-1-2018-08-29-07-20',
+                defaultValue: '',
                 description: 'The Snapshot ID for the Kong database to deploy')
         ])
     ]

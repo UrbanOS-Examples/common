@@ -128,6 +128,7 @@ variable "ckan_internal_instance_type" {
 
 variable "ckan_internal_backup_ami" {
   description = "AMI to restore ckan_internal from"
+  default = "ami-0f157ced15f5ad29d"
 }
 
 output "ckan_internal_instance_id" {

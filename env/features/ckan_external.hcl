@@ -152,6 +152,7 @@ resource "aws_route53_record" "ckan_external_root_public_dns" {
 
 variable "ckan_external_backup_ami" {
   description = "AMI of the ckan external image to restore"
+  default = "ami-0124f020e940d4a10"
 }
 
 variable "ckan_external_instance_ebs_optimized" {

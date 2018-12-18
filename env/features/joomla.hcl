@@ -89,7 +89,7 @@ resource "aws_iam_role_policy" "joomla_s3_bucket_policy" {
         "cloudwatch:ListMetrics",
         "ec2:DescribeTags"
       ],
-      "Resource":"*" 
+      "Resource":"*"
     }
   ]
 }
@@ -312,6 +312,7 @@ variable "joomla_instance_type" {
 
 variable "joomla_backup_ami" {
   description = "AMI to restore Joomla from"
+  default = "ami-05c3ff4f743a1dd71"
 }
 
 output "joomla_instance_id" {
