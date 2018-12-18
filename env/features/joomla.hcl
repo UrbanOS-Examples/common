@@ -222,18 +222,20 @@ resource "aws_lb_target_group_attachment" "joomla_shared_alb" {
   port             = 80
 }
 
-resource "aws_route53_record" "joomla_public_dns" {
-  zone_id = "${aws_route53_zone.internal_public_hosted_zone.zone_id}"
-  name    = ""
-  type    = "A"
-  count   = 1
+#Can't import root/blank record due to TF bug: https://github.com/terraform-providers/terraform-provider-aws/issues/4792
+#Adding card to add this record in different PR
+# resource "aws_route53_record" "joomla_public_dns" {
+#   zone_id = "${aws_route53_zone.internal_public_hosted_zone.zone_id}"
+#   name    = ""
+#   type    = "A"
+#   count   = 1
 
-  alias {
-    name                   = "${aws_alb.shared_alb.dns_name}"
-    zone_id                = "${aws_alb.shared_alb.zone_id}"
-    evaluate_target_health = false
-  }
-}
+#   alias {
+#     name                   = "${aws_alb.shared_alb.dns_name}"
+#     zone_id                = "${aws_alb.shared_alb.zone_id}"
+#     evaluate_target_health = false
+#   }
+# }
 
 resource "aws_route53_record" "joomla_www_public_dns" {
   zone_id = "${aws_route53_zone.internal_public_hosted_zone.zone_id}"
