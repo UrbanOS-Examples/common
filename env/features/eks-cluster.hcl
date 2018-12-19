@@ -92,6 +92,10 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "route53:ListResourceRecordSets",
 
                 "cloudwatch:PutMetricData",
+                "cloudwatch:ListMetrics",
+                "cloudwatch:GetMetricStatistics",
+                "cloudwatch:GetMetricData",
+                
                 "s3:Get*",
                 "s3:List*"
             ],
@@ -110,7 +114,6 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
 }
 EOF
 }
-
 resource "local_file" "aws_props" {
     content = <<EOF
 aws:
