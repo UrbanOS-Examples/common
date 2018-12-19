@@ -28,7 +28,7 @@ output "hive_thrift_address" {
 
 output "hive_thrift_url" {
   description = "The URL of the Hive database."
-  value = "jdbc:hive2://${aws_route53_record.datalake_hive_dns.fqdn}:10001/hive;transportMode=http;httpPath=cliservice"
+  value = "jdbc:hive2://${aws_route53_record.datalake_hive_dns.fqdn}:10000/hive;auth=noSasl"
 }
 
 output "hive_thrift_username" {
