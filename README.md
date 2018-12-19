@@ -33,7 +33,16 @@ terraform workspace use foo-workspace
 
 ### Deploying or Updating
 
+Note: many of the terraform deployments include configuring ec2 instances via ssh after they are deployed. In order for remote configuration to succeed, the cloud key needs to be in an ssh agent attached to the current session.  In OSX an ssh agent may be initialized on your terminal by default.
+
+```bash
+eval "$(ssh-agent)"
+
+ssh-add ~/.ssh/cloud_key_id_rsa
+```
+
 #### Shared Sandbox
+
 ```bash
 terraform plan -out sandbox.plan -var-file variables/sandbox.tfvars
 
@@ -41,7 +50,9 @@ terraform apply sandbox.plan
 ```
 
 #### Isolated Sandbox (env only)
+
 Until we can automate this, here are the minimal things (without renaming/adding resources, etc.) you need to do to make your own env. Note that the `vpc_cidr` and `vpc_*_subnets` need to match up.
+
 ```bash
 cd env
 tf-init --sandbox -w my-own-personal-sandbox
