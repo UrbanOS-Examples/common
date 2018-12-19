@@ -3,7 +3,7 @@ module "lime_db" {
 
   app_compute_security_group = "${aws_security_group.chatter.id}"
   vpc_id                     = "${module.vpc.vpc_id}"
-  subnets                    = "${slice(module.vpc.private_subnets,0,3)}"
+  subnets                    = "${local.private_subnets}"
   lime_db_size               = "${var.lime_db_size}"
   lime_db_storage            = "${var.lime_db_storage}"
   lime_db_multi_az           = "${var.lime_db_multi_az}"

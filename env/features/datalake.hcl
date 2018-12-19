@@ -4,10 +4,6 @@ data "aws_secretsmanager_secret_version" "bind_user_password" {
   secret_id = "${data.terraform_remote_state.alm_remote_state.bind_user_password_secret_id}"
 }
 
-locals {
-  hdp_subnets                    = "${slice(module.vpc.private_subnets,3,6)}"
-}
-
 module "cloudbreak" {
   source = "../modules/cloudbreak"
   vpc_id                   = "${module.vpc.vpc_id}"
@@ -18,7 +14,7 @@ module "cloudbreak" {
   cloudbreak_dns_zone_name = "${aws_route53_zone.public_hosted_zone.name}"
   cloudbreak_tag           = "1.0.0"
   ssh_key                  = "${aws_key_pair.cloud_key.key_name}"
-  final_db_snapshot        = "${var.final_db_snapshot}"
+  skip_final_db_snapshot        = "${var.skip_final_db_snapshot}"
   recovery_window_in_days  = "${var.recovery_window_in_days}"
 }
 

@@ -169,6 +169,14 @@ variable "owner" {
   default     = "jenkins"
 }
 
+locals {
+  hdp_subnets = "${slice(module.vpc.private_subnets,3,6)}"
+}
+
+locals {
+  private_subnets = "${slice(module.vpc.private_subnets,0,3)}"
+}
+
 output "vpc_id" {
   description = "The ID of the VPC"
   value       = "${module.vpc.vpc_id}"

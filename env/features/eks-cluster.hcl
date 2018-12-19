@@ -4,7 +4,7 @@ module "eks-cluster" {
   # version = "1.3.0"
 
   cluster_name = "${local.kubernetes_cluster_name}"
-  subnets      = "${slice(module.vpc.private_subnets,0,3)}"
+  subnets      = "${local.private_subnets}"
   vpc_id       = "${module.vpc.vpc_id}"
 
   kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
