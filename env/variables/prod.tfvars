@@ -10,7 +10,6 @@ enabled_features = ["eks-cluster",
                     "kong",
                     "load_balancer",
                     "load_balancer_shared",
-                    "streaming-data-aggregator",
                     "lime_db",
                     "cloudwatch_monitoring"
                    ]
