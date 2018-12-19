@@ -28,7 +28,8 @@
                     "fs.trash.interval": "4320",
                     "hadoop.proxyuser.yarn.hosts": "%HOSTGROUP::master_namenode1%,%HOSTGROUP::master_namenode2%",
                     "hadoop.proxyuser.hive.hosts": "%HOSTGROUP::master_namenode1%,%HOSTGROUP::master_namenode2%",
-                    "ha.zookeeper.quorum": "%HOSTGROUP::broker%:2181"
+                    "ha.zookeeper.quorum": "%HOSTGROUP::broker%:2181",
+                    "fs.s3a.endpoint": "s3.${REGION}.amazonaws.com"
                 }
             }
         },
@@ -108,6 +109,13 @@
             }
         },
         {
+          "yarn-env": {
+            "properties": {
+              "min_user_id": "400"
+            }
+          }
+        },
+        {
             "yarn-site": {
                 "properties": {
                     "hadoop.registry.rm.enabled": "false",
@@ -136,6 +144,7 @@
                 }
             }
         },
+
         {
             "ranger-hive-audit": {
                 "properties": {

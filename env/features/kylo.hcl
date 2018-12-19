@@ -31,7 +31,7 @@ resource "aws_db_instance" "kylo" {
 resource "aws_db_subnet_group" "kylo" {
   name        = "kylo db subnet group for ${terraform.workspace}"
   description = "DB Subnet Group for Kylo"
-  subnet_ids  = ["${module.vpc.private_subnets}"]
+  subnet_ids  = ["${local.private_subnets}"]
 
   tags {
     Name = "kylo db subnet group for ${terraform.workspace}"

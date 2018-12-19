@@ -22,6 +22,9 @@ module "vpc" {
     "${cidrsubnet(local.vpc_cidr, 3, 0)}",
     "${cidrsubnet(local.vpc_cidr, 3, 2)}",
     "${cidrsubnet(local.vpc_cidr, 3, 4)}",
+    "${cidrsubnet(local.vpc_cidr, 10, 192)}",
+    "${cidrsubnet(local.vpc_cidr, 10, 448)}",
+    "${cidrsubnet(local.vpc_cidr, 10, 704)}",
   ]
   public_subnets  = [
     "${cidrsubnet(local.vpc_cidr, 4, 2)}",
@@ -166,6 +169,14 @@ variable "owner" {
   default     = "jenkins"
 }
 
+locals {
+  hdp_subnets = "${slice(module.vpc.private_subnets,3,6)}"
+}
+
+locals {
+  private_subnets = "${slice(module.vpc.private_subnets,0,3)}"
+}
+
 output "vpc_id" {
   description = "The ID of the VPC"
   value       = "${module.vpc.vpc_id}"
@@ -175,6 +186,7 @@ output "private_subnets" {
   description = "List of IDs of private subnets"
   value       = ["${module.vpc.private_subnets}"]
 }
+
 
 output "public_subnets" {
   description = "List of IDs of public subnets"
