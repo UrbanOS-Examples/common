@@ -147,6 +147,11 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
             }
 
             if (scos.changeset.shouldDeploy(environment)) {
+                if (isGoingToProd) {
+                    timeout(10) {
+                        input('Apply infrastructure changes?')
+                    }
+                }
                 stage("Deploy ${environment}") {
                     terraform.apply()
                 }
