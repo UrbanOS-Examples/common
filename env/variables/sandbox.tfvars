@@ -2,14 +2,7 @@
 #   into the root working directory
 # if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
-enabled_features = [
-                    "load_balancer",
-                    "load_balancer_shared",
-                    "ckan_external",
-                    "ckan_internal",
-                    "ckan_shared",
-                    "kong"
-                   ]
+enabled_features = ["eks-cluster"]
 
 
 alm_account_id = "068920858268"
@@ -104,3 +97,4 @@ is_public_facing = false
 internal_root_dns_zone = "sandbox.internal.smartcolumbusos.com"
 
 root_dns_zone = "sandbox-smartos.com"
+

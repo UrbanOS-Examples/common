@@ -8,7 +8,8 @@ module "load_balancer_private" {
                           "${aws_security_group.os_servers.id}",
                           "${aws_security_group.allow_kubernetes_internet.id}"
                         ]
-  subnet_ids          = "${module.vpc.private_subnets}"
+  subnet_ids          = "${local.private_subnets}"
   is_external         = false
   dns_zone            = "${local.internal_public_hosted_zone_name}"
 }
+

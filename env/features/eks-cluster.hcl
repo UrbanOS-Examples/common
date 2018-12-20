@@ -4,7 +4,7 @@ module "eks-cluster" {
   # version = "1.3.0"
 
   cluster_name = "${local.kubernetes_cluster_name}"
-  subnets      = "${module.vpc.private_subnets}"
+  subnets      = "${local.private_subnets}"
   vpc_id       = "${module.vpc.vpc_id}"
 
   kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
@@ -92,6 +92,10 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "route53:ListResourceRecordSets",
 
                 "cloudwatch:PutMetricData",
+                "cloudwatch:ListMetrics",
+                "cloudwatch:GetMetricStatistics",
+                "cloudwatch:GetMetricData",
+                
                 "s3:Get*",
                 "s3:List*"
             ],
@@ -110,7 +114,6 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
 }
 EOF
 }
-
 resource "local_file" "aws_props" {
     content = <<EOF
 aws:
