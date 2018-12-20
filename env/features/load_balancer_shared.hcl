@@ -64,7 +64,7 @@ resource "aws_alb" "shared_alb" {
                           "${aws_security_group.os_servers.id}",
                           "${aws_security_group.allow_kubernetes_internet.id}"
                         ]
-  subnets            = ["${module.vpc.private_subnets}"]
+  subnets            = ["${local.private_subnets}"]
 }
 
 resource "aws_alb_listener" "https" {

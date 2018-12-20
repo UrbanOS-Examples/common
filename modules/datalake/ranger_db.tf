@@ -15,7 +15,7 @@ resource "random_string" "ranger_db_password" {
 resource "aws_db_subnet_group" "ranger_db_subnet_group" {
   name        = "ranger db ${terraform.workspace} subnet group"
   description = "DB Subnet Group"
-  subnet_ids  = ["${var.subnets}"]
+  subnet_ids  = ["${var.db_subnets}"]
 
   tags {
     Name = "Subnet Group for ranger in Environment ${terraform.workspace} VPC"

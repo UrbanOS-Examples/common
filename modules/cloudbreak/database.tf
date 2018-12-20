@@ -15,7 +15,7 @@ resource "random_string" "cloudbreak_db_password" {
 resource "aws_db_subnet_group" "cloudbreak_db_subnet_group" {
   name        = "cloudbreak db ${terraform.workspace} subnet group"
   description = "DB Subnet Group"
-  subnet_ids  = ["${var.subnets}"]
+  subnet_ids  = ["${var.db_subnets}"]
 
   tags {
     Name = "Subnet Group for Cloudbreak in Environment ${terraform.workspace} VPC"

@@ -37,6 +37,11 @@ variable "subnets" {
   type        = "list"
 }
 
+variable "db_subnets" {
+  description = "List of subnets where RDS reside."
+  type        = "list"
+}
+
 variable "remote_management_cidr" {
   description = "CIDR block of the ALM network."
 }

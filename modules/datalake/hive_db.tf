@@ -36,7 +36,7 @@ resource "aws_secretsmanager_secret_version" "hive_thrift_password" {
 resource "aws_db_subnet_group" "hive_db_subnet_group" {
   name        = "hive db ${terraform.workspace} subnet group"
   description = "DB Subnet Group"
-  subnet_ids  = ["${var.subnets}"]
+  subnet_ids  = ["${var.db_subnets}"]
 
   tags {
     Name = "Subnet Group for Hive in Environment ${terraform.workspace} VPC"
