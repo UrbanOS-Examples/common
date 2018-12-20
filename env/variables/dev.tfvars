@@ -64,4 +64,7 @@ lime_db_apply_immediately = true
 
 recovery_window_in_days = 0
 
+#DNS
 is_public_facing = false
+
+root_dns_zone = "dev-smartos.com"

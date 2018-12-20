@@ -10,5 +10,6 @@ module "load_balancer_private" {
                         ]
   subnet_ids          = "${local.private_subnets}"
   is_external         = false
-  dns_zone            = "${terraform.workspace}.${var.root_dns_zone}"
+  dns_zone            = "${local.internal_public_hosted_zone_name}"
 }
+

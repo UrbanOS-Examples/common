@@ -223,7 +223,7 @@ resource "aws_lb_target_group_attachment" "joomla_shared_alb" {
 }
 
 resource "aws_route53_record" "joomla_public_dns" {
-  zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
+  zone_id = "${aws_route53_zone.internal_public_hosted_zone.zone_id}"
   name    = ""
   type    = "A"
   count   = 1
@@ -236,7 +236,7 @@ resource "aws_route53_record" "joomla_public_dns" {
 }
 
 resource "aws_route53_record" "joomla_www_public_dns" {
-  zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
+  zone_id = "${aws_route53_zone.internal_public_hosted_zone.zone_id}"
   name    = "www"
   type    = "A"
   count   = 1
