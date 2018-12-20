@@ -93,6 +93,19 @@ resource "aws_route53_record" "kong_public_dns" {
   }
 }
 
+resource "aws_route53_record" "kong_root_public_dns" {
+  zone_id = "${aws_route53_zone.root_public_hosted_zone.zone_id}"
+  name    = "api"
+  type    = "A"
+  count   = 1
+
+  alias {
+    name                   = "${aws_alb.shared_alb.dns_name}"
+    zone_id                = "${aws_alb.shared_alb.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
 resource "aws_db_instance" "kong" {
   identifier             = "${terraform.workspace}-${var.kong_db_identifier}"
   instance_class         = "${var.kong_db_instance_class}"
