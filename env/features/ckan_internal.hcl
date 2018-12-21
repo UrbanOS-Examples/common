@@ -108,7 +108,7 @@ resource "aws_iam_policy_attachment" "ckan_rds_monitoring" {
 }
 
 resource "aws_route53_record" "ckan_internal_ec2_record" {
-  zone_id = "${aws_route53_zone.public_hosted_zone.zone_id}"
+  zone_id = "${aws_route53_zone.internal_public_hosted_zone.zone_id}"
   name    = "ckan-internal"
   type    = "A"
   count   = 1

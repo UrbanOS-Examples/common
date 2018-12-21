@@ -1,9 +1,9 @@
 locals {
-  public_hosted_zone_name = "${lower(terraform.workspace)}.${lower(var.root_dns_zone)}"
+  internal_public_hosted_zone_name = "${lower(terraform.workspace)}.${lower(var.internal_root_dns_zone)}"
 }
 
-resource "aws_route53_zone" "public_hosted_zone" {
-  name          = "${local.public_hosted_zone_name}"
+resource "aws_route53_zone" "internal_public_hosted_zone" {
+  name          = "${local.internal_public_hosted_zone_name}"
   force_destroy = true
 
   tags = {
@@ -18,10 +18,10 @@ resource "aws_route53_record" "alm_ns_record" {
   zone_id = "${data.terraform_remote_state.durable.hosted_zone_id}"
   type = "NS"
   ttl = 300
-  records = ["${aws_route53_zone.public_hosted_zone.name_servers}"]
+  records = ["${aws_route53_zone.internal_public_hosted_zone.name_servers}"]
 }
 
-variable "root_dns_zone" {
+variable "internal_root_dns_zone" {
   description = "Name of root domain (ex. example.com)"
   default     = "internal.smartcolumbusos.com"
 }
@@ -32,5 +32,10 @@ variable "prod_dns_zone" {
 }
 
 output "dns_zone_name" {
-  value = "${coalesce("${var.prod_dns_zone}","${aws_route53_zone.public_hosted_zone.name}")}"
+  value = "${coalesce("${var.prod_dns_zone}","${aws_route53_zone.internal_public_hosted_zone.name}")}"
+  description = "DEPRECATED - DO NOT USE"
+}
+
+output "internal_dns_zone_name" {
+  value = "${aws_route53_zone.internal_public_hosted_zone.name}"
 }
