@@ -87,6 +87,11 @@ variable "is_public_facing" {
   description = "false to utilize private/internal loadbalancers; true to use public"
 }
 
+variable "is_sandbox" {
+  description = "True disables public DNS records for sandbox domains to prevent terraform failues for certificate validation. This should always be true in Sandbox."
+  default = false
+}
+
 output "key_pair_name" {
   description = "Name of the keypair to use for env deployments"
   value       = "${aws_key_pair.cloud_key.key_name}"
