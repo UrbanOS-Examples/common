@@ -56,15 +56,19 @@ resource "aws_alb_target_group" "all_target_groups" {
   }
 }
 
+locals {
+  shared_alb_sgs = ["${aws_security_group.os_servers.id}",
+                    "${aws_security_group.allow_kubernetes_internet.id}",
+                    "${var.is_public_facing ? aws_security_group.tf_external_access.id : aws_security_group.tf_no_external_access.id}"   
+                    ]
+}
+
 resource "aws_alb" "shared_alb" {
   name               = "${terraform.workspace}-scos-shared-elb"
   internal           = "${!var.is_public_facing}"
   load_balancer_type = "application"
-  security_groups    = [
-                          "${aws_security_group.os_servers.id}",
-                          "${aws_security_group.allow_kubernetes_internet.id}"
-                        ]
-  subnets            = ["${local.private_subnets}"]
+  security_groups    = ["${local.shared_alb_sgs[0]}", "${local.shared_alb_sgs[1]}","${local.shared_alb_sgs[2]}"]
+  subnets            = ["${module.vpc.public_subnets}"]
 }
 
 resource "aws_alb_listener" "https" {

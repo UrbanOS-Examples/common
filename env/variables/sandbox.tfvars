@@ -98,3 +98,5 @@ internal_root_dns_zone = "sandbox.internal.smartcolumbusos.com"
 
 root_dns_zone = "sandbox-smartos.com"
 
+is_sandbox = true # Leave this true
+
