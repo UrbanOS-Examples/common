@@ -150,3 +150,9 @@ module "kylo" {
   alm_account_id  = "${var.alm_account_id}"
   repository_name = "kylo"
 }
+
+module "phoenix_api_repository" {
+  source          = "../modules/ecr"
+  alm_account_id  = "${var.alm_account_id}"
+  repository_name = "phoenix_api"
+}
