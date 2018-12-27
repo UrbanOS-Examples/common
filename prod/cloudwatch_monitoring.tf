@@ -345,22 +345,22 @@ resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_high_cpu_util" {
   treat_missing_data                    = "breaching"
 }
 
-resource "aws_cloudwatch_metric_alarm" "prod_scos_elb_no_healthy_hosts" {
-  alarm_name                            = "Prod SCOS Elb - No Healthy Hosts"
-  comparison_operator                   = "LessThanOrEqualToThreshold"
-  evaluation_periods                    = "2"
-  metric_name                           = "HealthyHostCount"
-  namespace                             = "AWS/ApplicationELB"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "0"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  dimensions {
-    TargetGroup                         = "${module.load_balancer_public.target_group_arn_suffix["${terraform.workspace}-Joomla"]}",
-    LoadBalancer                        = "${module.load_balancer_public.lb_arn_suffix}"
-  }
-  treat_missing_data                    = "breaching"
-}
+# resource "aws_cloudwatch_metric_alarm" "prod_scos_elb_no_healthy_hosts" {
+#   alarm_name                            = "Prod SCOS Elb - No Healthy Hosts"
+#   comparison_operator                   = "LessThanOrEqualToThreshold"
+#   evaluation_periods                    = "2"
+#   metric_name                           = "HealthyHostCount"
+#   namespace                             = "AWS/ApplicationELB"
+#   period                                = "300"
+#   statistic                             = "Average"
+#   threshold                             = "0"
+#   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+#   dimensions {
+#     TargetGroup                         = "${module.load_balancer_public.target_group_arn_suffix["${terraform.workspace}-Joomla"]}",
+#     LoadBalancer                        = "${module.load_balancer_public.lb_arn_suffix}"
+#   }
+#   treat_missing_data                    = "breaching"
+# }
 
 resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_free_storage_space_low" {
   count = "${var.ckan_alarms_enabled}"
