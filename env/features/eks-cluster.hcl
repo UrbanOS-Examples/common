@@ -3,9 +3,10 @@ module "eks-cluster" {
   # source  = "terraform-aws-modules/eks/aws"
   # version = "1.3.0"
 
-  cluster_name = "${local.kubernetes_cluster_name}"
-  subnets      = "${local.private_subnets}"
-  vpc_id       = "${module.vpc.vpc_id}"
+  cluster_name    = "${local.kubernetes_cluster_name}"
+  cluster_version = "${var.cluster_version}"
+  subnets         = "${local.private_subnets}"
+  vpc_id          = "${module.vpc.vpc_id}"
 
   kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
   kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
@@ -185,6 +186,11 @@ data "external" "helm_file_change_check" {
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   role       = "${module.eks-cluster.worker_iam_role_name}"
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
+}
+
+variable "cluster_version" {
+  description = "The version of k8s at which to install the cluster"
+  default     = "1.10"
 }
 
 variable "k8s_instance_size" {
