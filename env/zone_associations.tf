@@ -6,7 +6,7 @@ locals {
 }
 
 module "create_vpc_association_authorization" {
-  source = "github.com/SmartColumbusOS/terraform-aws-cli-resource"
+  source = "github.com/opetch/terraform-aws-cli-resource"
 
   account_id      = "${local.host_zone_acct}" 
   role            = "${local.assume_role}"
