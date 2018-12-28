@@ -12,6 +12,7 @@ enabled_features = ["eks-cluster",
                     "load_balancer_shared",
                     "streaming-data-aggregator",
                     "lime_db",
+                    "cloudwatch_monitoring"
                    ]
 
 role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
@@ -40,3 +41,7 @@ lime_db_apply_immediately = true
 
 #DNS
 is_public_facing = true
+
+alarms_slack_channel_name = "#prod_alerts"
+
+kylo_alarms_enabled = false
