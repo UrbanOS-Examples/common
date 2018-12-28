@@ -4,7 +4,6 @@
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = ["eks-cluster"]
 
-
 alm_account_id = "068920858268"
 
 alm_state_bucket_name = "scos-sandbox-terraform-state"
@@ -48,7 +47,6 @@ ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-
 ckan_db_storage_encrypted = false
 
 # Kong
-
 kong_backup_ami = "ami-0acc9642a39710355"
 
 kong_instance_ebs_optimized = false
@@ -66,9 +64,12 @@ cloudbreak_db_apply_immediately = true
 ambari_db_apply_immediately = true
 hive_db_apply_immediately = true
 
+#EKS Version
+cluster_version = "1.11"
+
 #EKS Workers
 min_num_of_workers = 1
-k8s_instance_size = "t2.medium"
+k8s_instance_size = "t3.medium"
 
 #Jupyterhub EKS Workers
 min_num_of_jupyterhub_workers=0
