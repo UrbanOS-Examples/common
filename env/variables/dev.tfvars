@@ -14,7 +14,8 @@ enabled_features = ["eks-cluster",
                     "datalake",
                     "kylo",
                     "lime_db",
-                    "cloudwatch_monitoring"
+                    "cloudwatch_monitoring",
+                    "cloudwatch_monitoring_kylo",
                    ]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
@@ -69,6 +70,20 @@ recovery_window_in_days = 0
 is_public_facing = false
 
 root_dns_zone = "dev-smartos.com"
+
+joomla_backup_ami = "ami-05c3ff4f743a1dd71"
+
+joomla_backup_file_name = "site-www.smartcolumbusos.com-20180829-200003edt.zip"
+
+ckan_internal_backup_ami = "ami-0f157ced15f5ad29d"
+
+ckan_external_backup_ami = "ami-0124f020e940d4a10"
+
+ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-24-12-10"
+
+kong_backup_ami = "ami-0eea495ff529dec4e"
+
+kong_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:prod-kong-0-13-1-2018-08-29-07-20"
 
 alarms_slack_path = "/services/T7LRETX4G/BDE8Y9SQ3/Amboqt9U8R3IYQgxUlBPkSUY"
 

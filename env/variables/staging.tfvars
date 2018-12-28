@@ -14,7 +14,8 @@ enabled_features = ["eks-cluster",
                     "datalake",
                     "kylo",
                     "lime_db",
-                    "cloudwatch_monitoring"
+                    "cloudwatch_monitoring",
+                    "cloudwatch_monitoring_kylo",
                    ]
 
 vpc_name = "test"
