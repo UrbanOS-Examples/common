@@ -1,7 +1,7 @@
 
 data "archive_file" "alert_handler_zip" {
     type        = "zip"
-    source_dir  = "${path.module}/files/lambda/alert_handler"
+    source_dir  = "${path.module}/files/cloudwatch_monitoring/lambda/alert_handler"
     output_path = "lambda_alert_handler.zip"
 }
 
@@ -65,8 +65,8 @@ resource "aws_lambda_function" "alert_handler_lambda" {
   timeout       = 30
   environment {
     variables {
-      SLACK_PATH = "${var.slack_path}"
-      SLACK_CHANNEL_NAME = "${var.slack_channel_name}"
+      SLACK_PATH = "${var.alarms_slack_path}"
+      SLACK_CHANNEL_NAME = "${var.alarms_slack_channel_name}"
     }
   }
 }
@@ -92,7 +92,7 @@ resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
 //---------ALARMS---------//
 resource "aws_cloudwatch_metric_alarm" "joomla_high_mem" {
   count = "${var.joomla_alarms_enabled}"
-  alarm_name                            = "Joomla - High Memory Utilization"
+  alarm_name                            = "${terraform.workspace} Joomla - High Memory Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "MemoryUtilization"
@@ -102,14 +102,14 @@ resource "aws_cloudwatch_metric_alarm" "joomla_high_mem" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.joomla_instance_id}"
+    InstanceId                          = "${aws_instance.joomla.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_cpu" {
   count = "${var.ckan_alarms_enabled}"
-  alarm_name                            = "CKAN Internal - High CPU Utilization"
+  alarm_name                            = "${terraform.workspace} CKAN Internal - High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "CPUUtilization"
@@ -119,14 +119,14 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_cpu" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_internal_instance_id}"
+    InstanceId                          = "${aws_instance.ckan_internal.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_mem" {
   count = "${var.ckan_alarms_enabled}"
-  alarm_name                            = "CKAN Internal - High Memory Utilization"
+  alarm_name                            = "${terraform.workspace} CKAN Internal - High Memory Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "MemoryUtilization"
@@ -136,14 +136,14 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_mem" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_internal_instance_id}"
+    InstanceId                          = "${aws_instance.ckan_internal.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
-resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_high_cpu_util" {
+resource "aws_cloudwatch_metric_alarm" "ckan_rds_high_cpu_util" {
   count = "${var.ckan_alarms_enabled}"
-  alarm_name                            = "Production CKAN - RDS High CPU Utilization"
+  alarm_name                            = "${terraform.workspace} CKAN - RDS High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "CPUUtilization"
@@ -153,14 +153,14 @@ resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_high_cpu_util" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.ckan_db_instance_id}"
+    DBInstanceIdentifier                = "${aws_db_instance.ckan.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_instance_status_check_failed" {
   count = "${var.ckan_alarms_enabled}"
-  alarm_name                            = "CKAN - Instance Status Check Failed"
+  alarm_name                            = "${terraform.workspace} CKAN - Instance Status Check Failed"
   comparison_operator                   = "GreaterThanThreshold"
   evaluation_periods                    = "1"
   metric_name                           = "StatusCheckFailed_Instance"
@@ -170,14 +170,14 @@ resource "aws_cloudwatch_metric_alarm" "ckan_instance_status_check_failed" {
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_external_instance_id}"
+    InstanceId                          = "${aws_instance.ckan_external.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_high_mem" {
   count = "${var.ckan_alarms_enabled}"
-  alarm_name                            = "CKAN - High Memory Utilization"
+  alarm_name                            = "${terraform.workspace} CKAN - High Memory Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "MemoryUtilization"
@@ -187,14 +187,14 @@ resource "aws_cloudwatch_metric_alarm" "ckan_high_mem" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_external_instance_id}"
+    InstanceId                          = "${aws_instance.ckan_external.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_high_cpu" {
   count = "${var.ckan_alarms_enabled}"
-  alarm_name                            = "CKAN - High CPU Utilization"
+  alarm_name                            = "${terraform.workspace} CKAN - High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "CPUUtilization"
@@ -204,14 +204,14 @@ resource "aws_cloudwatch_metric_alarm" "ckan_high_cpu" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_external_instance_id}"
+    InstanceId                          = "${aws_instance.ckan_external.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ckan_internal_instance_status_check_failed" {
   count = "${var.ckan_alarms_enabled}"
-  alarm_name                            = "CKAN Internal - Instance Status Check Failed"
+  alarm_name                            = "${terraform.workspace} CKAN Internal - Instance Status Check Failed"
   comparison_operator                   = "GreaterThanThreshold"
   evaluation_periods                    = "1"
   metric_name                           = "StatusCheckFailed_Instance"
@@ -221,14 +221,14 @@ resource "aws_cloudwatch_metric_alarm" "ckan_internal_instance_status_check_fail
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.ckan_internal_instance_id}"
+    InstanceId                          = "${aws_instance.ckan_internal.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
-resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_free_storage_space_low" {
+resource "aws_cloudwatch_metric_alarm" "kong_rds_free_storage_space_low" {
   count = "${var.kong_alarms_enabled}"
-  alarm_name                            = "Production Kong - RDS Free Storage Space Low"
+  alarm_name                            = "${terraform.workspace} Kong - RDS Free Storage Space Low"
   comparison_operator                   = "LessThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "FreeStorageSpace"
@@ -238,14 +238,14 @@ resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_free_storage_space_low" {
   threshold                             = "15000000000"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.kong_db_instance_id}"
+    DBInstanceIdentifier                = "${aws_db_instance.kong.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
-resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_high_cpu_util" {
+resource "aws_cloudwatch_metric_alarm" "kong_rds_high_cpu_util" {
   count = "${var.kong_alarms_enabled}"
-  alarm_name                            = "Production Kong - RDS High CPU Utilization"
+  alarm_name                            = "${terraform.workspace} Kong - RDS High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "CPUUtilization"
@@ -255,14 +255,14 @@ resource "aws_cloudwatch_metric_alarm" "prod_kong_rds_high_cpu_util" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.kong_db_instance_id}"
+    DBInstanceIdentifier                = "${aws_db_instance.kong.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "kong_high_mem" {
   count = "${var.kong_alarms_enabled}"
-  alarm_name                            = "Kong - High Memory Utilization"
+  alarm_name                            = "${terraform.workspace} Kong - High Memory Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "MemoryUtilization"
@@ -272,14 +272,14 @@ resource "aws_cloudwatch_metric_alarm" "kong_high_mem" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.kong_instance_id}"
+    InstanceId                          = "${aws_instance.kong.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "kong_instance_status_check_failed" {
   count = "${var.kong_alarms_enabled}"
-  alarm_name                            = "Kong - Instance Status Check Failed"
+  alarm_name                            = "${terraform.workspace} Kong - Instance Status Check Failed"
   comparison_operator                   = "GreaterThanThreshold"
   evaluation_periods                    = "1"
   metric_name                           = "StatusCheckFailed_Instance"
@@ -289,14 +289,14 @@ resource "aws_cloudwatch_metric_alarm" "kong_instance_status_check_failed" {
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.kong_instance_id}"
+    InstanceId                          = "${aws_instance.kong.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "kong_high_cpu" {
   count = "${var.kong_alarms_enabled}"
-  alarm_name                            = "Kong - High CPU Utilization"
+  alarm_name                            = "${terraform.workspace} Kong - High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "CPUUtilization"
@@ -306,14 +306,14 @@ resource "aws_cloudwatch_metric_alarm" "kong_high_cpu" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.kong_instance_id}"
+    InstanceId                          = "${aws_instance.kong.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
-resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_free_storage_space_low" {
+resource "aws_cloudwatch_metric_alarm" "joomla_rds_free_storage_space_low" {
   count = "${var.joomla_alarms_enabled}"
-  alarm_name                            = "Production Joomla - RDS Free Storage Space Low"
+  alarm_name                            = "${terraform.workspace} Joomla - RDS Free Storage Space Low"
   comparison_operator                   = "LessThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "FreeStorageSpace"
@@ -323,14 +323,14 @@ resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_free_storage_space_low" 
   threshold                             = "15000000000"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.joomla_db_instance_id}"
+    DBInstanceIdentifier                = "${aws_db_instance.joomla_db.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
-resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_high_cpu_util" {
+resource "aws_cloudwatch_metric_alarm" "joomla_rds_high_cpu_util" {
   count = "${var.joomla_alarms_enabled}"
-  alarm_name                            = "Production Joomla - RDS High CPU Utilization"
+  alarm_name                            = "${terraform.workspace} Joomla - RDS High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "CPUUtilization"
@@ -340,31 +340,14 @@ resource "aws_cloudwatch_metric_alarm" "prod_joomla_rds_high_cpu_util" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.joomla_db_instance_id}"
+    DBInstanceIdentifier                = "${aws_db_instance.joomla_db.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
-resource "aws_cloudwatch_metric_alarm" "prod_scos_elb_no_healthy_hosts" {
-  alarm_name                            = "Prod SCOS Elb - No Healthy Hosts"
-  comparison_operator                   = "LessThanOrEqualToThreshold"
-  evaluation_periods                    = "2"
-  metric_name                           = "HealthyHostCount"
-  namespace                             = "AWS/ApplicationELB"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "0"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  dimensions {
-    TargetGroup                         = "${module.load_balancer_public.target_group_arn_suffix["${terraform.workspace}-Joomla"]}",
-    LoadBalancer                        = "${module.load_balancer_public.lb_arn_suffix}"
-  }
-  treat_missing_data                    = "breaching"
-}
-
-resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_free_storage_space_low" {
+resource "aws_cloudwatch_metric_alarm" "ckan_rds_free_storage_space_low" {
   count = "${var.ckan_alarms_enabled}"
-  alarm_name                            = "Production CKAN - RDS Free Storage Space Low"
+  alarm_name                            = "${terraform.workspace} CKAN - RDS Free Storage Space Low"
   comparison_operator                   = "LessThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "FreeStorageSpace"
@@ -374,13 +357,13 @@ resource "aws_cloudwatch_metric_alarm" "prod_ckan_rds_free_storage_space_low" {
   threshold                             = "15000000000"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.ckan_db_instance_id}"
+    DBInstanceIdentifier                = "${aws_db_instance.ckan.id}"
   }
   treat_missing_data                    = "breaching"
 }
 resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
   count = "${var.joomla_alarms_enabled}"
-  alarm_name                            = "Joomla - High CPU Utilization"
+  alarm_name                            = "${terraform.workspace} Joomla - High CPU Utilization"
   comparison_operator                   = "GreaterThanOrEqualToThreshold"
   evaluation_periods                    = "2"
   metric_name                           = "CPUUtilization"
@@ -390,14 +373,14 @@ resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
   threshold                             = "90"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.joomla_instance_id}"
+    InstanceId                          = "${aws_instance.joomla.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "joomla_instance_status_check_failed" {
   count = "${var.joomla_alarms_enabled}"
-  alarm_name                            = "Joomla - Instance Status Check Failed"
+  alarm_name                            = "${terraform.workspace} Joomla - Instance Status Check Failed"
   comparison_operator                   = "GreaterThanThreshold"
   evaluation_periods                    = "1"
   metric_name                           = "StatusCheckFailed_Instance"
@@ -407,13 +390,13 @@ resource "aws_cloudwatch_metric_alarm" "joomla_instance_status_check_failed" {
   threshold                             = "0"
   alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
   dimensions {
-    InstanceId                          = "${data.terraform_remote_state.env_remote_state.joomla_instance_id}"
+    InstanceId                          = "${aws_instance.joomla.id}"
   }
   treat_missing_data                    = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "watchintor_cota_streaming_consumer_open_connection_failed" {
-  alarm_name                            = "Watchinator - Cota Streaming Consumer Open Connection Failed"
+  alarm_name                            = "${terraform.workspace} Watchinator - Cota Streaming Consumer Open Connection Failed"
   comparison_operator                   = "LessThanThreshold"
   evaluation_periods                    = "1"
   metric_name                           = "Opened"
@@ -427,50 +410,14 @@ resource "aws_cloudwatch_metric_alarm" "watchintor_cota_streaming_consumer_open_
   }
   treat_missing_data                    = "breaching"
 }
-
-
-resource "aws_cloudwatch_metric_alarm" "prod_kylo_rds_free_storage_space_low" {
-  count = "${var.kylo_alarms_enabled}"
-  alarm_name                            = "Production Kylo - RDS Free Storage Space Low"
-  comparison_operator                   = "LessThanOrEqualToThreshold"
-  evaluation_periods                    = "2"
-  metric_name                           = "FreeStorageSpace"
-  namespace                             = "AWS/RDS"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "${10 * 0.1 * 1000000000}" # Gi * % * bytes
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  dimensions {
-    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.kylo_db_instance_id}"
-  }
-  treat_missing_data                    = "breaching"
-}
-
-resource "aws_cloudwatch_metric_alarm" "prod_kylo_rds_high_cpu_util" {
-  count = "${var.kylo_alarms_enabled}"
-  alarm_name                            = "Production Kylo - RDS High CPU Utilization"
-  comparison_operator                   = "GreaterThanOrEqualToThreshold"
-  evaluation_periods                    = "2"
-  metric_name                           = "CPUUtilization"
-  namespace                             = "AWS/RDS"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "90"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  dimensions {
-    DBInstanceIdentifier                = "${data.terraform_remote_state.env_remote_state.kylo_db_instance_id}"
-  }
-  treat_missing_data                    = "breaching"
-}
-
 //-----------------------//
 
-variable "slack_path" {
+variable "alarms_slack_path" {
   description = "Path to the Slack channel"
   default = "/services/T7LRETX4G/BA0EW8W6R/vRbX198LKBkhAEK64OnHCUXH"
 }
 
-variable "slack_channel_name" {
+variable "alarms_slack_channel_name" {
   description = "Name of the Slack channel"
 }
 
@@ -489,7 +436,3 @@ variable "kong_alarms_enabled" {
   default = true
 }
 
-variable "kylo_alarms_enabled" {
-  description = "Enables Kylo Cloudwatch alarms. Defaults to true."
-  default = true
-}
