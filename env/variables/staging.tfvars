@@ -14,6 +14,8 @@ enabled_features = ["eks-cluster",
                     "datalake",
                     "kylo",
                     "lime_db",
+                    "cloudwatch_monitoring",
+                    "cloudwatch_monitoring_kylo",
                    ]
 
 vpc_name = "test"
@@ -66,3 +68,7 @@ recovery_window_in_days = 0
 is_public_facing = false
 
 root_dns_zone = "staging-smartos.com"
+
+alarms_slack_path = "/services/T7LRETX4G/BDE8Y9SQ3/Amboqt9U8R3IYQgxUlBPkSUY"
+
+alarms_slack_channel_name = "#pre_prod_alerts"
