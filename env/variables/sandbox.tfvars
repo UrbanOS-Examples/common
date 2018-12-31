@@ -2,7 +2,9 @@
 #   into the root working directory
 # if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
-enabled_features = ["eks-cluster"]
+enabled_features = [
+    "eks-cluster"
+]
 
 alm_account_id = "068920858268"
 
@@ -101,3 +103,11 @@ root_dns_zone = "sandbox-smartos.com"
 
 is_sandbox = true # Leave this true
 
+# Kerberos
+kdc_instance_type = "t2.medium"
+
+kdc_centos_ami = "ami-3ecc8f46"
+
+kdc_instance_ebs_optimized = false
+
+kdc_domain = "OS-KDC.COM"
