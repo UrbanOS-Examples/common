@@ -104,10 +104,6 @@ root_dns_zone = "sandbox-smartos.com"
 is_sandbox = true # Leave this true
 
 # Kerberos
-kdc_instance_type = "t2.medium"
-
-kdc_centos_ami = "ami-3ecc8f46"
-
-kdc_instance_ebs_optimized = false
+kdc_instance_type = "t2.small"
 
 kdc_domain = "OS-KDC.COM"
