@@ -21,6 +21,19 @@ terraform init --backend-config=../backends/sandbox-alm.conf
 
 All projects share the same two backends: the one in sandbox-alm and the one in alm.
 
+## DNS root zone resolution
+
+Due to TLS certificates requiring DNS validation there is a manual step needed when creating a dev/staging/prod environment for the first time.  Terraform will create the route53 zone and provide the nameserver records that need to be manually updated/added to the domain registration.  This can be done while terraform is trying to validate the certificate as the default timeout is 45 minutes.  Once added it takes a few minutes for it to begin resolving correctly.
+
+This does not need performed in sandbox as there is logic in sandbox to utilize the *.internal dns zones, based on the is_sandbox variable.
+
+The following steps are used to update name servers:
+
+1. Log into AWS console with an account that has ALM administrator privileges
+2. Navigate to Route53 Registered Domains - https://console.aws.amazon.com/route53/home#DomainListing:
+3. Click on the appropriate domain
+4. In the top right, click "Add or edit name servers" and add the nameservers that are in the NS record of the appropriate route53 zone
+
 ## Selecting a workspace
 
 Terraform workspaces are stored in the state S3 bucket.  A workspace name can be set to any name to deploy a set of resources without affecting any other resources inside of terraform.  In the sandbox VPC, a workspace named `sandbox` is likely already availible.
