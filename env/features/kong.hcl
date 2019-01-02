@@ -173,7 +173,7 @@ resource "aws_iam_role_policy" "kong_cloudwatch_policy" {
         "cloudwatch:ListMetrics",
         "ec2:DescribeTags"
       ],
-      "Resource":"*" 
+      "Resource":"*"
     }
   ]
 }
@@ -192,10 +192,12 @@ resource "random_string" "kong_db_password_kong" {
 
 variable "kong_backup_ami" {
   description = "The AMI to restore for kong"
+  default = "ami-0eea495ff529dec4e"
 }
 
 variable "kong_db_snapshot_id" {
   description = "The snapshot to restore for the kong db"
+  default = "arn:aws:rds:us-west-2:374013108165:snapshot:prod-kong-0-13-1-2018-08-29-07-20"
 }
 
 variable "kong_db_multi_az" {

@@ -227,3 +227,8 @@ output "eks_cluster_name" {
   description = "Name of the EKS cluster"
   value       = "${local.kubernetes_cluster_name}"
 }
+
+output "eks_worker_role_arn" {
+  description = "EKS Worker Role ARN"
+  value = "${module.eks-cluster.worker_iam_role_arn}"
+}
