@@ -37,3 +37,8 @@ output "tls_certificate_arn" {
   description = "ARN of the generated TLS certificate for the environment."
   value = "${module.tls_certificate.arn}"
 }
+
+output "root_tls_certificate_arn" {
+  description = "ARN of the generated root TLS certificate for the environment"
+  value = "${module.root_tls_certificate.arn}"
+}
