@@ -66,34 +66,6 @@ resource "aws_db_subnet_group" "default" {
   }
 }
 
-resource "aws_security_group" "os_servers" {
-  name   = "OS Servers"
-  vpc_id = "${module.vpc.vpc_id}"
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    self        = true
-    description = "Allow traffic from self"
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
-    description = "Allow all traffic from admin VPC"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_security_group" "allow_kubernetes_internet" {
   name_prefix   = "Allow Kubernetes"
   vpc_id = "${module.vpc.vpc_id}"
@@ -240,13 +212,4 @@ variable "key_pair_public_key" {
   description = "The public key used to create a key pair"
   # The Jenkins public key
   default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZUiqcbO+5rkKXuYxBcUGtyLWtNainCjKaKaV4ZBEDhUZIxSJXLNq0SH7NxcODYDNNREqUdy6okJMP16NLuMHngmZYGW7FWaB5AVeKpYOdUHL2ik+RH0pY6PquGNWXMqUP+uVB8Kn5SgqsYT/u84Re6m0FztqVf7N8L5SuDbdnkvfLUc+R3JiMArvVGGKj5GkcUAqMFuzEuBQ2e7ID/bSevtMKfrPlOCLVSUzbMIVPCrxE7YyhTDgZjN7kMNZePWQhdyq86QzHJr50qa0fMnp2oUP1qwzbFjymYbG+oXPcj9dSiB7q2anf2imBnWP8JlhSinzJZrR2wa7Vn535MBhD"
-}
-
-output "allow_all_security_group" {
-  description = "Security group id to allow all traffic to access albs"
-  value       = "${aws_security_group.allow_all.id}"
-}
-
-output "os_servers_sg_id" {
-  value = "${aws_security_group.os_servers.id}"
 }

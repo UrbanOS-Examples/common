@@ -63,38 +63,7 @@ resource "aws_security_group" "allow_all" {
   }
 }
 
-resource "aws_security_group" "os_servers" {
-  name   = "OS Servers"
-  vpc_id = "${module.vpc.vpc_id}"
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    self        = true
-    description = "Allow traffic from self"
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
-    description = "Allow all traffic from admin VPC"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 output "allow_all_security_group" {
   description = "Security group id to allow all traffic to access albs"
   value       = "${aws_security_group.allow_all.id}"
-}
-output "os_servers_sg_id" {
-  value = "${aws_security_group.os_servers.id}"
 }
