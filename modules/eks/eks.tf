@@ -109,7 +109,7 @@ resource "null_resource" "eks_infrastructure" {
 
     command = <<EOF
 set -e
-export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
+export KUBECONFIG=${path.root}/kubeconfig_streaming-kube-${terraform.workspace}
 kubectl apply -f ${path.module}/k8s/tiller-role/
 helm init --service-account tiller
 
