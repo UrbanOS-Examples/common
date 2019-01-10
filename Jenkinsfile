@@ -58,7 +58,7 @@ def terraformOverrides = params.findAll { key, value ->
     key != "environmentsParameter" && key != "skipBuild" && value != ""
 }
 
-node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCredentials([
+node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass", "GitHub"]) { withCredentials([
     [
         $class: 'AmazonWebServicesCredentialsBinding',
         credentialsId: 'aws_jenkins_user',
