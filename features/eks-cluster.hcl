@@ -171,14 +171,14 @@ resource "null_resource" "tear_down_load_balancers" {
     command = <<EOF
     set -e
     echo "Destroying load balancers..."
-    ${path.module}/../scripts/destroy_albs_created_via_kubernetes.sh ${module.vpc.vpc_id} ${var.region} ${var.role_arn}
+    ${path.module}/files/scripts/destroy_albs_created_via_kubernetes.sh ${module.vpc.vpc_id} ${var.region} ${var.role_arn}
   EOF
   }
 }
 
 data "external" "helm_file_change_check" {
   program = [
-    "${path.module}/../scripts/helm_file_change_check.sh",
+    "${path.module}/files/scripts/helm_file_change_check.sh",
     "${path.module}/helm"
     ]
 }

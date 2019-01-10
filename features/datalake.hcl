@@ -5,7 +5,7 @@ data "aws_secretsmanager_secret_version" "bind_user_password" {
 }
 
 module "cloudbreak" {
-  source = "../modules/cloudbreak"
+  source = "git@github.com:SmartColumbusOS/scos-tf-cloudbreak"
   vpc_id                   = "${module.vpc.vpc_id}"
   subnets                  = "${local.hdp_subnets}"
   db_subnets                  = "${local.private_subnets}"
@@ -20,12 +20,12 @@ module "cloudbreak" {
 }
 
 module "datalake" {
-  source = "../modules/datalake"
+  source = "git@github.com:SmartColumbusOS/scos-tf-datalake"
 
   region                         = "${var.region}"
   vpc_id                         = "${module.vpc.vpc_id}"
   subnets                        = "${local.hdp_subnets}"
-  db_subnets                  = "${local.private_subnets}"
+  db_subnets                     = "${local.private_subnets}"
   remote_management_cidr         = "${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"
   ssh_key                        = "${aws_key_pair.cloud_key.key_name}"
   alb_certificate                = "${module.tls_certificate.arn}"
