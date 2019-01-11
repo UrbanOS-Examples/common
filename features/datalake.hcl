@@ -5,7 +5,7 @@ data "aws_secretsmanager_secret_version" "bind_user_password" {
 }
 
 module "cloudbreak" {
-  source = "git@github.com:SmartColumbusOS/scos-tf-cloudbreak"
+  source = "git@github.com:SmartColumbusOS/scos-tf-cloudbreak?ref=1.0.0"
   vpc_id                   = "${module.vpc.vpc_id}"
   subnets                  = "${local.hdp_subnets}"
   db_subnets                  = "${local.private_subnets}"
@@ -20,7 +20,7 @@ module "cloudbreak" {
 }
 
 module "datalake" {
-  source = "git@github.com:SmartColumbusOS/scos-tf-datalake"
+  source = "git@github.com:SmartColumbusOS/scos-tf-datalake?ref=1.0.0"
 
   region                         = "${var.region}"
   vpc_id                         = "${module.vpc.vpc_id}"

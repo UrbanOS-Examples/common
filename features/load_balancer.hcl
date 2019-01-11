@@ -1,6 +1,6 @@
 
 module "load_balancer_private" {
-  source              = "git@github.com:SmartColumbusOS/scos-tf-old-prod-load-balancer"
+  source              = "git@github.com:SmartColumbusOS/scos-tf-old-prod-load-balancer?ref=1.0.0"
   target_group_prefix = "${terraform.workspace}-Int"
   vpc_id              = "${module.vpc.vpc_id}"
   certificate_arn     = "${module.tls_certificate.arn}"

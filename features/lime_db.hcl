@@ -1,5 +1,5 @@
 module "lime_db" {
-  source = "git@github.com:SmartColumbusOS/scos-tf-lime-db"
+  source = "git@github.com:SmartColumbusOS/scos-tf-lime-db?ref=1.0.0"
 
   app_compute_security_group = "${aws_security_group.chatter.id}"
   vpc_id                     = "${module.vpc.vpc_id}"
