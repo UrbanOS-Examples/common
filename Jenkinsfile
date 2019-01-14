@@ -83,58 +83,6 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass", "GitHub"]
         publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
     }
 
-    if (false && scos.changeset.shouldDeploy('dev')) {
-        def terraform = scos.terraform('prod-prime')
-        def gitHash
-
-        stage('Checkout current prod code') {
-            gitHash = sh(returnStdout: true, script: 'git rev-parse HEAD')
-
-            sh 'git fetch github --tags && git checkout prod'
-        }
-
-        try {
-            stage('Create Ephemeral Prod In Dev') {
-                terraform.init()
-
-                def overrides = [:]
-                overrides << terraformOverrides
-                overrides << [
-                    'key_pair_public_key': publicKey,
-                    'vpc_cidr': '10.201.0.0/16',
-                    // The following are dead after this code makes it to prod
-                    'kubernetes_cluster_name': 'streaming-kube-prod-prime'
-                ]
-
-                terraform.plan('variables/dev.tfvars', overrides)
-                terraform.apply()
-            }
-
-            stage('Return to current git revision') {
-                sh "git checkout ${gitHash}"
-            }
-
-            stage('Apply to ephemeral prod') {
-                terraform.init()
-
-                def overrides = [:]
-                overrides << terraformOverrides
-                overrides << [
-                    'key_pair_public_key': publicKey,
-                    'vpc_cidr': '10.201.0.0/16'
-                ]
-
-                terraform.plan('variables/dev.tfvars', overrides)
-                terraform.apply()
-            }
-        } finally {
-            stage('Destroy ephemeral prod') {
-                terraform.planDestroy('variables/dev.tfvars')
-                terraform.apply()
-            }
-        }
-    }
-
     environments.each { environment ->
         def terraform = scos.terraform(environment)
 
