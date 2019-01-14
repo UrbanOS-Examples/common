@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@4.3.5',
+    identifier: 'pipeline-lib@4.5.0',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -58,7 +58,7 @@ def terraformOverrides = params.findAll { key, value ->
     key != "environmentsParameter" && key != "skipBuild" && value != ""
 }
 
-node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCredentials([
+node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass", "GitHub"]) { withCredentials([
     [
         $class: 'AmazonWebServicesCredentialsBinding',
         credentialsId: 'aws_jenkins_user',
@@ -79,98 +79,36 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass"]) { withCr
 
     scos.doCheckoutStage()
 
-    dir('env') {
-        stage('Setup SSH keys') {
-            publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
-        }
-
-        if (false && scos.changeset.shouldDeploy('dev')) {
-            def terraform = scos.terraform('prod-prime')
-            def gitHash
-
-            stage('Checkout current prod code') {
-                gitHash = sh(returnStdout: true, script: 'git rev-parse HEAD')
-
-                sh 'git fetch github --tags && git checkout prod'
-            }
-
-            try {
-                stage('Create Ephemeral Prod In Dev') {
-                    terraform.init()
-
-                    def overrides = [:]
-                    overrides << terraformOverrides
-                    overrides << [
-                        'key_pair_public_key': publicKey,
-                        'vpc_cidr': '10.201.0.0/16',
-                        // The following are dead after this code makes it to prod
-                        'kubernetes_cluster_name': 'streaming-kube-prod-prime'
-                    ]
-
-                    terraform.plan('variables/dev.tfvars', overrides)
-                    terraform.apply()
-                }
-
-                stage('Return to current git revision') {
-                    sh "git checkout ${gitHash}"
-                }
-
-                stage('Apply to ephemeral prod') {
-                    terraform.init()
-
-                    def overrides = [:]
-                    overrides << terraformOverrides
-                    overrides << [
-                        'key_pair_public_key': publicKey,
-                        'vpc_cidr': '10.201.0.0/16'
-                    ]
-
-                    terraform.plan('variables/dev.tfvars', overrides)
-                    terraform.apply()
-                }
-            } finally {
-                stage('Destroy ephemeral prod') {
-                    terraform.planDestroy('variables/dev.tfvars')
-                    terraform.apply()
-                }
-            }
-        }
-
-        environments.each { environment ->
-            def terraform = scos.terraform(environment)
-
-            def isGoingToProd = (scos.changeset.isRelease && environment == 'prod')
-            def shouldBePlanned = (!scos.changeset.isRelease || isGoingToProd)
-
-            if(shouldBePlanned) {
-                doPlan(terraform, environment, publicKey, terraformOverrides)
-            }
-
-            if (scos.changeset.shouldDeploy(environment)) {
-                if (isGoingToProd) {
-                    timeout(10) {
-                        input('Apply infrastructure changes?')
-                    }
-                }
-                stage("Deploy ${environment}") {
-                    terraform.apply()
-                }
-                stage('Tag') {
-                    if (environment == 'staging') {
-                        scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
-                    }
-
-                    scos.applyAndPushGitHubTag(environment)
-                }
-            }
-        }
+    stage('Setup SSH keys') {
+        publicKey = sh(returnStdout: true, script: "ssh-keygen -y -f ${keyfile}").trim()
     }
-    scos.doStageIf(scos.changeset.shouldDeploy('prod'), 'Apply Prod specific infrastructure') {
-        dir('prod') {
-            def terraform = scos.terraform('prod')
-            terraform.init()
-            terraform.plan(terraform.defaultVarFile)
-            terraform.apply()
+
+    environments.each { environment ->
+        def terraform = scos.terraform(environment)
+
+        def isGoingToProd = (scos.changeset.isRelease && environment == 'prod')
+        def shouldBePlanned = (!scos.changeset.isRelease || isGoingToProd)
+
+        if(shouldBePlanned) {
+            doPlan(terraform, environment, publicKey, terraformOverrides)
+        }
+
+        if (scos.changeset.shouldDeploy(environment)) {
+            if (isGoingToProd) {
+                timeout(10) {
+                    input('Apply infrastructure changes?')
+                }
+            }
+            stage("Deploy ${environment}") {
+                terraform.apply()
+            }
+            stage('Tag') {
+                if (environment == 'staging') {
+                    scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
+                }
+
+                scos.applyAndPushGitHubTag(environment)
+            }
         }
     }
 }}}}
