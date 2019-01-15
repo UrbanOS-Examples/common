@@ -1,21 +1,3 @@
-provider "aws" {
-  version = "1.39"
-  region  = "${var.region}"
-
-  assume_role {
-    role_arn = "${var.role_arn}"
-  }
-}
-
-provider "aws" {
-  version = "1.39"
-  alias   = "alm"
-  region  = "${var.alm_region}"
-
-  assume_role {
-    role_arn = "${var.alm_role_arn}"
-  }
-}
 terraform {
   backend "s3" {
     key     = "operating-system"
