@@ -22,6 +22,10 @@ provider "template" {
   version = "1.0.0"
 }
 
+provider "external" {
+  version = "1.0.0"
+}
+
 provider "aws" {
   version = "1.39"
   region  = "${var.region}"
