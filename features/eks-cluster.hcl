@@ -1,10 +1,9 @@
 module "eks-cluster" {
-  source = "github.com/SmartColumbusOS/terraform-aws-eks"
-  # source  = "terraform-aws-modules/eks/aws"
-  # version = "1.3.0"
+  source = "github.com/SmartColumbusOS/terraform-aws-eks?ref=1.6.0"
 
   cluster_name    = "${local.kubernetes_cluster_name}"
   cluster_version = "${var.cluster_version}"
+  ami_version     = "${var.eks_ami_version}"
   subnets         = "${local.private_subnets}"
   vpc_id          = "${module.vpc.vpc_id}"
 
@@ -191,6 +190,11 @@ resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
 variable "cluster_version" {
   description = "The version of k8s at which to install the cluster"
   default     = "1.10"
+}
+
+variable "eks_ami_version" {
+  description = "the version of the EKS AMI to use to deploy workers"
+  default     = "20181210"
 }
 
 variable "k8s_instance_size" {
