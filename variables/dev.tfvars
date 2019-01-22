@@ -10,12 +10,8 @@ enabled_features = ["eks-cluster",
                     "joomla",
                     "load_balancer",
                     "load_balancer_shared",
-                    "datalake",
-                    "kylo",
                     "lime_db",
                     "cloudwatch_monitoring",
-                    "cloudwatch_monitoring_kylo",
-                    "kdc",
                    ]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
