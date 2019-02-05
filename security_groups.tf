@@ -2,7 +2,8 @@ resource "aws_security_group" "chatter" {
   name        = "chatter"
   description = "Security group for all nodes in the cluster."
   vpc_id      = "${module.vpc.vpc_id}"
-  tags        = {
+
+  tags = {
     Name = "Egress and internal chatter"
   }
 }
@@ -95,6 +96,12 @@ output "allow_all_security_group" {
   description = "Security group id to allow all traffic to access albs"
   value       = "${aws_security_group.allow_all.id}"
 }
+
 output "os_servers_sg_id" {
   value = "${aws_security_group.os_servers.id}"
+}
+
+output "chatter_sg_id" {
+  description = "The common security group for intra-VPC traffic"
+  value       = "${aws_security_group.chatter.id}"
 }
