@@ -50,12 +50,8 @@ spec:
         {{- if .Values.externalDns.args }}
           args:
           {{- range $key, $value := .Values.externalDns.args }}
-            {{- if kindIs "slice" $value }}
-              {{- range $repeated := $value }}
+            {{- range $repeated := $value }}
             - --{{ $key }}={{ $repeated }}
-              {{- end }}
-            {{- else }}
-            - --{{ $key }}={{ $value }}
             {{- end }}
           {{- end }}
 {{- if .Values.externalDns.extraArgs }}
