@@ -50,7 +50,9 @@ spec:
         {{- if .Values.externalDns.args }}
           args:
           {{- range $key, $value := .Values.externalDns.args }}
-            - --{{ $key }}={{ $value }}
+            {{- range $repeated := $value }}
+            - --{{ $key }}={{ $repeated }}
+            {{- end }}
           {{- end }}
 {{- if .Values.externalDns.extraArgs }}
 {{ toYaml .Values.externalDns.extraArgs | trim | indent 12 }}

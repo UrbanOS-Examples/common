@@ -107,8 +107,8 @@ albIngress:
   enabled: true
   name: alb-ingress
   image:
-    repository: quay.io/coreos/alb-ingress-controller
-    tag: v1.0.0
+    repository: docker.io/amazon/aws-alb-ingress-controller
+    tag: v1.1.1
     pullPolicy: Always
   args: {}
   extraEnv:
