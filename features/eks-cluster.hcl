@@ -149,7 +149,7 @@ kubectl label namespace cluster-infra name=cluster-infra --overwrite
 
 helm upgrade --install cluster-infra ${path.module}/helm/cluster-infra \
     --namespace=cluster-infra \
-    --set externalDns.args."domain\-filter"="${local.internal_public_hosted_zone_name}" \
+    --set externalDns.args."domain\-filter"="{${aws_route53_zone.internal_public_hosted_zone.name},${aws_route53_zone.root_public_hosted_zone.name}}" \
     --set albIngress.extraEnv."AWS\_REGION"="${var.region}" \
     --set albIngress.extraEnv."CLUSTER\_NAME"="${module.eks-cluster.cluster_id}" \
     --values ${path.module}/helm/cluster-infra/run-config.yaml \
