@@ -28,6 +28,7 @@ resource "aws_db_instance" "joomla_db" {
   username               = "joomla"
   password               = "${random_string.joomla_db_password.result}"
   multi_az               = "${var.joomla_db_multi_az}"
+  auto_minor_version_upgrade = false
 
   tags {
     workload-type = "other"
