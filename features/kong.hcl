@@ -113,7 +113,7 @@ resource "aws_db_instance" "kong" {
   db_subnet_group_name   = "${aws_db_subnet_group.default.name}"
   skip_final_snapshot    = true
   engine                 = "postgres"
-  engine_version         = "9.6.6"
+  engine_version         = "9.6.11"
   parameter_group_name   = "${var.kong_db_parameter_group_name}"
   allocated_storage      = "${var.kong_db_allocated_storage}"
   storage_type           = "gp2"
@@ -123,6 +123,7 @@ resource "aws_db_instance" "kong" {
   multi_az               = "${var.kong_db_multi_az}"
   storage_encrypted      = false
   iops                   = 0
+  auto_minor_version_upgrade = false
 
   tags {
     workload-type = "${terraform.workspace}"
