@@ -100,6 +100,7 @@ resource "aws_db_instance" "ckan" {
   storage_encrypted         = "${var.ckan_db_storage_encrypted}"
   monitoring_interval       = 60
   monitoring_role_arn = "${aws_iam_role.ckan_rds_monitoring.arn}"
+  auto_minor_version_upgrade = false
 
   lifecycle {
     ignore_changes = ["final_snapshot_identifier", "storage_encrypted", "snapshot_identifier"]
@@ -184,7 +185,7 @@ variable "ckan_db_parameter_group_name" {
 
 variable "ckan_db_engine_version" {
   description = "The version of postgresql used for ckan"
-  default     = "9.6.6"
+  default     = "9.6.11"
 }
 
 variable "ckan_theme_version" {
