@@ -1,5 +1,5 @@
 resource "aws_elasticache_cluster" "redis" {
-  cluster_id           = "redis-cluster"
+  cluster_id           = "redis-${terraform.workspace}"
   engine               = "redis"
   node_type            = "cache.t2.micro"
   num_cache_nodes      = 1
@@ -11,7 +11,7 @@ resource "aws_elasticache_cluster" "redis" {
 }
 
 resource "aws_security_group" "redis" {
-  name        = "redis"
+  name        = "redis-${terraform.workspace}"
   description = "Security group for all nodes in the cluster to be able to communicate with redis"
   vpc_id      = "${module.vpc.vpc_id}"
 
@@ -31,11 +31,33 @@ resource "aws_security_group_rule" "eks_workers_to_redis" {
 }
 
 resource "aws_elasticache_subnet_group" "redis_cache_subnet" {
-  name       = "redis-cache-subnet"
+  name       = "redis-cache-subnet-${terraform.workspace}"
   subnet_ids = ["${module.vpc.private_subnets}"]
 }
 
-output "redis_hostname" {
-  description = "Hostname for redis cluster"
-  value       = "${lookup(aws_elasticache_cluster.redis.cache_nodes[0], "address")}"
+resource "null_resource" "redis_external_service" {
+  depends_on = ["data.external.helm_file_change_check_redis", "null_resource.eks_infrastructure"]
+  provisioner "local-exec" {
+
+    command = <<EOF
+set -e
+export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
+
+helm upgrade --install common-external-services ${path.module}/helm/external-services \
+    --namespace=external-services \
+    --set redis.host="${lookup(aws_elasticache_cluster.redis.cache_nodes[0], "address")}"
+
+EOF
+  }
+
+  triggers {
+    helm_file_change_check = "${data.external.helm_file_change_check.result.md5_result}"
+  }
+}
+
+data "external" "helm_file_change_check_redis" {
+  program = [
+    "${path.module}/files/scripts/helm_file_change_check.sh",
+    "${path.module}/helm/external-services"
+    ]
 }

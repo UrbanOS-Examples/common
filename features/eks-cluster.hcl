@@ -178,7 +178,7 @@ resource "null_resource" "tear_down_load_balancers" {
 data "external" "helm_file_change_check" {
   program = [
     "${path.module}/files/scripts/helm_file_change_check.sh",
-    "${path.module}/helm"
+    "${path.module}/helm/cluster-infra"
     ]
 }
 
