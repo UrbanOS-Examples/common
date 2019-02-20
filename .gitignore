@@ -12,3 +12,6 @@ sandbox_staging.tfvars
 **/*.out
 **/_feature_*.tf
 
+aws.yaml
+config-map-aws-auth_streaming-kube-smrt-*.yaml
+kubeconfig_streaming-kube-smrt-*

@@ -1,0 +1,5 @@
+name: common-external-services
+apiVersion: v1
+description: External Serivces for SCOS Kubernetes Cluster
+version: 1.0.0
+tillerVersion: ">=2.8.0"
