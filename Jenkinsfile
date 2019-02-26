@@ -103,10 +103,6 @@ node('infrastructure') { ansiColor('xterm') { sshagent(["k8s-no-pass", "GitHub"]
                 terraform.apply()
             }
             stage('Tag') {
-                if (environment == 'staging') {
-                    scos.applyAndPushGitHubTag(scos.releaseCandidateNumber())
-                }
-
                 scos.applyAndPushGitHubTag(environment)
             }
         }
