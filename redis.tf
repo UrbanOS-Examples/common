@@ -1,13 +1,16 @@
 resource "aws_elasticache_cluster" "redis" {
-  cluster_id           = "redis-${terraform.workspace}"
-  engine               = "redis"
-  node_type            = "cache.t2.micro"
-  num_cache_nodes      = 1
-  parameter_group_name = "default.redis5.0"
-  engine_version       = "5.0.0"
-  port                 = 6379
-  subnet_group_name    = "${aws_elasticache_subnet_group.redis_cache_subnet.name}"
-  security_group_ids   = ["${aws_security_group.redis.id}"]
+  cluster_id                = "redis-${terraform.workspace}"
+  engine                    = "redis"
+  node_type                 = "cache.t2.micro"
+  num_cache_nodes           = 1
+  parameter_group_name      = "default.redis5.0"
+  engine_version            = "5.0.0"
+  port                      = 6379
+  subnet_group_name         = "${aws_elasticache_subnet_group.redis_cache_subnet.name}"
+  security_group_ids        = ["${aws_security_group.redis.id}"]
+  snapshot_retention_limit  = 7
+  snapshot_window           = "06:00-07:00"
+  maintenance_window        = "sun:07:15-sun:09:00"
 }
 
 resource "aws_security_group" "redis" {
