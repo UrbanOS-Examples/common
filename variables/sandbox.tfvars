@@ -3,7 +3,8 @@
 # if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = [
-    "eks-cluster"
+    "eks-cluster",
+    "redis",
 ]
 
 alm_account_id = "068920858268"
@@ -58,14 +59,6 @@ kong_db_instance_class = "db.t2.2xlarge"
 
 kong_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:prod-kong-0-13-1-2018-08-29-07-20"
 
-cloudbreak_db_multi_az = false
-ambari_db_multi_az = false
-hive_db_multi_az = false
-
-cloudbreak_db_apply_immediately = true
-ambari_db_apply_immediately = true
-hive_db_apply_immediately = true
-
 #EKS Version
 cluster_version = "1.11"
 
@@ -81,10 +74,10 @@ max_num_of_jupyterhub_workers=2
 ldap_server = "iam-master.alm.sandbox.internal.smartcolumbusos.com"
 ldap_domain = "dc=sandbox,dc=internal,dc=smartcolumbusos,dc=com"
 
-kylo_db_multi_az=false
-kylo_db_instance_class="db.t2.small"
-
 skip_final_db_snapshot = true
+
+# Redis Elasticache settings
+redis_node_type = "cache.t2.medium"
 
 # Lime DB override settings
 lime_db_size = "db.t2.small"
