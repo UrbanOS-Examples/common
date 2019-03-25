@@ -1,7 +1,7 @@
 resource "aws_elasticache_cluster" "redis" {
   cluster_id                = "redis-${terraform.workspace}"
   engine                    = "redis"
-  node_type                 = "cache.t2.micro"
+  node_type                 = "${var.redis_node_type}"
   num_cache_nodes           = 1
   parameter_group_name      = "default.redis5.0"
   engine_version            = "5.0.0"
@@ -63,4 +63,9 @@ data "external" "helm_file_change_check_redis" {
     "${path.module}/files/scripts/helm_file_change_check.sh",
     "${path.module}/helm/external-services"
     ]
+}
+
+variable "redis_node_type" {
+  description = "The size of the Redis Elasticache instance"
+  default     = "cache.t2.medium"
 }

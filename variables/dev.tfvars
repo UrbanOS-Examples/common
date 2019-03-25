@@ -12,6 +12,7 @@ enabled_features = ["eks-cluster",
                     "load_balancer_shared",
                     "lime_db",
                     "cloudwatch_monitoring",
+                    "redis",
                    ]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
@@ -19,14 +20,6 @@ role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 vpc_cidr = "10.100.0.0/16"
 
 ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-24-12-10"
-
-cloudbreak_db_multi_az = false
-ambari_db_multi_az = false
-hive_db_multi_az = false
-
-cloudbreak_db_apply_immediately = true
-ambari_db_apply_immediately = true
-hive_db_apply_immediately = true
 
 joomla_backup_file_name = "site-www.dev.internal.smartcolumbusos.com-20181106-190001est.zip"
 
@@ -49,10 +42,10 @@ joomla_instance_type = "t2.small"
 min_num_of_jupyterhub_workers=3
 max_num_of_jupyterhub_workers=4
 
-kylo_db_multi_az=false
-kylo_db_instance_class="db.t2.small"
-
 skip_final_db_snapshot = true
+
+# Redis Elasticache settings
+redis_node_type = "cache.t2.medium"
 
 # Lime DB override settings
 lime_db_size = "db.t2.small"

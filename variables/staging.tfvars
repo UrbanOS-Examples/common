@@ -12,6 +12,7 @@ enabled_features = ["eks-cluster",
                     "load_balancer_shared",
                     "lime_db",
                     "cloudwatch_monitoring",
+                    "redis",
                    ]
 
 vpc_name = "test"
@@ -23,10 +24,6 @@ ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-
 vpc_cidr = "10.180.0.0/16"
 
 joomla_backup_file_name = "site-www.staging.internal.smartcolumbusos.com-20181107-190001est.zip"
-
-cloudbreak_db_apply_immediately = true
-ambari_db_apply_immediately = true
-hive_db_apply_immediately = true
 
 # prod is an m4.2xl and m4.xl respectively
 # We're at 5% and 14% memory utilization and negligible cpu usage in non-prod environments.
@@ -47,10 +44,10 @@ joomla_instance_type = "t2.small"
 min_num_of_jupyterhub_workers=3
 max_num_of_jupyterhub_workers=5
 
-kylo_db_multi_az=false
-kylo_db_instance_class="db.t2.small"
-
 skip_final_db_snapshot = true
+
+# Redis Elasticache settings
+redis_node_type = "cache.t2.medium"
 
 # Lime DB override settings
 lime_db_size = "db.t2.small"
