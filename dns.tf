@@ -32,10 +32,10 @@ variable "prod_dns_zone" {
 }
 
 output "dns_zone_name" {
-  value = "${coalesce("${var.prod_dns_zone}","${aws_route53_zone.internal_public_hosted_zone.name}")}"
+  value = "${coalesce("${var.prod_dns_zone}","${local.internal_public_hosted_zone_name}")}"
   description = "DEPRECATED - DO NOT USE"
 }
 
 output "internal_dns_zone_name" {
-  value = "${aws_route53_zone.internal_public_hosted_zone.name}"
+  value = "${local.internal_public_hosted_zone_name}"
 }

@@ -1,6 +1,10 @@
 # #Assumption: We've changed internal_root_dns_zone to be ONLY the root URL
+locals {
+  root_public_hosted_zone_name = "${lower(var.root_dns_zone)}"
+}
+
 resource "aws_route53_zone" "root_public_hosted_zone" {
-  name          = "${lower(var.root_dns_zone)}"
+  name          = "${local.root_public_hosted_zone_name}"
   force_destroy = true
 }
 
@@ -37,5 +41,5 @@ resource "aws_route53_record" "streaming_root_record" {
 }
 
 output "root_dns_zone_name" {
-  value = "${aws_route53_zone.root_public_hosted_zone.name}"
+  value = "${local.root_public_hosted_zone_name}"
 }
