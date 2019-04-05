@@ -11,7 +11,8 @@ enabled_features = ["eks-cluster",
                     "load_balancer",
                     "load_balancer_shared",
                     "lime_db",
-                    "cloudwatch_monitoring"
+                    "cloudwatch_monitoring",
+                    "redis"
                    ]
 
 role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
@@ -31,6 +32,9 @@ joomla_db_multi_az = true
 ckan_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:rds:prod-production-ckan-2018-09-24-05-00"
 
 skip_final_db_snapshot = false
+
+# Redis Elasticache settings
+redis_node_type = "cache.t2.medium"
 
 # Lime DB override settings
 lime_db_size = "db.t2.small"
