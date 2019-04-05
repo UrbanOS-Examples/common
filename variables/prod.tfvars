@@ -11,7 +11,8 @@ enabled_features = ["eks-cluster",
                     "load_balancer",
                     "load_balancer_shared",
                     "lime_db",
-                    "cloudwatch_monitoring"
+                    "cloudwatch_monitoring",
+                    "redis"
                    ]
 
 role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
