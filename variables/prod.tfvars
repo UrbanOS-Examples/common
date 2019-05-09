@@ -34,7 +34,7 @@ ckan_db_snapshot_id = "arn:aws:rds:us-west-2:374013108165:snapshot:rds:prod-prod
 skip_final_db_snapshot = false
 
 # Redis Elasticache settings
-redis_node_type = "cache.t2.medium"
+redis_node_type = "cache.m4.large"
 
 # Lime DB override settings
 lime_db_size = "db.t2.small"
