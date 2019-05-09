@@ -47,7 +47,7 @@ max_num_of_jupyterhub_workers=5
 skip_final_db_snapshot = true
 
 # Redis Elasticache settings
-redis_node_type = "cache.t2.medium"
+redis_node_type = "cache.m4.large"
 
 # Lime DB override settings
 lime_db_size = "db.t2.small"

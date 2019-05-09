@@ -55,6 +55,7 @@ EOF
 
   triggers {
     helm_file_change_check = "${data.external.helm_file_change_check.result.md5_result}"
+    redis_host = "${lookup(aws_elasticache_cluster.redis.cache_nodes[0], "address")}"
   }
 }
 
