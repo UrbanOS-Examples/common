@@ -11,6 +11,7 @@ resource "aws_elasticache_cluster" "redis" {
   snapshot_retention_limit  = 7
   snapshot_window           = "06:00-07:00"
   maintenance_window        = "sun:07:15-sun:09:00"
+  apply_immediately         = true
 }
 
 resource "aws_security_group" "redis" {
