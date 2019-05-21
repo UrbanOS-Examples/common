@@ -1,17 +1,17 @@
 resource "aws_elasticache_cluster" "redis" {
-  cluster_id                = "redis-${terraform.workspace}"
-  engine                    = "redis"
-  node_type                 = "${var.redis_node_type}"
-  num_cache_nodes           = 1
-  parameter_group_name      = "default.redis5.0"
-  engine_version            = "5.0.0"
-  port                      = 6379
-  subnet_group_name         = "${aws_elasticache_subnet_group.redis_cache_subnet.name}"
-  security_group_ids        = ["${aws_security_group.redis.id}"]
-  snapshot_retention_limit  = 7
-  snapshot_window           = "06:00-07:00"
-  maintenance_window        = "sun:07:15-sun:09:00"
-  apply_immediately         = true
+  cluster_id               = "redis-${terraform.workspace}"
+  engine                   = "redis"
+  node_type                = "${var.redis_node_type}"
+  num_cache_nodes          = 1
+  parameter_group_name     = "default.redis5.0"
+  engine_version           = "5.0.0"
+  port                     = 6379
+  subnet_group_name        = "${aws_elasticache_subnet_group.redis_cache_subnet.name}"
+  security_group_ids       = ["${aws_security_group.redis.id}"]
+  snapshot_retention_limit = 7
+  snapshot_window          = "06:00-07:00"
+  maintenance_window       = "sun:07:15-sun:09:00"
+  apply_immediately        = true
 }
 
 resource "aws_security_group" "redis" {
@@ -41,8 +41,8 @@ resource "aws_elasticache_subnet_group" "redis_cache_subnet" {
 
 resource "null_resource" "redis_external_service" {
   depends_on = ["data.external.helm_file_change_check_redis", "null_resource.eks_infrastructure"]
-  provisioner "local-exec" {
 
+  provisioner "local-exec" {
     command = <<EOF
 set -e
 export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
@@ -56,15 +56,15 @@ EOF
 
   triggers {
     helm_file_change_check = "${data.external.helm_file_change_check.result.md5_result}"
-    redis_host = "${lookup(aws_elasticache_cluster.redis.cache_nodes[0], "address")}"
+    redis_host             = "${lookup(aws_elasticache_cluster.redis.cache_nodes[0], "address")}"
   }
 }
 
 data "external" "helm_file_change_check_redis" {
   program = [
     "${path.module}/files/scripts/helm_file_change_check.sh",
-    "${path.module}/helm/external-services"
-    ]
+    "${path.module}/helm/external-services",
+  ]
 }
 
 variable "redis_node_type" {
