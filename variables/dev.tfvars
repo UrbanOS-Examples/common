@@ -39,8 +39,8 @@ joomla_instance_ebs_optimized = false
 joomla_instance_type = "t2.small"
 
 #Jupyterhub EKS Workers
-min_num_of_jupyterhub_workers=3
-max_num_of_jupyterhub_workers=4
+min_num_of_jupyterhub_workers=1
+max_num_of_jupyterhub_workers=2
 
 skip_final_db_snapshot = true
 

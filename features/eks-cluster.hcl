@@ -25,6 +25,15 @@ module "eks-cluster" {
       pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
+      name                 = "Kafka-Workers"
+      asg_min_size         = "${var.min_num_of_kafka_workers}"
+      asg_max_size         = "${var.max_num_of_kafka_workers}"
+      instance_type        = "${var.k8s_instance_size}"
+      key_name             = "${aws_key_pair.cloud_key.key_name}"
+      kubelet_extra_args   = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true"
+      pre_userdata         = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+    },
+    {
       name                 = "Jupyterhub-Workers"
       asg_min_size         = "${var.min_num_of_jupyterhub_workers}"
       asg_max_size         = "${var.max_num_of_jupyterhub_workers}"
@@ -95,7 +104,7 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
                 "cloudwatch:ListMetrics",
                 "cloudwatch:GetMetricStatistics",
                 "cloudwatch:GetMetricData",
-                
+
                 "s3:Get*",
                 "s3:List*"
             ],
@@ -219,6 +228,15 @@ variable "min_num_of_jupyterhub_workers" {
 
 variable "max_num_of_jupyterhub_workers" {
   description = "Maximum number of JupyterHub workers to be created on eks cluster"
+  default = 5
+}
+variable "min_num_of_kafka_workers" {
+  description = "Minimum number of kafka workers to be created on eks cluster"
+  default = 3
+}
+
+variable "max_num_of_kafka_workers" {
+  description = "Maximum number of kafka workers to be created on eks cluster"
   default = 5
 }
 
