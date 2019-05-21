@@ -2,7 +2,7 @@ data "external" "seeded_random" {
   program = [
     "python",
     "-c",
-    "import random; import json; random.seed('${terraform.workspace}'); print(json.dumps({'cidr_block': '10.{}.0.0/16'.format(random.randint(0, 255))}))"
+    "import random; import json; random.seed('${terraform.workspace}'); print(json.dumps({'cidr_block': '10.{}.0.0/16'.format(random.randint(0, 255))}))",
   ]
 }
 
@@ -26,7 +26,8 @@ module "vpc" {
     "${cidrsubnet(local.vpc_cidr, 10, 448)}",
     "${cidrsubnet(local.vpc_cidr, 10, 704)}",
   ]
-  public_subnets  = [
+
+  public_subnets = [
     "${cidrsubnet(local.vpc_cidr, 4, 2)}",
     "${cidrsubnet(local.vpc_cidr, 4, 6)}",
     "${cidrsubnet(local.vpc_cidr, 4, 10)}",
@@ -67,21 +68,21 @@ resource "aws_db_subnet_group" "default" {
 }
 
 resource "aws_security_group" "allow_kubernetes_internet" {
-  name_prefix   = "Allow Kubernetes"
-  vpc_id = "${module.vpc.vpc_id}"
+  name_prefix = "Allow Kubernetes"
+  vpc_id      = "${module.vpc.vpc_id}"
   description = "Allows jupyter notebooks to access api gateway"
 
   ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
     security_groups = ["${aws_security_group.chatter.id}"]
   }
 
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
     security_groups = ["${aws_security_group.chatter.id}"]
   }
 }
@@ -105,10 +106,10 @@ resource "aws_security_group" "tf_external_access" {
   }
 
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -117,10 +118,10 @@ resource "aws_security_group" "tf_no_external_access" {
   vpc_id = "${module.vpc.vpc_id}"
 
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -197,7 +198,6 @@ output "private_subnets" {
   value       = ["${module.vpc.private_subnets}"]
 }
 
-
 output "public_subnets" {
   description = "List of IDs of public subnets"
   value       = ["${module.vpc.public_subnets}"]
@@ -210,6 +210,7 @@ output "nat_public_ips" {
 
 variable "key_pair_public_key" {
   description = "The public key used to create a key pair"
+
   # The Jenkins public key
-  default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZUiqcbO+5rkKXuYxBcUGtyLWtNainCjKaKaV4ZBEDhUZIxSJXLNq0SH7NxcODYDNNREqUdy6okJMP16NLuMHngmZYGW7FWaB5AVeKpYOdUHL2ik+RH0pY6PquGNWXMqUP+uVB8Kn5SgqsYT/u84Re6m0FztqVf7N8L5SuDbdnkvfLUc+R3JiMArvVGGKj5GkcUAqMFuzEuBQ2e7ID/bSevtMKfrPlOCLVSUzbMIVPCrxE7YyhTDgZjN7kMNZePWQhdyq86QzHJr50qa0fMnp2oUP1qwzbFjymYbG+oXPcj9dSiB7q2anf2imBnWP8JlhSinzJZrR2wa7Vn535MBhD"
+  default = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZUiqcbO+5rkKXuYxBcUGtyLWtNainCjKaKaV4ZBEDhUZIxSJXLNq0SH7NxcODYDNNREqUdy6okJMP16NLuMHngmZYGW7FWaB5AVeKpYOdUHL2ik+RH0pY6PquGNWXMqUP+uVB8Kn5SgqsYT/u84Re6m0FztqVf7N8L5SuDbdnkvfLUc+R3JiMArvVGGKj5GkcUAqMFuzEuBQ2e7ID/bSevtMKfrPlOCLVSUzbMIVPCrxE7YyhTDgZjN7kMNZePWQhdyq86QzHJr50qa0fMnp2oUP1qwzbFjymYbG+oXPcj9dSiB7q2anf2imBnWP8JlhSinzJZrR2wa7Vn535MBhD"
 }

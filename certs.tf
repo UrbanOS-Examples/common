@@ -8,7 +8,7 @@ module "tls_certificate" {
 }
 
 locals {
-  root_tls_cert_domain_name               = "${var.is_sandbox ? local.internal_public_hosted_zone_name : var.root_dns_zone}"
+  root_tls_cert_domain_name = "${var.is_sandbox ? local.internal_public_hosted_zone_name : var.root_dns_zone}"
 
   root_tls_cert_subject_alternative_names = "${var.is_sandbox ? local.internal_public_hosted_zone_name : var.root_dns_zone}"
   root_tls_cert_hosted_zone_id            = "${var.is_sandbox ? aws_route53_zone.internal_public_hosted_zone.zone_id : aws_route53_zone.root_public_hosted_zone.zone_id}"
@@ -16,7 +16,7 @@ locals {
 
 module "root_tls_certificate" {
   source = "github.com/azavea/terraform-aws-acm-certificate?ref=0.1.0"
- 
+
   domain_name               = "${local.root_tls_cert_domain_name}"
   subject_alternative_names = ["*.${local.root_tls_cert_subject_alternative_names}"]
   hosted_zone_id            = "${local.root_tls_cert_hosted_zone_id}"
@@ -35,10 +35,10 @@ variable "tls_certificate_public_hosted_zone_id_override" {
 
 output "tls_certificate_arn" {
   description = "ARN of the generated TLS certificate for the environment."
-  value = "${module.tls_certificate.arn}"
+  value       = "${module.tls_certificate.arn}"
 }
 
 output "root_tls_certificate_arn" {
   description = "ARN of the generated root TLS certificate for the environment"
-  value = "${module.root_tls_certificate.arn}"
+  value       = "${module.root_tls_certificate.arn}"
 }

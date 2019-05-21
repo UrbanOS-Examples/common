@@ -9,8 +9,8 @@ resource "aws_route53_zone" "root_public_hosted_zone" {
 }
 
 variable "root_dns_zone" {
-    description = "root dns zone name"
-    default = "smartcolumbusos.com"
+  description = "root dns zone name"
+  default     = "smartcolumbusos.com"
 }
 
 resource "aws_route53_record" "cota_root_record" {
@@ -19,7 +19,10 @@ resource "aws_route53_record" "cota_root_record" {
   type    = "CNAME"
   ttl     = 300
   records = ["cota.${aws_route53_zone.internal_public_hosted_zone.name}"]
-  lifecycle = { ignore_changes = ["allow_overwrite"] }
+
+  lifecycle = {
+    ignore_changes = ["allow_overwrite"]
+  }
 }
 
 resource "aws_route53_record" "jupyter_root_record" {
@@ -28,7 +31,10 @@ resource "aws_route53_record" "jupyter_root_record" {
   type    = "CNAME"
   ttl     = 300
   records = ["jupyter.${aws_route53_zone.internal_public_hosted_zone.name}"]
-  lifecycle = { ignore_changes = ["allow_overwrite"] }
+
+  lifecycle = {
+    ignore_changes = ["allow_overwrite"]
+  }
 }
 
 resource "aws_route53_record" "streaming_root_record" {
@@ -37,7 +43,10 @@ resource "aws_route53_record" "streaming_root_record" {
   type    = "CNAME"
   ttl     = 300
   records = ["socket.${aws_route53_zone.internal_public_hosted_zone.name}"]
-  lifecycle = { ignore_changes = ["allow_overwrite"] }
+
+  lifecycle = {
+    ignore_changes = ["allow_overwrite"]
+  }
 }
 
 output "root_dns_zone_name" {

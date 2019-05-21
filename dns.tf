@@ -14,10 +14,10 @@ resource "aws_route53_zone" "internal_public_hosted_zone" {
 resource "aws_route53_record" "alm_ns_record" {
   provider = "aws.alm"
 
-  name = "${terraform.workspace}"
+  name    = "${terraform.workspace}"
   zone_id = "${data.terraform_remote_state.durable.hosted_zone_id}"
-  type = "NS"
-  ttl = 300
+  type    = "NS"
+  ttl     = 300
   records = ["${aws_route53_zone.internal_public_hosted_zone.name_servers}"]
 }
 
@@ -32,7 +32,7 @@ variable "prod_dns_zone" {
 }
 
 output "dns_zone_name" {
-  value = "${coalesce("${var.prod_dns_zone}","${local.internal_public_hosted_zone_name}")}"
+  value       = "${coalesce("${var.prod_dns_zone}","${local.internal_public_hosted_zone_name}")}"
   description = "DEPRECATED - DO NOT USE"
 }
 

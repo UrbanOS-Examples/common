@@ -39,7 +39,7 @@ resource "aws_key_pair" "cloud_key" {
 }
 
 locals {
-  vpc_name = "${length(var.vpc_name) > 0 ? var.vpc_name : terraform.workspace}"
+  vpc_name                = "${length(var.vpc_name) > 0 ? var.vpc_name : terraform.workspace}"
   kubernetes_cluster_name = "streaming-kube-${terraform.workspace}"
 }
 
@@ -73,7 +73,7 @@ variable "is_public_facing" {
 
 variable "is_sandbox" {
   description = "True disables public DNS records for sandbox domains to prevent terraform failues for certificate validation. This should always be true in Sandbox."
-  default = false
+  default     = false
 }
 
 output "key_pair_name" {
