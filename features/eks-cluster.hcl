@@ -14,7 +14,7 @@ module "eks-cluster" {
 
   # THIS COUNT NEEDS TO MATCH THE LENGTH OF THE PROVIDED LIST OR IT WILL NOT WORK
   # as of Terraform v0.11.7, computing this value is not seemingly supported
-  worker_group_count = 2
+  worker_group_count = 3
 
   worker_groups = [
     {
@@ -26,21 +26,21 @@ module "eks-cluster" {
       pre_userdata  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
-      name               = "Kafka-Workers"
-      asg_min_size       = "${var.min_num_of_kafka_workers}"
-      asg_max_size       = "${var.max_num_of_kafka_workers}"
-      instance_type      = "${var.k8s_instance_size}"
-      key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true"
-      pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
-    },
-    {
       name               = "Jupyterhub-Workers"
       asg_min_size       = "${var.min_num_of_jupyterhub_workers}"
       asg_max_size       = "${var.max_num_of_jupyterhub_workers}"
       instance_type      = "t2.medium"
       key_name           = "${aws_key_pair.cloud_key.key_name}"
       kubelet_extra_args = "--register-with-taints=scos.run.jupyterhub=true:NoExecute --node-labels=scos.run.jupyterhub=true"
+      pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+    },
+    {
+      name               = "Kafka-Workers"
+      asg_min_size       = "${var.min_num_of_kafka_workers}"
+      asg_max_size       = "${var.max_num_of_kafka_workers}"
+      instance_type      = "${var.k8s_instance_size}"
+      key_name           = "${aws_key_pair.cloud_key.key_name}"
+      kubelet_extra_args = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true"
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
   ]
