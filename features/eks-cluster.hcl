@@ -38,7 +38,7 @@ module "eks-cluster" {
       name               = "Kafka-Workers"
       asg_min_size       = "${var.min_num_of_kafka_workers}"
       asg_max_size       = "${var.max_num_of_kafka_workers}"
-      instance_type      = "${var.k8s_instance_size}"
+      instance_type      = "m5a.xlarge"
       key_name           = "${aws_key_pair.cloud_key.key_name}"
       kubelet_extra_args = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true"
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
