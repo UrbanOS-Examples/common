@@ -17,7 +17,7 @@ data "template_file" "joomla_unite_config" {
 resource "aws_db_instance" "joomla_db" {
   identifier             = "${var.joomla_db_identifier}-${terraform.workspace}"
   instance_class         = "${var.joomla_db_instance_class}"
-  vpc_security_group_ids = ["${aws_security_group.os_servers.id}"]
+  vpc_security_group_ids = ["${aws_security_group.os_servers.id}", "${aws_security_group.joomla_db.id}"]
   db_subnet_group_name   = "${aws_db_subnet_group.default.name}"
   skip_final_snapshot    = true
   engine                 = "mysql"
@@ -35,6 +35,33 @@ resource "aws_db_instance" "joomla_db" {
   }
 }
 
+resource "aws_security_group" "joomla_db" {
+  name   = "joomla_database"
+  vpc_id = "${module.vpc.vpc_id}"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
+    description = "Allow traffic from self"
+  }
+
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    security_groups = ["${aws_security_group.chatter.id}"]
+    description     = "Allow ingress from EKS-deployed app to its database"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 resource "aws_iam_instance_profile" "joomla" {
   name = "${terraform.workspace}_joomla"
   role = "${aws_iam_role.joomla_ec2.name}"
