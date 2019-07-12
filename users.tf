@@ -30,3 +30,28 @@ resource "aws_iam_user_policy" "discovery_api_user_ro" {
 }
 EOF
 }
+
+resource "aws_iam_user" "reaper_user" {
+  name = "${terraform.workspace}-reaper"
+}
+
+resource "aws_iam_user_policy" "reaper_user_ro" {
+  name = "write"
+  user = "${aws_iam_user.reaper_user.name}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt2",
+      "Action": [
+        "s3:putObject"
+      ],
+      "Effect": "Allow",
+      "Resource": ["${aws_s3_bucket.os_hosted_datasets.arn}/*"]
+    }
+  ]
+}
+EOF
+}

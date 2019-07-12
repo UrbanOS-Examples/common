@@ -5,7 +5,7 @@ resource "aws_s3_bucket" "os_public_data" {
 }
 
 resource "aws_s3_bucket" "os_hosted_datasets" {
-  bucket        = "${terraform.workspace}-hosted-datasets"
+  bucket        = "${terraform.workspace}-hosted-dataset-files"
   acl           = "private"
   force_destroy = true
 }
