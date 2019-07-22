@@ -90,22 +90,6 @@ resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
 }
 
 //---------ALARMS---------//
-resource "aws_cloudwatch_metric_alarm" "joomla_high_mem" {
-  count = "${var.joomla_alarms_enabled}"
-  alarm_name                            = "${terraform.workspace} Joomla - High Memory Utilization"
-  comparison_operator                   = "GreaterThanOrEqualToThreshold"
-  evaluation_periods                    = "2"
-  metric_name                           = "MemoryUtilization"
-  namespace                             = "System/Linux"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "90"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  dimensions {
-    InstanceId                          = "${aws_instance.joomla.id}"
-  }
-  treat_missing_data                    = "breaching"
-}
 
 resource "aws_cloudwatch_metric_alarm" "ckan_internal_high_cpu" {
   count = "${var.ckan_alarms_enabled}"
@@ -361,39 +345,6 @@ resource "aws_cloudwatch_metric_alarm" "ckan_rds_free_storage_space_low" {
   }
   treat_missing_data                    = "breaching"
 }
-resource "aws_cloudwatch_metric_alarm" "joomla_high_cpu" {
-  count = "${var.joomla_alarms_enabled}"
-  alarm_name                            = "${terraform.workspace} Joomla - High CPU Utilization"
-  comparison_operator                   = "GreaterThanOrEqualToThreshold"
-  evaluation_periods                    = "2"
-  metric_name                           = "CPUUtilization"
-  namespace                             = "AWS/EC2"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "90"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  dimensions {
-    InstanceId                          = "${aws_instance.joomla.id}"
-  }
-  treat_missing_data                    = "breaching"
-}
-
-resource "aws_cloudwatch_metric_alarm" "joomla_instance_status_check_failed" {
-  count = "${var.joomla_alarms_enabled}"
-  alarm_name                            = "${terraform.workspace} Joomla - Instance Status Check Failed"
-  comparison_operator                   = "GreaterThanThreshold"
-  evaluation_periods                    = "1"
-  metric_name                           = "StatusCheckFailed_Instance"
-  namespace                             = "AWS/EC2"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "0"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  dimensions {
-    InstanceId                          = "${aws_instance.joomla.id}"
-  }
-  treat_missing_data                    = "breaching"
-}
 
 resource "aws_cloudwatch_metric_alarm" "watchintor_cota_streaming_consumer_open_connection_failed" {
   alarm_name                            = "${terraform.workspace} Watchinator - Cota Streaming Consumer Open Connection Failed"
@@ -435,4 +386,3 @@ variable "kong_alarms_enabled" {
   description = "Enables Kong Cloudwatch alarms. Defaults to true."
   default = true
 }
-
