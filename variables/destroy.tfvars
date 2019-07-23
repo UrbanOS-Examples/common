@@ -1,5 +1,3 @@
-joomla_backup_file_name = ""
-joomla_backup_ami = ""
 ckan_internal_backup_ami = ""
 ckan_external_backup_ami = ""
 ckan_db_snapshot_id = ""

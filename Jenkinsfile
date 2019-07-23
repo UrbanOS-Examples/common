@@ -19,14 +19,6 @@ properties(
                 defaultValue: scos.environments().join("\n"),
                 description: 'Environments in which to deploy common/env'),
             string(
-                name: 'joomla_backup_ami',
-                defaultValue: '',
-                description: 'The AMI for the Joomla EC2 instance snapshot to deploy'),
-            string(
-                name: 'joomla_backup_file_name',
-                defaultValue: '',
-                description: 'The backup file name in the global backups S3 bucket'),
-            string(
                 name: 'ckan_internal_backup_ami',
                 defaultValue: '',
                 description: 'The AMI for the CKAN Internal EC2 instance snapshot to deploy'),
