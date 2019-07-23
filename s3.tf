@@ -9,3 +9,10 @@ resource "aws_s3_bucket" "os_hosted_datasets" {
   acl           = "private"
   force_destroy = true
 }
+
+resource "aws_s3_bucket" "ckan" {
+  #keep to preserve copy of CKAN data
+  bucket        = "${terraform.workspace}-os-ckan-data"
+  acl           = "private"
+  force_destroy = true
+}

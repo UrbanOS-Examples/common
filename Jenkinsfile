@@ -17,27 +17,7 @@ properties(
             text(
                 name: 'environmentsParameter',
                 defaultValue: scos.environments().join("\n"),
-                description: 'Environments in which to deploy common/env'),
-            string(
-                name: 'ckan_internal_backup_ami',
-                defaultValue: '',
-                description: 'The AMI for the CKAN Internal EC2 instance snapshot to deploy'),
-            string(
-                name: 'ckan_external_backup_ami',
-                defaultValue: '',
-                description: 'The AMI for the CKAN External EC2 instance snapshot to deploy'),
-            string(
-                name: 'ckan_db_snapshot_id',
-                defaultValue: '',
-                description: 'The Snapshot ID for the CKAN database to deploy'),
-            string(
-                name: 'kong_backup_ami',
-                defaultValue: '',
-                description: 'The AMI for the Kong Internal EC2 instance snapshot to deploy'),
-            string(
-                name: 'kong_db_snapshot_id',
-                defaultValue: '',
-                description: 'The Snapshot ID for the Kong database to deploy')
+                description: 'Environments in which to deploy common/env')
         ])
     ]
 )

@@ -3,13 +3,7 @@
 # If you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = ["eks-cluster",
-                    "ckan_shared",
-                    "ckan_internal",
-                    "ckan_external",
-                    "kong",
                     "joomla",
-                    "load_balancer",
-                    "load_balancer_shared",
                     "lime_db",
                     "cloudwatch_monitoring",
                     "redis",
@@ -19,18 +13,6 @@ role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
 vpc_cidr = "10.100.0.0/16"
 
-ckan_db_snapshot_id = "arn:aws:rds:us-west-2:073132350570:snapshot:ckan-2018-09-24-12-10"
-
-# prod is an m4.2xl and m4.xl respectively
-# We're at 5% and 14% memory utilization and negligible cpu usage in non-prod environments.
-# This works out to a t2.medium being about 2x our actual usage.
-ckan_internal_instance_type = "t2.medium"
-
-ckan_internal_instance_ebs_optimized = false
-
-ckan_external_instance_type = "t2.medium"
-
-ckan_external_instance_ebs_optimized = false
 
 #Jupyterhub EKS Workers
 min_num_of_jupyterhub_workers=1
