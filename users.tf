@@ -69,7 +69,7 @@ resource "aws_iam_user_policy" "odo_user_rw" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "Stmt3",
+      "Sid": "Stmt1",
       "Action": [
         "s3:putObject"
         "s3:getObject"
