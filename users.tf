@@ -71,7 +71,7 @@ resource "aws_iam_user_policy" "odo_user_rw" {
     {
       "Sid": "Stmt1",
       "Action": [
-        "s3:putObject"
+        "s3:putObject",
         "s3:getObject"
       ],
       "Effect": "Allow",
