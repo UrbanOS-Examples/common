@@ -55,3 +55,29 @@ resource "aws_iam_user_policy" "reaper_user_ro" {
 }
 EOF
 }
+
+resource "aws_iam_user" "odo_user" {
+  name = "${terraform.workspace}-odo"
+}
+
+resource "aws_iam_user_policy" "odo_user_rw" {
+  name = "read-write"
+  user = "${aws_iam_user.odo_user.name}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1",
+      "Action": [
+        "s3:putObject",
+        "s3:getObject"
+      ],
+      "Effect": "Allow",
+      "Resource": ["${aws_s3_bucket.os_hosted_datasets.arn}/*"]
+    }
+  ]
+}
+EOF
+}
