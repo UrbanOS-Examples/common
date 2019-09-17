@@ -1,5 +1,6 @@
 # The Terraform Scripts
 
+RIP Paul
 
 A collection of terraform scripts to be run by the continuous integration/continuous delivery mechanism to deploy, maintain, and update the various environments in the Smart Columbus Operating System.  These scripts can be run by developers in a Sandbox subaccount to prove out new scripts before entrusting them to automated deployment.
 
