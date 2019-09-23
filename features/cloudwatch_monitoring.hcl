@@ -1,8 +1,7 @@
-
 data "archive_file" "alert_handler_zip" {
-    type        = "zip"
-    source_dir  = "${path.module}/files/cloudwatch_monitoring/lambda/alert_handler"
-    output_path = "lambda_alert_handler.zip"
+  type        = "zip"
+  source_dir  = "${path.module}/files/cloudwatch_monitoring/lambda/alert_handler"
+  output_path = "lambda_alert_handler.zip"
 }
 
 resource "aws_iam_policy" "alert_handler_iam_policy" {
@@ -33,6 +32,7 @@ EOF
 
 resource "aws_iam_role" "alert_handler_iam_role" {
   name = "${terraform.workspace}_lambda_alert_handler_role"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -50,22 +50,23 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "alert_handler_iam_rolepolicy_attachment" {
-  role = "${aws_iam_role.alert_handler_iam_role.name}"
+  role       = "${aws_iam_role.alert_handler_iam_role.name}"
   policy_arn = "${aws_iam_policy.alert_handler_iam_policy.arn}"
 }
 
 resource "aws_lambda_function" "alert_handler_lambda" {
-  filename = "lambda_alert_handler.zip"
+  filename         = "lambda_alert_handler.zip"
   source_code_hash = "${data.archive_file.alert_handler_zip.output_base64sha256}"
-  function_name = "${terraform.workspace}_alert_handler"
-  role = "${aws_iam_role.alert_handler_iam_role.arn}"
-  description = "An Amazon SNS trigger that sends CloudWatch alarm notifications to Slack."
-  handler = "index.handler"
-  runtime = "nodejs8.10"
-  timeout       = 30
+  function_name    = "${terraform.workspace}_alert_handler"
+  role             = "${aws_iam_role.alert_handler_iam_role.arn}"
+  description      = "An Amazon SNS trigger that sends CloudWatch alarm notifications to Slack."
+  handler          = "index.handler"
+  runtime          = "nodejs8.10"
+  timeout          = 30
+
   environment {
     variables {
-      SLACK_PATH = "${var.alarms_slack_path}"
+      SLACK_PATH         = "${var.alarms_slack_path}"
       SLACK_CHANNEL_NAME = "${var.alarms_slack_channel_name}"
     }
   }
@@ -92,60 +93,66 @@ resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
 //---------ALARMS---------//
 
 resource "aws_cloudwatch_metric_alarm" "joomla_rds_free_storage_space_low" {
-  count = "${var.joomla_alarms_enabled}"
-  alarm_name                            = "${terraform.workspace} Joomla - RDS Free Storage Space Low"
-  comparison_operator                   = "LessThanOrEqualToThreshold"
-  evaluation_periods                    = "2"
-  metric_name                           = "FreeStorageSpace"
-  namespace                             = "AWS/RDS"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "15000000000"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  count               = "${var.joomla_alarms_enabled}"
+  alarm_name          = "${terraform.workspace} Joomla - RDS Free Storage Space Low"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "FreeStorageSpace"
+  namespace           = "AWS/RDS"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "15000000000"
+  alarm_actions       = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+
   dimensions {
-    DBInstanceIdentifier                = "${aws_db_instance.joomla_db.id}"
+    DBInstanceIdentifier = "${module.joomla_db.id}"
   }
-  treat_missing_data                    = "breaching"
+
+  treat_missing_data = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "joomla_rds_high_cpu_util" {
-  count = "${var.joomla_alarms_enabled}"
-  alarm_name                            = "${terraform.workspace} Joomla - RDS High CPU Utilization"
-  comparison_operator                   = "GreaterThanOrEqualToThreshold"
-  evaluation_periods                    = "2"
-  metric_name                           = "CPUUtilization"
-  namespace                             = "AWS/RDS"
-  period                                = "300"
-  statistic                             = "Average"
-  threshold                             = "90"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
-  dimensions {
-    DBInstanceIdentifier                = "${aws_db_instance.joomla_db.id}"
-  }
-  treat_missing_data                    = "breaching"
-}
+  count               = "${var.joomla_alarms_enabled}"
+  alarm_name          = "${terraform.workspace} Joomla - RDS High CPU Utilization"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/RDS"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "90"
+  alarm_actions       = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
 
+  dimensions {
+    DBInstanceIdentifier = "${module.joomla_db.id}"
+  }
+
+  treat_missing_data = "breaching"
+}
 
 resource "aws_cloudwatch_metric_alarm" "watchintor_cota_streaming_consumer_open_connection_failed" {
-  alarm_name                            = "${terraform.workspace} Watchinator - Cota Streaming Consumer Open Connection Failed"
-  comparison_operator                   = "LessThanThreshold"
-  evaluation_periods                    = "1"
-  metric_name                           = "Opened"
-  namespace                             = "Socket Connection"
-  period                                = "120"
-  statistic                             = "Sum"
-  threshold                             = "1"
-  alarm_actions                         = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  alarm_name          = "${terraform.workspace} Watchinator - Cota Streaming Consumer Open Connection Failed"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Opened"
+  namespace           = "Socket Connection"
+  period              = "120"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_actions       = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+
   dimensions {
-    ApplicationName                     = "Cota-Streaming-Consumer"
+    ApplicationName = "Cota-Streaming-Consumer"
   }
-  treat_missing_data                    = "breaching"
+
+  treat_missing_data = "breaching"
 }
+
 //-----------------------//
 
 variable "alarms_slack_path" {
   description = "Path to the Slack channel"
-  default = "/services/T7LRETX4G/BA0EW8W6R/vRbX198LKBkhAEK64OnHCUXH"
+  default     = "/services/T7LRETX4G/BA0EW8W6R/vRbX198LKBkhAEK64OnHCUXH"
 }
 
 variable "alarms_slack_channel_name" {
@@ -154,5 +161,5 @@ variable "alarms_slack_channel_name" {
 
 variable "joomla_alarms_enabled" {
   description = "Enables Joomla Cloudwatch alarms. Defaults to true."
-  default = true
+  default     = true
 }
