@@ -7,7 +7,7 @@ module "joomla_db" {
   attached_vpc_id          = "${module.vpc.vpc_id}"
   attached_subnet_ids      = "${local.private_subnets}"
   attached_security_groups = ["${aws_security_group.chatter.id}"]
-  instance_class           = "db.t2.large"
+  instance_class           = "${var.joomla_db_instance_class}"
 }
 
 resource "aws_s3_bucket" "joomla-backups" {
@@ -27,4 +27,9 @@ resource "aws_s3_bucket" "joomla-backups" {
       days = 183
     }
   }
+}
+
+variable "joomla_db_instance_class" {
+  description = "AWS instance class for joomla rds instance"
+  default = "db.t2.large"
 }

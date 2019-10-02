@@ -26,3 +26,6 @@ root_dns_zone = "dev-smartos.com"
 #Alarms
 alarms_slack_path = "/services/T7LRETX4G/BDE8Y9SQ3/Amboqt9U8R3IYQgxUlBPkSUY"
 alarms_slack_channel_name = "#pre_prod_alerts"
+
+#Joomla
+joomla_db_instance_class = "db.t3.small"
