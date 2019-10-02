@@ -13,26 +13,11 @@ role_arn = "arn:aws:iam::374013108165:role/jenkins_role"
 
 vpc_cidr = "10.200.0.0/16"
 
+#DNS
 prod_dns_zone = "smartcolumbusos.com"
-
-skip_final_db_snapshot = false
 
 # Redis Elasticache settings
 redis_node_type = "cache.m4.large"
 
-# Lime DB override settings
-lime_db_size = "db.t2.small"
-
-lime_db_storage = 100
-
-lime_db_multi_az = true
-
-lime_db_apply_immediately = true
-
-#DNS
-is_public_facing = true
-
+#Alarms
 alarms_slack_channel_name = "#prod_alerts"
-
-#KDC
-kdc_domain = "OS-KDC.COM"

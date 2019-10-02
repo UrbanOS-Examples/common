@@ -13,32 +13,19 @@ role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
 vpc_cidr = "10.100.0.0/16"
 
-
 #Jupyterhub EKS Workers
 min_num_of_jupyterhub_workers=1
 max_num_of_jupyterhub_workers=2
 
-skip_final_db_snapshot = true
-
 # Redis Elasticache settings
 redis_node_type = "cache.t2.medium"
 
-# Lime DB override settings
-lime_db_size = "db.t2.small"
-lime_db_storage = 20
-lime_db_multi_az = false
-lime_db_apply_immediately = true
-
-recovery_window_in_days = 0
-
 #DNS
-is_public_facing = false
-
 root_dns_zone = "dev-smartos.com"
 
+#Alarms
 alarms_slack_path = "/services/T7LRETX4G/BDE8Y9SQ3/Amboqt9U8R3IYQgxUlBPkSUY"
-
 alarms_slack_channel_name = "#pre_prod_alerts"
 
-#KDC
-kdc_domain = "OS-KDC.COM"
+#Joomla
+joomla_db_instance_class = "db.t3.small"

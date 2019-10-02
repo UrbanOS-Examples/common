@@ -57,20 +57,6 @@ variable "vpc_name" {
   default     = ""
 }
 
-variable "skip_final_db_snapshot" {
-  description = "Should the databases take a final snapshot or not"
-  default     = false
-}
-
-variable "recovery_window_in_days" {
-  description = "How long to allow secrets to be recovered if they are deleted"
-  default     = 30
-}
-
-variable "is_public_facing" {
-  description = "false to utilize private/internal loadbalancers; true to use public"
-}
-
 variable "is_sandbox" {
   description = "True disables public DNS records for sandbox domains to prevent terraform failues for certificate validation. This should always be true in Sandbox."
   default     = false

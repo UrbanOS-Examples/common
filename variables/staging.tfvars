@@ -19,28 +19,12 @@ vpc_cidr = "10.180.0.0/16"
 min_num_of_jupyterhub_workers=1
 max_num_of_jupyterhub_workers=3
 
-skip_final_db_snapshot = true
-
 # Redis Elasticache settings
 redis_node_type = "cache.m4.large"
 
-# Lime DB override settings
-lime_db_size = "db.t2.small"
-lime_db_storage = 20
-lime_db_multi_az = false
-lime_db_apply_immediately = true
-
-recovery_window_in_days = 0
-
 #DNS
-is_public_facing = false
-
 root_dns_zone = "staging-smartos.com"
 
+#Alarms
 alarms_slack_path = "/services/T7LRETX4G/BDE8Y9SQ3/Amboqt9U8R3IYQgxUlBPkSUY"
-
 alarms_slack_channel_name = "#pre_prod_alerts"
-
-#KDC
-
-kdc_domain = "OS-KDC.COM"
