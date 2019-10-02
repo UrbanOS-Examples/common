@@ -32,10 +32,6 @@ max_num_of_jupyterhub_workers=2
 min_num_of_kafka_workers=1
 max_num_of_kafka_workers=3
 
-# LDAP datalake settings
-ldap_server = "iam-master.alm.sandbox.internal.smartcolumbusos.com"
-ldap_domain = "dc=sandbox,dc=internal,dc=smartcolumbusos,dc=com"
-
 skip_final_db_snapshot = true
 
 # Redis Elasticache settings
@@ -57,8 +53,3 @@ internal_root_dns_zone = "sandbox.internal.smartcolumbusos.com"
 root_dns_zone = "sandbox-smartos.com"
 
 is_sandbox = true # Leave this true
-
-# Kerberos
-kdc_instance_type = "t2.small"
-
-kdc_domain = "OS-KDC.COM"

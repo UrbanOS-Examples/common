@@ -33,6 +33,3 @@ lime_db_apply_immediately = true
 is_public_facing = true
 
 alarms_slack_channel_name = "#prod_alerts"
-
-#KDC
-kdc_domain = "OS-KDC.COM"
