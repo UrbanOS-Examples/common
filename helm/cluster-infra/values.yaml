@@ -140,3 +140,7 @@ storageClass:
     reclaimPolicy: Retain
     mountOptions:
     - debug
+
+metrics-server:
+  args:
+    - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
