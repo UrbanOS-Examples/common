@@ -43,8 +43,8 @@ module "eks-cluster" {
       kubelet_extra_args = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true"
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
-    # so we don't have to go through a roll in the future - set to zeros and something inconsequential until we figure out what we need
     {
+      # so we don't have to go through a roll in the future - set to zeros and something inconsequential until we figure out what we need
       name               = "Memory-Optimized-Workers"
       asg_min_size       = "0"
       asg_max_size       = "0"
@@ -162,6 +162,7 @@ resource "null_resource" "eks_infrastructure" {
   provisioner "local-exec" {
     command = <<EOF
 set -e
+kubectl version
 export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
 kubectl apply -f ${path.module}/k8s/tiller-role/
 helm init --service-account tiller
