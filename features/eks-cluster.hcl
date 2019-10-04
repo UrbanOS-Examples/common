@@ -7,7 +7,7 @@ module "eks-cluster" {
   subnets         = "${local.private_subnets}"
   vpc_id          = "${module.vpc.vpc_id}"
 
-  kubeconfig_aws_authenticator_command         = "heptio-authenticator-aws"
+  kubeconfig_aws_authenticator_command         = "aws-iam-authenticator"
   kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
 
   worker_additional_security_group_ids = ["${aws_security_group.chatter.id}", "${aws_security_group.allow_ssh_from_alm.id}"]
