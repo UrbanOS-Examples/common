@@ -162,7 +162,6 @@ resource "null_resource" "eks_infrastructure" {
   provisioner "local-exec" {
     command = <<EOF
 set -e
-kubectl version
 export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
 kubectl apply -f ${path.module}/k8s/tiller-role/
 helm init --service-account tiller
