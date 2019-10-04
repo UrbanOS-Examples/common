@@ -38,7 +38,7 @@ module "eks-cluster" {
       name               = "Kafka-Workers"
       asg_min_size       = "${var.min_num_of_kafka_workers}"
       asg_max_size       = "${var.max_num_of_kafka_workers}"
-      instance_type      = "${var.k8s_instance_size}"
+      instance_type      = "${var.kafka_worker_instance_size}"
       key_name           = "${aws_key_pair.cloud_key.key_name}"
       kubelet_extra_args = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true"
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
@@ -48,7 +48,7 @@ module "eks-cluster" {
       name               = "Memory-Optimized-Workers"
       asg_min_size       = "0"
       asg_max_size       = "0"
-      instance_type      = "t2.nano"
+      instance_type      = "r5a.large"
       key_name           = "${aws_key_pair.cloud_key.key_name}"
       kubelet_extra_args = "--node-labels=scos.run.memory-optimized=true"
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
@@ -235,9 +235,20 @@ variable "eks_ami_version" {
 }
 
 variable "k8s_instance_size" {
+  # See Note below on changing instance type
   description = "EC2 instance type"
   default     = "t2.xlarge"
 }
+
+variable "kafka_worker_instance_size" {
+  # See Note below on changing instance type
+  description = "EC2 instance type for kafka workers"
+  default     = "r5a.large"
+}
+
+# If you're changing ec2 instance types to a newer generation of server you may need to update the CNI plugin.
+# https://docs.aws.amazon.com/en_us/eks/latest/userguide/cni-upgrades.html
+# kubectl apply -f https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/release-1.5/config/v1.5/aws-k8s-cni.yaml
 
 variable "min_num_of_workers" {
   description = "Minimum number of workers to be created on eks cluster"
