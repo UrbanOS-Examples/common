@@ -179,6 +179,10 @@ echo "Identified Running Tiller Pod..."
 kubectl get namespaces | egrep '^cluster-infra ' || kubectl create namespace cluster-infra
 kubectl label namespace cluster-infra name=cluster-infra --overwrite
 
+cd ${path.module}/helm/cluster-infra
+helm dependency update
+cd -
+
 helm upgrade --install cluster-infra ${path.module}/helm/cluster-infra \
     --namespace=cluster-infra \
     --set externalDns.args."domain\-filter"="{${aws_route53_zone.internal_public_hosted_zone.name},${aws_route53_zone.root_public_hosted_zone.name}}" \
