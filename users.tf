@@ -46,6 +46,8 @@ resource "aws_iam_user_policy" "reaper_user_ro" {
     {
       "Sid": "Stmt2",
       "Action": [
+        "s3:Get*",
+        "s3:List*",
         "s3:putObject"
       ],
       "Effect": "Allow",
