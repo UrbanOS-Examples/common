@@ -15,5 +15,21 @@ cat <<MARK > /etc/systemd/system/kubelet.service.d/override.conf
 Restart=always
 MARK
 
+# Security Setting to enforce standard kernel tuning. ref: CIS 2.1.6
+mkdir --parents /etc/systemd/system/kubelet.service.d
+cat <<MARK > /etc/sysctl.d/90-scos-kubelet.conf
+vm.overcommit_memory=1
+kernel.panic=10
+kernel.panic_on_oops=1
+MARK
+
+sed -i '$s/}/,\n"protectKernelDefaults":true}/' /etc/kubernetes/kubelet/kubelet-config.json
+
+sysctl --system
+
 systemctl daemon-reload
 systemctl restart docker
+systemctl restart kubelet.service
+
+chmod 640 /etc/kubernetes/kubelet/kubelet-config.json
+chown root:root /etc/kubernetes/kubelet/kubelet-config.json
