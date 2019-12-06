@@ -31,7 +31,7 @@ module "eks-cluster" {
       asg_max_size       = "${var.max_num_of_jupyterhub_workers}"
       instance_type      = "t2.medium"
       key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "--register-with-taints=scos.run.jupyterhub=true:NoExecute --node-labels=scos.run.jupyterhub=true"
+      kubelet_extra_args = "--register-with-taints=scos.run.jupyterhub=true:NoExecute --node-labels=scos.run.jupyterhub=true ${var.kubelet_security_args}"
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
@@ -40,7 +40,7 @@ module "eks-cluster" {
       asg_max_size       = "${var.max_num_of_kafka_workers}"
       instance_type      = "${var.kafka_worker_instance_size}"
       key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true"
+      kubelet_extra_args = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true ${var.kubelet_security_args}"
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
@@ -50,7 +50,7 @@ module "eks-cluster" {
       asg_max_size       = "0"
       instance_type      = "r5a.large"
       key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "--node-labels=scos.run.memory-optimized=true"
+      kubelet_extra_args = "--node-labels=scos.run.memory-optimized=true ${var.kubelet_security_args}"
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
@@ -59,7 +59,7 @@ module "eks-cluster" {
       asg_max_size       = "0"
       instance_type      = "t2.nano"
       key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "--node-labels=scos.run.cpu-optimized=true"
+      kubelet_extra_args = "--node-labels=scos.run.cpu-optimized=true ${var.kubelet_security_args}"
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
   ]
@@ -278,6 +278,11 @@ variable "min_num_of_kafka_workers" {
 variable "max_num_of_kafka_workers" {
   description = "Maximum number of kafka workers to be created on eks cluster"
   default     = 5
+}
+
+variable "kubelet_security_args" {
+  description = "A set of additional kubelet configurations to meet security standards. WARNING: Invalid command line parameters here will cause all nodes deployed with these settings to never become ready. This kills the cluster."
+  default     = "--read-only-port=0 --event-qps=0"
 }
 
 output "eks_cluster_kubeconfig" {
