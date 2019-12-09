@@ -18,12 +18,13 @@ module "eks-cluster" {
 
   worker_groups = [
     {
-      name          = "Workers"
-      asg_min_size  = "${var.min_num_of_workers}"
-      asg_max_size  = "${var.max_num_of_workers}"
-      instance_type = "${var.k8s_instance_size}"
-      key_name      = "${aws_key_pair.cloud_key.key_name}"
-      pre_userdata  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      name               = "Workers"
+      asg_min_size       = "${var.min_num_of_workers}"
+      asg_max_size       = "${var.max_num_of_workers}"
+      instance_type      = "${var.k8s_instance_size}"
+      key_name           = "${aws_key_pair.cloud_key.key_name}"
+      kubelet_extra_args = "${var.kubelet_security_args}"
+      pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
       name               = "Jupyterhub-Workers"
