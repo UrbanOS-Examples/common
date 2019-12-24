@@ -7,6 +7,7 @@ enabled_features = ["eks-cluster",
                     "lime_db",
                     "cloudwatch_monitoring",
                     "redis",
+                    "ses",
                    ]
 
 vpc_name = "test"
