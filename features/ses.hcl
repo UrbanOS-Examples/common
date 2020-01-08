@@ -49,3 +49,7 @@ resource "aws_iam_user_policy" "smtp_user" {
 }
 EOF
 }
+
+resource "aws_ses_email_identity" "example" {
+  email = "smartcolumbusos@columbus.gov"
+}
