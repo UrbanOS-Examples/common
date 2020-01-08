@@ -50,6 +50,6 @@ resource "aws_iam_user_policy" "smtp_user" {
 EOF
 }
 
-resource "aws_ses_email_identity" "example" {
+resource "aws_ses_email_identity" "smartcolumbusos_email" {
   email = "smartcolumbusos@columbus.gov"
 }
