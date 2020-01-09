@@ -61,7 +61,7 @@ resource "aws_lambda_function" "alert_handler_lambda" {
   role             = "${aws_iam_role.alert_handler_iam_role.arn}"
   description      = "An Amazon SNS trigger that sends CloudWatch alarm notifications to Slack."
   handler          = "index.handler"
-  runtime          = "nodejs8.10"
+  runtime          = "nodejs12.x"
   timeout          = 30
 
   environment {
