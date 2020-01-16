@@ -25,18 +25,6 @@ resource "aws_route53_record" "cota_root_record" {
   }
 }
 
-resource "aws_route53_record" "jupyter_root_record" {
-  zone_id = "${aws_route53_zone.root_public_hosted_zone.zone_id}"
-  name    = "jupyter"
-  type    = "CNAME"
-  ttl     = 300
-  records = ["jupyter.${aws_route53_zone.internal_public_hosted_zone.name}"]
-
-  lifecycle = {
-    ignore_changes = ["allow_overwrite"]
-  }
-}
-
 resource "aws_route53_record" "streaming_root_record" {
   zone_id = "${aws_route53_zone.root_public_hosted_zone.zone_id}"
   name    = "streaming"
