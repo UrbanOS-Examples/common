@@ -24,10 +24,6 @@ cluster_version = "1.13"
 min_num_of_workers = 1
 k8s_instance_size = "t3.medium"
 
-#Jupyterhub EKS Workers
-min_num_of_jupyterhub_workers=0
-max_num_of_jupyterhub_workers=2
-
 #Kafka EKS Workers
 min_num_of_kafka_workers=1
 max_num_of_kafka_workers=3

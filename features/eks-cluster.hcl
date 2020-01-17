@@ -28,8 +28,8 @@ module "eks-cluster" {
     },
     {
       name               = "Jupyterhub-Workers"
-      asg_min_size       = "${var.min_num_of_jupyterhub_workers}"
-      asg_max_size       = "${var.max_num_of_jupyterhub_workers}"
+      asg_min_size       = "0"
+      asg_max_size       = "0"
       instance_type      = "t2.medium"
       key_name           = "${aws_key_pair.cloud_key.key_name}"
       kubelet_extra_args = "--register-with-taints=scos.run.jupyterhub=true:NoExecute --node-labels=scos.run.jupyterhub=true ${var.kubelet_security_args}"
@@ -259,16 +259,6 @@ variable "min_num_of_workers" {
 variable "max_num_of_workers" {
   description = "Maximum number of workers to be created on eks cluster"
   default     = 12
-}
-
-variable "min_num_of_jupyterhub_workers" {
-  description = "Minimum number of JupyterHub workers to be created on eks cluster"
-  default     = 3
-}
-
-variable "max_num_of_jupyterhub_workers" {
-  description = "Maximum number of JupyterHub workers to be created on eks cluster"
-  default     = 5
 }
 
 variable "min_num_of_kafka_workers" {

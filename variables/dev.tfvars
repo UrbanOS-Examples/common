@@ -14,10 +14,6 @@ role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
 
 vpc_cidr = "10.100.0.0/16"
 
-#Jupyterhub EKS Workers
-min_num_of_jupyterhub_workers=1
-max_num_of_jupyterhub_workers=2
-
 # Redis Elasticache settings
 redis_node_type = "cache.t2.medium"
 
