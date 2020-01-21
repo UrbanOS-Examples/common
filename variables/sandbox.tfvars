@@ -4,7 +4,7 @@
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = [
     "eks-cluster",
-    "redis",
+    "redis"
 ]
 
 alm_account_id = "068920858268"
@@ -15,7 +15,7 @@ role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
 alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
-key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRAvH6k7iEeRDz9SQtkH1o8KiUaed/e2hmzTUjA8bhmeWVLPsgCMKIUKR0jdPlvdZ0AmMLXswobsXj08dPgWxUZxoAWIqKCjd969KckydUpBtcb+X2Q+tpOcugBOQSY1H8hgNrdcRKEaUllTfvseJ9pBOYU7j9VuZ608HQhfZw7+aS8wi9o/BJwejtpWdlo6gkxXoIRqDX/ioYg+W6Tc7yoUzAEANwZAy3/3GKWDrh+9jnzR6mEEN48Nuee49wWfP5G0T/v4+Gvux5zioHb3rcmmR9YTkFOiv1poInhXlPdc7Q38yj+z6E+hACNN3rK80YjU0ByaSPltPjqm9ZYmPX"
+key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCnatmW6UiFC9EIxmcdRebNnjFC6KfKJjNJhqCW8RwIqAfopSWITuCNsA6yRDauV1VJugmi8bZfb0ZDW+C/d6hAd2tpXjVURYVa43vQJezXWgAa3vHCyUVSwPNClXDx9hh7EqqhaYe/LyepTFaB9atcueesKbqH5O2F24sEDAz7lFYEouKPLk36kyORT11WD47EfGwEbGJFCIaRKutBlcY9YYzdi/306cKsHvX5wZacminBGlvOhfkZ/07F60ShP3floIFgkYAKttHjM4oirXpGpYxI4Yz5oaH9wDQfcNfFMQty/FyAQ0Yvy3Sr8xCouWNK7tKJdo/2vCQFvAy9zg9MGsZx+e7y7PNmkPasen6Uu/yzl3MCPp2hyBcjjP5Pnz7O6Qw97D6T7vLybpr5W9OHumAB1ZoW3cFX7kOFHlp1114u3D1QX55Y7rWpAz7F+ZWSsf5K3DtMwKdQ8RBhL3gUFhvLSbpdvH/01VM5+2h9xrgL2j4+6SDwNUFHgYraSMKdsQJFYa3J2rrbF0phqBIqp9aKPk5DLPkVqxfd7JkGEUlng9Sn8Pk7VvJqvjLsxta8yhMtv9dhr7CA8tr57oQ2YTEf5rErshmTSPU5JLDW5KpJcbII8C6bC9QEIydpd3VtXnu9+AsFbmHWFNtmkuv4y+BvZXG7XR0Eu6n5C/biKw== oasis2@MBP-6"
 
 #EKS Version
 cluster_version = "1.13"
