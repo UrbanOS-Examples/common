@@ -34,7 +34,7 @@ data "terraform_remote_state" "durable" {
 resource "random_pet" "this_exists_to_download_random_plugin_if_terraform_cache_is_removed" {}
 
 resource "aws_key_pair" "cloud_key" {
-  key_name   = "${terraform.workspace}_env_cloud_key_20190121"
+  key_name   = "${terraform.workspace}_env_cloud_key_20200121"
   public_key = "${var.key_pair_public_key}"
 }
 
