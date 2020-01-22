@@ -211,3 +211,7 @@ output "nat_public_ips" {
 variable "key_pair_public_key" {
   description = "The public key used to create a key pair"
 }
+
+variable "key_pair_name" {
+  description = "The name of the keypair.  This must be changed to roll the keys"
+}
