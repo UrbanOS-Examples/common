@@ -3,18 +3,16 @@
 # if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = ["eks-cluster",
-                    "joomla",
-                    "lime_db",
-                    "cloudwatch_monitoring",
-                    "redis",
-                    "ses",
-                   ]
+  "joomla",
+  "lime_db",
+  "cloudwatch_monitoring",
+  "redis",
+  "ses",
+]
 
 vpc_name = "test"
 
 role_arn = "arn:aws:iam::647770347641:role/jenkins_role"
-
-key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC9+lmPon1iXDTxgFlihcrqv3Ugkq/M1SyMrZF/JIcJB6h6j9GS/93sBYLhl60i8DZeymQWd3H65eG46T8gFXC05aRg0OPLiTjDoJFirWpQuefM4zNl3UAWbSmD6ltjEQyXlErqvDEz8RjqSSWP19fKjnAZVdZWmXHQRd2MrxI2MvGnXrH2piVzJWyXNWXMNs7wWyttlD0so1oGOyRVV5kKKYzDOmlDy37xf/6GqgI50BnoDPyn4QwhTtt1DhMJTsadn0wWiqTcMYAA083z9eyiTEUU/KiOIaWghV7gwg4EpcS7tNd2aybv8OuJwUPP4LmVYF1F/sKkvE4EhLpF3/JWhHA9iE03YP5xnYIeisa+HIxpiBLGlguIyRCwUKRuXyxXeS8w57hWDryfjFm9+tUvIXqBtS0W5lc0Jkw4rozvPsR6+XgylVMYzf/LTNJR4pJqMEJKsQd4M/b96eIpsghJZZ1BA47FoUvqyq1qPp1DlF9Uyff38MAgb4OM7LulyS9fwdJgt+BMlPgAUryECdq++OH5KfL3nVxU/O8/1lQJw2Za8+3qZrd8GMIgmIs6wQMQWMGcPDYzqYnxdHZWEHsmH3dnSS9KJEnvX8htr2Oh0EYJlsu3SWlMBeK03e533w38LCJdZjXbOUh/m/pSdOlHiP/bZKY9S3GTdTyOMUwBJQ== oasis2@MBP-6"
 
 vpc_cidr = "10.180.0.0/16"
 
@@ -26,4 +24,9 @@ root_dns_zone = "staging-smartos.com"
 
 #Alarms
 alarms_slack_path = "/services/T7LRETX4G/BDE8Y9SQ3/Amboqt9U8R3IYQgxUlBPkSUY"
+
 alarms_slack_channel_name = "#pre_prod_alerts"
+
+key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCzjXXBkeSlA0T304GqMXdeSOYeCiMx5qoYvJEQg1LYbKAQjJSw0tmlIWfKtaf7Ym9gGFBhHApKV9FgcH+hmCfypM2gwD2cyP5MHw186U8hv0SWCQ1yQDkA94X3zeK3+8IDziSReM9f7csIcn/z1sJdphAKaGq1mowueItp7QW+wHt1Xe1l5J/szyDUKMsdcs0d8Ee57Jd4Pk6p8vkmP4yETBdNGnabYqVPYuDVdK2EklR2YzgIam+orYQItjoKAC6R/SH+/b7noWQyUrZrS6x57dcDgXu3r63wRykdme5Id0h+ayr+XdybQsrUoaVKEdvVZlC32XVgf5/A0zspCWbL3U0O3+SjyvazCfSQlBA2CEmSVkQLdWULfU6S9P5pt59qc4JOTufOZaabxXgOyVLK79gJOMyYWEERrC/HH6xzVRgVxcy7fpHk5bViKrSgWvYCzeBqfUxZv9OooWJeTRWI7htRnRt3uRo4MI9TApbqE+aOkrQldsL70W4ZYlRjdC4oVxPxTpT6TeoSoVXCfV3quyPgEh5a/1QPkyQvmoc8qFDaXtpAKM2vwMcz/eHCXEqFUioC4r4jxeNZVN+ltWPguL3JSR7VGZJp0LwEFHp2HDCwbIr69HShZe1FZ8zXygZgDhhVK2IXjl+vivVcR9pbwelpZtDWhrapDTxHIDePww== oasis2@MBP-6"
+
+key_pair_name = "eks_key_staging_20200122"

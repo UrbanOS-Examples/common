@@ -3,16 +3,14 @@
 # If you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = ["eks-cluster",
-                    "joomla",
-                    "lime_db",
-                    "cloudwatch_monitoring",
-                    "redis",
-                    "ses",
-                   ]
+  "joomla",
+  "lime_db",
+  "cloudwatch_monitoring",
+  "redis",
+  "ses",
+]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
-
-key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEzyFGkMRGxqkxLCnrinox4DXtHcnV3ei0OOCXjeomNm7hF7WNmgxmph4tFpNiObcOQEkc/etMriQ3MYTG4NC2w1pBuL63p8weN4lGqR8BnWJM3Q+ygNx0565wDSeiijocYaPlAZSXPIF6dwnpeGO5awY2KzF08b4StkAV5BCV4UJRgW2yfTi5c7DPHtwttSn9gu98Qhv6SRQs6+2f2hN4iSnDtefMVE8oEJXmnybUly9hIxlgfALL+LivmYHi5sOUhXzgNk9vYtI5/V6rKiw7+JxhjJEJ8l0TkVd64evX1UTRa3EO2tDyWahya+v32B/aFoFDbjYkB/pLXsGYjmVnLRbJxdn59hNlZ9NxANHEki+CwO3adaE1g3ZypaDU5VAPYNv5bHFnuOEhQ5Wa5BD3AazzT+GPSrAQsp8T3uAfAS7tIeDjNvGvj82YfjmoabTODUshNqASnbuBFVAxviL1mt6Ca4wZXM4gQU0qRtNNMRNBrJl6DROw++ze2owfZJ+lcAHOPnXhLLa8D3sAqKZkfJS8tqHLVJ+Q3hqbSdDXyAty2WOO6T52usWZMvEgZfRK/Kx9KMdSItdEU9YmN+IricxdI1VPoYpnY7SuN+7TnsUVWJHMly0pin9P10Ztt7jmkPxl0EWYBLDzy8LhWTGWVGIO1Ul444j0gLc+yNJ9hQ== oasis2@MBP-6"
 
 vpc_cidr = "10.100.0.0/16"
 
@@ -24,7 +22,12 @@ root_dns_zone = "dev-smartos.com"
 
 #Alarms
 alarms_slack_path = "/services/T7LRETX4G/BDE8Y9SQ3/Amboqt9U8R3IYQgxUlBPkSUY"
+
 alarms_slack_channel_name = "#pre_prod_alerts"
 
 #Joomla
 joomla_db_instance_class = "db.t3.small"
+
+key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCfqCqT/eWD0FaguKXYdtjayETz7v8hQQTBaJdHDOGWKM0e3rYx4E4D6oaj4e2QEKUrxJWOvISe81AACEKhLVVIbffgobKV1ymTJ1QnsF/cQkI3rK7mu9H/vVf3Mdw331e/c8wQARkIPtjpB17/sTI15zULZKd34xH57NLr7chUPMT842WxgWK6+lYaAfnVyVbJVNXL6lrCqgJY0gGDN+ZENKxG5gtQmaPtBlF3O9ccKrCpn94RMh8Bax6YFCa2PbaAbZiSGmemlghsu1cpm4SZ6RCH7Z3EVSCLlsPdM8jY+cDOzXX45VgwfJ44YdVXBRz9oS4Xr8tsjXbiv145zrb1bpuMVW0/faBHDFckWLgigvVLutrHYldgOh6MLGfR6/BsjHOMdMWmJMJP/fzs5LNmbB7mmtautZiLMHNydwmMe01zlhgCijguWwF682Qf1d4NuMhq2ocJ6rsXmEdakSYgQd8qNPiUjqh+DjCBxHvfZ+NO8/BrU7Z+sAvltYL7zb5v7DSJ7Gfb/Itr10rP1e9u7ZulFNmq8muSsArFOL3FRzLa+TqcI81jVfwMc8H62XBof2py+1W6ZlUXPKiieNfjUE6SukiQgotKpRFgQPpJljAnbbEcaMTv0AxUVFfY8YGhBJ6bI+/ppTII3gRvJ8tnzfOF/A+XLkIIYsXT3ERFyQ== oasis2@MBP-6"
+
+key_pair_name = "eks_key_dev_20200122"
