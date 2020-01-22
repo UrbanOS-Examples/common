@@ -27,12 +27,12 @@ module "eks-cluster" {
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
-      name               = "Jupyterhub-Workers"
+      name               = "Worker-Group-Two-Workers"
       asg_min_size       = "0"
       asg_max_size       = "0"
       instance_type      = "t2.medium"
       key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "--register-with-taints=scos.run.jupyterhub=true:NoExecute --node-labels=scos.run.jupyterhub=true ${var.kubelet_security_args}"
+      kubelet_extra_args = "--register-with-taints=scos.run.group-two=true:NoExecute --node-labels=scos.run.group-two=true ${var.kubelet_security_args}"
       pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
