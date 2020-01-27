@@ -10,7 +10,7 @@ if [ -z $1 ]; then
     exit 1
 fi
 
-for environment in "sandbox" "dev" "staging" # "prod"
+for environment in "sandbox" "dev" "staging" #"prod"
 do
     echo creating key for $environment
     password=$(openssl rand 18 -base64)
@@ -25,14 +25,14 @@ do
     aws secretsmanager create-secret --name eks_${environment}_private_key_${date} --secret-string "$(cat ./eks_${environment}_id_rsa_${date})" --region us-east-2
 
     # delete the old keyname and public key string 
-    sed -i ''  "/key_pair_public_key.*/d" ./variables/$environment.tfvars
-    sed -i ''  "/key_pair_name.*/d" ./variables/$environment.tfvars
+    sed -i ''  "/key_pair_public_key.*/d" ${git_root}/variables/$environment.tfvars
+    sed -i ''  "/key_pair_name.*/d" ${git_root}/variables/$environment.tfvars
 
     #append new values to tfvars file
     echo "key_pair_public_key = \"$(cat ./eks_${environment}_id_rsa_${date}.pub | tr -d '\n')\"" >> ${git_root}/variables/${environment}.tfvars        
     echo "key_pair_name = \"eks_key_${environment}_${date}\"" >> ${git_root}/variables/${environment}.tfvars
     
-    terraform fmt variables/${environment}.tfvars
+    terraform fmt ${git_root}/variables/${environment}.tfvars
     rm eks_${environment}_*
 done
 
