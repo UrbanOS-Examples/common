@@ -10,7 +10,16 @@ if [ -z $1 ]; then
     exit 1
 fi
 
-for environment in "sandbox" "dev" "staging" #"prod"
+for environment in "sandbox" "dev" "staging" "prod"
+do
+    export AWS_PROFILE=${profile_prefix}_${environment}
+    if ! aws s3 ls 1>/dev/null 2>&1; then
+        echo 1>&2 "AWS profile named ${AWS_PROFILE} not found or setup incorrectly"
+        exit 1
+    fi
+done
+
+for environment in "sandbox" "dev" "staging" "prod"
 do
     echo creating key for $environment
     password=$(openssl rand 18 -base64)
