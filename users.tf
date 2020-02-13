@@ -83,3 +83,28 @@ resource "aws_iam_user_policy" "odo_user_rw" {
 }
 EOF
 }
+
+resource "aws_iam_user" "forklift_user" {
+  name = "${terraform.workspace}-forklift"
+}
+
+resource "aws_iam_user_policy" "forklift_user_rw" {
+  name = "read-write"
+  user = "${aws_iam_user.forklift_user.name}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1",
+      "Action": [
+        "s3:putObject"
+      ],
+      "Effect": "Allow",
+      "Resource": ["arn:aws:s3:::presto-hive-storage-${terraform.workspace}/*"]
+    }
+  ]
+}
+EOF
+}
