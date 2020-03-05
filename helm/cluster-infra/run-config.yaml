@@ -12,7 +12,7 @@ albIngress:
 
 externalDns:
   args:
-    source: [ingress]
+    source: [ingress, service]
     provider: [aws]
     policy: [upsert-only]
     aws-zone-type: [public]
