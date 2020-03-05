@@ -45,8 +45,9 @@ locals {
 
 variable "region" {
   description = "AWS Region"
-  default     = "us-west-2"
+  default     = "us-west-2" # If changing regions see comments below
 }
+# See here for details about AWS inspector package rules: https://docs.aws.amazon.com/inspector/latest/userguide/inspector_rules-arns.html
 
 variable "role_arn" {
   description = "The ARN for the assumed role into the environment to be changes (e.g. dev, test, prod)"

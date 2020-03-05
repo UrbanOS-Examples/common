@@ -70,11 +70,11 @@ variable "inspector_assessment_rules_package_arns" {
 }
 
 variable "inspector_assessment_duration" {
-  description = "Allowed duration of assessment"
+  description = "Allowed duration of assessment in seconds"
   default     = 3600
 }
 
 variable "inspector_assessment_schedule_expression" {
-  description = "Allowed duration of assessment"
-  default     = "cron(0 0 7 * ? *)"
+  description = "Inspector assessment schedule"
+  default     = "cron(0 0 15 * ? *)"
 }
