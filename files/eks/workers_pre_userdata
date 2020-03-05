@@ -162,7 +162,7 @@ Ciphers aes128-ctr,aes192-ctr,aes256-ctr
 
 LogLevel VERBOSE
 ClientAliveInterval 300
-ClientAliveCountMax 0 
+ClientAliveCountMax 0
 LoginGraceTime 60
 PermitRootLogin no
 PermitUserEnvironment no
@@ -187,3 +187,8 @@ systemctl restart docker
 
 chmod 640 /etc/kubernetes/kubelet/kubelet-config.json
 chown root:root /etc/kubernetes/kubelet/kubelet-config.json
+
+curl -O https://inspector-agent.amazonaws.com/linux/latest/install
+sudo bash install
+sudo /opt/aws/awsagent/bin/awsagent status
+rm install

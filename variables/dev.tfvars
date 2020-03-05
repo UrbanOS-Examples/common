@@ -8,6 +8,7 @@ enabled_features = ["eks-cluster",
   "cloudwatch_monitoring",
   "redis",
   "ses",
+  "inspector_assessment"
 ]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
