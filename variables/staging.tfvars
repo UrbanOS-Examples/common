@@ -8,6 +8,7 @@ enabled_features = ["eks-cluster",
   "cloudwatch_monitoring",
   "redis",
   "ses",
+  "inspector_assessment"
 ]
 
 vpc_name = "test"
