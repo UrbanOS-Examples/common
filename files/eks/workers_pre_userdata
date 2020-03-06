@@ -188,7 +188,11 @@ systemctl restart docker
 chmod 640 /etc/kubernetes/kubelet/kubelet-config.json
 chown root:root /etc/kubernetes/kubelet/kubelet-config.json
 
-curl -O https://inspector-agent.amazonaws.com/linux/latest/install
-sudo bash install
-sudo /opt/aws/awsagent/bin/awsagent status
+STATUS=$(curl -O -s -w '%{http_code}' https://inspector-agent.amazonaws.com/linux/latest/install)
+if [ $STATUS -eq 200 ]; then
+  sudo bash install
+  sudo /opt/aws/awsagent/bin/awsagent status
+else
+  echo "ERROR: Unable to fetch inspector agent install script. Got $STATUS status."
+fi
 rm install
