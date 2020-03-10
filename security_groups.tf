@@ -4,12 +4,13 @@ resource "aws_security_group" "chatter" {
   vpc_id      = "${module.vpc.vpc_id}"
 
   tags = {
-    Name = "Egress and internal chatter"
+    Name = "Ingress and egress for EKS cluster nodes."
+    Description = "Security group for allowing non-EKS cluster resources to talk to the EKS cluster."
   }
 }
 
 resource "aws_security_group_rule" "chatter_egress_internet" {
-  description       = "Allow nodes to egress to the Internet."
+  description       = "Allow nodes to egress to anywhere."
   protocol          = "-1"
   security_group_id = "${aws_security_group.chatter.id}"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -18,21 +19,12 @@ resource "aws_security_group_rule" "chatter_egress_internet" {
   type              = "egress"
 }
 
-resource "aws_security_group_rule" "chatter_ingress_self" {
-  description              = "Allow nodes to communicate with each other."
-  protocol                 = "-1"
-  security_group_id        = "${aws_security_group.chatter.id}"
-  source_security_group_id = "${aws_security_group.chatter.id}"
-  from_port                = 0
-  to_port                  = 65535
+resource "aws_security_group_rule" "allow_all_sg_to_eks_worker_sg_node_ports" {
+  description              = "Allow load balancer resources to talk to services in the NodePort range."
   type                     = "ingress"
-}
-
-resource "aws_security_group_rule" "allow_all_sg_to_eks_worker_sg" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
+  from_port                = 30000
+  to_port                  = 32767
+  protocol                 = "tcp"
   security_group_id        = "${aws_security_group.chatter.id}"
   source_security_group_id = "${aws_security_group.allow_all.id}"
 }
@@ -42,7 +34,13 @@ resource "aws_security_group" "allow_all" {
   description = "Allow all inbound traffic"
   vpc_id      = "${module.vpc.vpc_id}"
 
+  tags = {
+    Name = "Ingress and egress for load balancers."
+    Description = "Security group for allowing external and internal networks to talk to load balancers."
+  }
+
   ingress {
+    description = "Allow any network to talk to load balancer via HTTP."
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -50,6 +48,7 @@ resource "aws_security_group" "allow_all" {
   }
 
   ingress {
+    description = "Allow any network to talk to load balancer via HTTPS."
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -57,34 +56,7 @@ resource "aws_security_group" "allow_all" {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_security_group" "os_servers" {
-  name   = "OS Servers"
-  vpc_id = "${module.vpc.vpc_id}"
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    self        = true
-    description = "Allow traffic from self"
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
-    description = "Allow all traffic from admin VPC"
-  }
-
-  egress {
+    description = "Allow nodes to egress to anywhere."
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -95,10 +67,6 @@ resource "aws_security_group" "os_servers" {
 output "allow_all_security_group" {
   description = "Security group id to allow all traffic to access albs"
   value       = "${aws_security_group.allow_all.id}"
-}
-
-output "os_servers_sg_id" {
-  value = "${aws_security_group.os_servers.id}"
 }
 
 output "chatter_sg_id" {
