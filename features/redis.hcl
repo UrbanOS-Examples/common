@@ -26,7 +26,7 @@ resource "aws_security_group" "redis" {
 
 resource "aws_security_group_rule" "eks_workers_to_redis" {
   description              = "Allow worker nodes to communicate with redis"
-  protocol                 = "-1"
+  protocol                 = "tcp"
   security_group_id        = "${aws_security_group.redis.id}"
   source_security_group_id = "${aws_security_group.chatter.id}"
   from_port                = 6379
