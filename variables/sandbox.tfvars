@@ -3,7 +3,7 @@
 # if you change the list of enabled features, or if you switch to a different environment
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = [
-  "eks-cluster"
+  "eks-cluster",
 ]
 
 alm_account_id = "068920858268"
@@ -37,6 +37,6 @@ root_dns_zone = "sandbox-smartos.com"
 
 is_sandbox = true # Leave this true
 
-key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDWRogUKlMCf+T/NOvlZZIIRbcAlAkpTA9QQkE3sho31EBMQKM681CxOBSYse9NH6MLsh70097WjR5kTV4AmcxRK3sO2Ez6GX0dYEf3TFokjrQ5nHX+7RUplD4yOq1ISbZux9SwMG+ktnYt/ZH3OO+78BjmN4CGQARZdrodpX6XtJ5asH6+F9U2JnIofCUiCmkZF+4n5/1HKyw3ytDNsJENbEyGlByESxTTvqWc8N8pyTqBRkdqkViybDYyJcT2nqJi5EtgckuA2D8cdBI6BMSzdWbC6R92mMPDgc+5hOW14V8dTwvTgajvxoVlFPbD95sqGXnF0GxSyym/VHltbfpX3hcBUkl1eF6ChjmKCGxhZsM2ILQNGNVgKHX1zy0mslxpw2sN/Za0D4Dsc0ao4J+2W/r3mO1Mp7wtJzK2sAmMNgxz5wpOnfmxAyUPB8l9kAhq6tl11Xrj1hJMMFsI4/HwW81PVEWHCv3AS0YAR1dhb1I5rjaaqqcQQysSGK/PRURjCwgUOYujqoFRNTjZYczuGBtRBSitt/ntldco9PjI9IbbsW6m4Ai6LBxVkgqRo4lkV87qyXMJ95Pa2G0LlS4IN+MDTPNib1M2ENxXzW7ueZCatOFSJU1we8tBS2kC4wiDLiAFOIvCxKlSgna3icjJhYwtglV0mI387/1rrt1p+w== oasis@SmartCity01.local"
+key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCrnk5HU0rn3fe5MksDs+cz7zxl9+xbzOVNz+Rl1AjTRC58xm1zatkrUjtraQY2A/0zRvfTalSdheAhxXgf8IcKMsbytrInyqkIz1kOnciAuF/RanHyoYxaQE/N/klbjcJPLeglm+s8pXIVBwsTIe4B+sjwkkLEoiVhrVllj7z4XsptE8ko1+nGJFVY0GM27AKtt+TZvRTcj3/2d6BiUs0QLD4No11VsAP41l4FxE7ywtZWDY3S3H/Ii+/d7Z9Z8abmwwLEPeNnDQ1BP7a1RCCfKGR5Crlbo6n6oIREyT8cHGvfsZVkgjjIF43Zj5L6mQBra20vVWt1Wf9a3AQZVWxLkRmicuqakodKdp8Liuj569u6MH//vnXQ0XXDfyyKgsigIw6NHBJkY0jRZakE9/fM+a4BOLxx5IK9q+CaIlPIaNno6DEHi+k8vG69nDI39n1UJfcjfiZdeZ7PX/McgxxNR7yZuiUqtflaWx9S8rxcz04eJbkDQFuabGTZsCmgtcauENEFBtISiYVEUaBbS7uywLdt6FlASHoYyFvO/xIpPdB2VUZo6ARA0P5I5K96k4UrkT02L09/I3hD/LbC+T73RMCLmPptiumxrkuL91ZmWhkZseguybfZJJe3ZrdpGnt94/fB+odbrkEt2UsATBEHB1dBdwQy5UT1/QL3ho48LQ== jarred.olson@AMAC02XR4Z3JG5M"
 
-key_pair_name = "eks_key_sandbox_20200224"
+key_pair_name = "eks_key_sandbox_2020_03_23"
