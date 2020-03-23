@@ -2,7 +2,7 @@
 set -eo pipefail
 
 git_root=$(git rev-parse --show-toplevel)
-date=$(date +"%Y%m%d")
+date=$(date +"%Y_%m_%d")
 profile_prefix=$1
 
 if [ -z $1 ]; then
