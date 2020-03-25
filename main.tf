@@ -63,6 +63,11 @@ variable "is_sandbox" {
   default     = false
 }
 
+variable "force_destroy_s3_bucket" {
+  description = "A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
+  default       = false
+}
+
 output "key_pair_name" {
   description = "Name of the keypair to use for env deployments"
   value       = "${aws_key_pair.cloud_key.key_name}"

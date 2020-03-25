@@ -1,5 +1,5 @@
 module "joomla_db" {
-  source                   = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.0.3"
+  source                   = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.0.4"
   identifier               = "${terraform.workspace}-joomla"
   prefix                   = "${terraform.workspace}-joomla"
   database_name            = "joomla"
@@ -13,7 +13,7 @@ module "joomla_db" {
 resource "aws_s3_bucket" "joomla-backups" {
   bucket        = "${terraform.workspace}-os-joomla-backups"
   acl           = "private"
-  force_destroy = true
+  force_destroy = "${var.force_destroy_s3_bucket}"
 
   lifecycle_rule {
     enabled = true
