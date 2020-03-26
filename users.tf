@@ -52,6 +52,18 @@ resource "aws_iam_user_policy" "reaper_user_ro" {
       ],
       "Effect": "Allow",
       "Resource": ["${aws_s3_bucket.os_hosted_datasets.arn}/*"]
+    },
+    {
+      "Sid": "Stmt3",
+      "Action": [
+        "s3:Get*",
+        "s3:List*"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:s3:::*/*",
+        "arn:aws:s3:::*"
+        ]
     }
   ]
 }
