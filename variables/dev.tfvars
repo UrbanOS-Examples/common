@@ -9,6 +9,7 @@ enabled_features = ["eks-cluster",
   "redis",
   "ses",
   "inspector_assessment",
+  "data_science_stack",
 ]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"
