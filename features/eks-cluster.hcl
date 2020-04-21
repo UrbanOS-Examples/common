@@ -221,6 +221,13 @@ data "external" "helm_file_change_check" {
   ]
 }
 
+data "external" "helm_file_change_check_external_services" {
+  program = [
+    "${path.module}/files/scripts/helm_file_change_check.sh",
+    "${path.module}/helm/external-services",
+  ]
+}
+
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   role       = "${module.eks-cluster.worker_iam_role_name}"
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"

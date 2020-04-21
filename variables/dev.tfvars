@@ -10,6 +10,7 @@ enabled_features = ["eks-cluster",
   "ses",
   "inspector_assessment",
   "data_science_stack",
+  "elasticsearch",
 ]
 
 role_arn = "arn:aws:iam::073132350570:role/jenkins_role"

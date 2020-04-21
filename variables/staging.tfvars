@@ -9,6 +9,7 @@ enabled_features = ["eks-cluster",
   "redis",
   "ses",
   "inspector_assessment",
+  "elasticsearch",
 ]
 
 vpc_name = "test"

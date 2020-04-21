@@ -40,31 +40,26 @@ resource "aws_elasticache_subnet_group" "redis_cache_subnet" {
 }
 
 resource "null_resource" "redis_external_service" {
-  depends_on = ["data.external.helm_file_change_check_redis", "null_resource.eks_infrastructure"]
+  depends_on = ["data.external.helm_file_change_check_external_services", "null_resource.eks_infrastructure"]
 
   provisioner "local-exec" {
     command = <<EOF
 set -e
 export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
 
+# this is called common for backwards compatibility, but it is just redis
 helm upgrade --install common-external-services ${path.module}/helm/external-services \
     --namespace=external-services \
-    --set redis.host="${lookup(aws_elasticache_cluster.redis.cache_nodes[0], "address")}"
+    --set name="redis" \
+    --set host="${lookup(aws_elasticache_cluster.redis.cache_nodes[0], "address")}"
 
 EOF
   }
 
   triggers {
-    helm_file_change_check = "${data.external.helm_file_change_check_redis.result.md5_result}"
+    helm_file_change_check = "${data.external.helm_file_change_check_external_services.result.md5_result}"
     redis_host             = "${lookup(aws_elasticache_cluster.redis.cache_nodes[0], "address")}"
   }
-}
-
-data "external" "helm_file_change_check_redis" {
-  program = [
-    "${path.module}/files/scripts/helm_file_change_check.sh",
-    "${path.module}/helm/external-services",
-  ]
 }
 
 variable "redis_node_type" {
