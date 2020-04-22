@@ -1,2 +1,2 @@
-name: "a name for the external service"
-host: "a host/ip to map to"
+redis:
+  host:

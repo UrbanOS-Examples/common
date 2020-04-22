@@ -5,7 +5,7 @@ variable "elasticsearch_instance_type" {
 
 variable "elasticsearch_instance_count" {
   description = "The number of the ElasticSearch instances in the cluster"
-  default     = 3
+  default     = 2
 }
 
 variable "elasticsearch_dedicated_master_enabled" {
@@ -20,7 +20,7 @@ variable "elasticsearch_dedicated_master_type" {
 
 variable "elasticsearch_dedicated_master_count" {
   description = "The number of the ElasticSearch master instances (if enabled) in the cluster"
-  default     = 3
+  default     = 2
 }
 
 variable "elasticsearch_zone_awareness_enabled" {
@@ -92,7 +92,7 @@ resource "aws_elasticsearch_domain" "elasticsearch" {
 
   vpc_options {
     # there are 6 total private subnets and this one includes only the main 3
-    subnet_ids = ["${local.private_subnets}"]
+    subnet_ids = ["${slice(local.private_subnets, 0, var.elasticsearch_instance_count)}"]
 
     security_group_ids = ["${aws_security_group.elasticsearch.id}"]
   }
@@ -178,28 +178,6 @@ resource "aws_security_group_rule" "elasticsearch_egress" {
   from_port         = 0
   to_port           = 0
   type              = "egress"
-}
-
-resource "null_resource" "elasticsearch_external_service" {
-  depends_on = ["data.external.helm_file_change_check_external_services", "null_resource.eks_infrastructure"]
-
-  provisioner "local-exec" {
-    command = <<EOF
-set -e
-export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
-
-helm upgrade --install elasticsearch-external-service ${path.module}/helm/external-services \
-    --namespace=external-services \
-    --set name="elasticsearch" \
-    --set host="${aws_elasticsearch_domain.elasticsearch.endpoint}"
-
-EOF
-  }
-
-  triggers {
-    helm_file_change_check = "${data.external.helm_file_change_check_external_services.result.md5_result}"
-    es_host                = "${aws_elasticsearch_domain.elasticsearch.endpoint}"
-  }
 }
 
 output "elasticsearch_endpoint" {
