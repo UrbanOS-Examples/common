@@ -4,6 +4,7 @@
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = [
   "eks-cluster",
+  "redis"
 ]
 
 alm_account_id = "068920858268"
@@ -15,15 +16,15 @@ role_arn = "arn:aws:iam::068920858268:role/admin_role"
 alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
 #EKS Version
-cluster_version = "1.13"
+cluster_version = "1.14"
 
-#EKS Workers
-min_num_of_workers = 1
+#EKS Workers  
+min_num_of_workers = 3
 
 k8s_instance_size = "t3.medium"
 
 #Kafka EKS Workers
-min_num_of_kafka_workers = 1
+min_num_of_kafka_workers = 3
 
 max_num_of_kafka_workers = 3
 
