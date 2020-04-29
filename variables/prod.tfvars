@@ -9,6 +9,7 @@ enabled_features = ["eks-cluster",
   "redis",
   "ses",
   "inspector_assessment",
+  "data_science_stack",
   "elasticsearch",
 ]
 
