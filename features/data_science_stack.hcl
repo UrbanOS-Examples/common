@@ -57,7 +57,7 @@ resource "aws_s3_bucket_public_access_block" "parking_prediction" {
 }
 
 resource "aws_s3_bucket_policy" "parking_prediction" {
-  bucket = "${aws_s3_bucket.ckan.id}"
+  bucket = "${aws_s3_bucket.parking_prediction.id}"
 
   policy = <<POLICY
 {
