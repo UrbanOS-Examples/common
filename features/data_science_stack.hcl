@@ -33,3 +33,82 @@ resource "aws_security_group" "database_vpn_access" {
     cidr_blocks = ["10.0.0.0/16"]
   }
 }
+resource "aws_s3_bucket" "parking_prediction" {
+  bucket        = "${terraform.workspace}-parking-prediction"
+  acl           = "private"
+  force_destroy = "${var.force_destroy_s3_bucket}"
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "parking_prediction" {
+  bucket = "${aws_s3_bucket.parking_prediction.id}"
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "parking_prediction" {
+  bucket = "${aws_s3_bucket.ckan.id}"
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowSSLRequestsOnly",
+      "Action": "s3:*",
+      "Effect": "Deny",
+      "Resource": "${aws_s3_bucket.parking_prediction.arn}",
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      },
+      "Principal": "*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_iam_user" "parking_prediction_api" {
+  name = "${terraform.workspace}-parking-prediction-api"
+}
+
+resource "aws_iam_user_policy" "parking_prediction_api_ro" {
+  name = "read"
+  user = "${aws_iam_user.parking_prediction_api.name}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Effect": "Allow",
+      "Resource": "${aws_s3_bucket.parking_prediction.arn}"
+    },
+    {
+      "Sid": "Stmt2",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": ["${aws_s3_bucket.parking_prediction.arn}/*"]
+    }
+  ]
+}
+EOF
+}
