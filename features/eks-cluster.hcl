@@ -228,7 +228,7 @@ resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
 
 variable "cluster_version" {
   description = "The version of k8s at which to install the cluster"
-  default     = "1.14"
+  default     = "1.15"
 }
 
 variable "eks_ami_version" {
