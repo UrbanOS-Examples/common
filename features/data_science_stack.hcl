@@ -96,3 +96,18 @@ resource "aws_iam_user_policy" "parking_prediction_api_ro" {
 }
 EOF
 }
+
+output "data_science_db_server" {
+  description = "Data Science MSSQL server url"
+  value       = "${module.parking_prediction_database.address}"
+}
+
+output "data_science_db_secret_id" {
+  description = "Data Science MSSQL server secret"
+  value = "${module.parking_prediction_database.password_secret_id}"
+}
+
+output "data_science_db_username" {
+  description = "Data Science MSSQL username"
+  value = "${module.parking_prediction_database.address}"
+}
