@@ -109,5 +109,5 @@ output "data_science_db_secret_id" {
 
 output "data_science_db_username" {
   description = "Data Science MSSQL username"
-  value = "${module.parking_prediction_database.address}"
+  value = "${module.parking_prediction_database.username}"
 }
