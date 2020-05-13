@@ -68,6 +68,10 @@ resource "aws_iam_user" "parking_prediction_api" {
   name = "${terraform.workspace}-parking-prediction-api"
 }
 
+resource "aws_iam_user" "parking_prediction_train" {
+  name = "${terraform.workspace}-parking-prediction-train"
+}
+
 resource "aws_iam_user_policy" "parking_prediction_api_ro" {
   name = "read"
   user = "${aws_iam_user.parking_prediction_api.name}"
@@ -88,6 +92,37 @@ resource "aws_iam_user_policy" "parking_prediction_api_ro" {
       "Sid": "Stmt2",
       "Action": [
         "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": ["${aws_s3_bucket.parking_prediction.arn}/*"]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_user_policy" "parking_prediction_train" {
+  name = "read"
+  user = "${aws_iam_user.parking_prediction_train.name}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Effect": "Allow",
+      "Resource": "${aws_s3_bucket.parking_prediction.arn}"
+    },
+    {
+      "Sid": "Stmt2",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject"
       ],
       "Effect": "Allow",
       "Resource": ["${aws_s3_bucket.parking_prediction.arn}/*"]
