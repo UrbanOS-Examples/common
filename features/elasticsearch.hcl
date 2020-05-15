@@ -48,8 +48,6 @@ variable "elasticsearch_ebs_volume_size" {
   default     = 10
 }
 
-data "aws_caller_identity" "current" {}
-
 resource "aws_elasticsearch_domain" "elasticsearch" {
   domain_name           = "elasticsearch-${terraform.workspace}"
   elasticsearch_version = "${var.elasticsearch_version}"
