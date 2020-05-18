@@ -31,6 +31,8 @@ data "terraform_remote_state" "durable" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 resource "random_pet" "this_exists_to_download_random_plugin_if_terraform_cache_is_removed" {}
 
 resource "aws_key_pair" "cloud_key" {
