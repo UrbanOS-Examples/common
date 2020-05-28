@@ -10,7 +10,7 @@ exports.handler = function(message, context) {
     
     var event = toCommonEvent(message);
     
-    console.log(LEVELS[event.severity], event.source, event.title, event.description);
+    console.log(event.source, event.title, event.description);
 
     var postData = toSlackPost(event);
 

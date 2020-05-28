@@ -68,6 +68,7 @@ resource "aws_lambda_function" "alert_handler_lambda" {
     variables {
       SLACK_PATH         = "${var.alarms_slack_path}"
       SLACK_CHANNEL_NAME = "${var.alarms_slack_channel_name}"
+      ACCOUNT            = "scos-${terraform.workspace}"
     }
   }
 }
@@ -88,6 +89,26 @@ resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
   topic_arn = "${aws_sns_topic.alert_handler_sns_topic.arn}"
   protocol  = "lambda"
   endpoint  = "${aws_lambda_function.alert_handler_lambda.arn}"
+}
+
+//---------EVENTS---------//
+resource "aws_cloudwatch_event_rule" "guardduty" {
+  name        = "${terraform.workspace}-guardduty"
+  description = "Capture whenever a GuardDuty event is seen"
+
+  event_pattern = <<PATTERN
+{
+  "source": [
+    "aws.guardduty"
+  ]
+}
+PATTERN
+}
+
+resource "aws_cloudwatch_event_target" "guardduty_to_sns" {
+  rule      = "${aws_cloudwatch_event_rule.guardduty.name}"
+  target_id = "GuardDutyToSNS"
+  arn       = "${aws_sns_topic.alert_handler_sns_topic.arn}"
 }
 
 //---------ALARMS---------//
