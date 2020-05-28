@@ -1,93 +1,8 @@
-data "archive_file" "alert_handler_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/files/cloudwatch_monitoring/lambda/alert_handler"
-  output_path = "lambda_alert_handler.zip"
-}
+module "monitoring" {
+  source = "git@github.com:SmartColumbusOS/scos-tf-monitoring.git?ref=1.0.1"
 
-resource "aws_iam_policy" "alert_handler_iam_policy" {
-  name = "${terraform.workspace}_lambda_alert_handler_policy"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [ {
-    "Effect": "Allow",
-    "Action": "logs:CreateLogGroup",
-    "Resource": "arn:aws:logs:*:*:*"
-  }, {
-    "Effect": "Allow",
-    "Action": [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ],
-    "Resource": "arn:aws:logs:*:*:*:*"
-  }, {
-    "Effect": "Allow",
-    "Action": "sns:Publish",
-    "Resource": "arn:aws:sns:*:*:*"
-  } ]
-}
-EOF
-}
-
-resource "aws_iam_role" "alert_handler_iam_role" {
-  name = "${terraform.workspace}_lambda_alert_handler_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "alert_handler_iam_rolepolicy_attachment" {
-  role       = "${aws_iam_role.alert_handler_iam_role.name}"
-  policy_arn = "${aws_iam_policy.alert_handler_iam_policy.arn}"
-}
-
-resource "aws_lambda_function" "alert_handler_lambda" {
-  filename         = "lambda_alert_handler.zip"
-  source_code_hash = "${data.archive_file.alert_handler_zip.output_base64sha256}"
-  function_name    = "${terraform.workspace}_alert_handler"
-  role             = "${aws_iam_role.alert_handler_iam_role.arn}"
-  description      = "An Amazon SNS trigger that sends CloudWatch alarm notifications to Slack."
-  handler          = "index.handler"
-  runtime          = "nodejs12.x"
-  timeout          = 30
-
-  environment {
-    variables {
-      SLACK_PATH         = "${var.alarms_slack_path}"
-      SLACK_CHANNEL_NAME = "${var.alarms_slack_channel_name}"
-    }
-  }
-}
-
-resource "aws_lambda_permission" "with_sns" {
-  statement_id  = "AllowExecutionFromSNS"
-  action        = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.alert_handler_lambda.function_name}"
-  principal     = "sns.amazonaws.com"
-  source_arn    = "${aws_sns_topic.alert_handler_sns_topic.arn}"
-}
-
-resource "aws_sns_topic" "alert_handler_sns_topic" {
-  name = "lambda_alert_topic"
-}
-
-resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
-  topic_arn = "${aws_sns_topic.alert_handler_sns_topic.arn}"
-  protocol  = "lambda"
-  endpoint  = "${aws_lambda_function.alert_handler_lambda.arn}"
+  alarms_slack_channel_name = "${var.alarms_slack_channel_name}"
+  alarms_slack_path         = "${var.alarms_slack_path}"
 }
 
 //---------ALARMS---------//
@@ -102,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "joomla_rds_free_storage_space_low" {
   period              = "300"
   statistic           = "Average"
   threshold           = "15000000000"
-  alarm_actions       = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  alarm_actions       = ["${module.monitoring.alert_handler_sns_topic_arn}"]
 
   dimensions {
     DBInstanceIdentifier = "${module.joomla_db.id}"
@@ -121,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "joomla_rds_high_cpu_util" {
   period              = "300"
   statistic           = "Average"
   threshold           = "90"
-  alarm_actions       = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  alarm_actions       = ["${module.monitoring.alert_handler_sns_topic_arn}"]
 
   dimensions {
     DBInstanceIdentifier = "${module.joomla_db.id}"
@@ -139,7 +54,7 @@ resource "aws_cloudwatch_metric_alarm" "watchintor_cota_streaming_consumer_open_
   period              = "120"
   statistic           = "Sum"
   threshold           = "1"
-  alarm_actions       = ["${aws_sns_topic.alert_handler_sns_topic.arn}"]
+  alarm_actions       = ["${module.monitoring.alert_handler_sns_topic_arn}"]
 
   dimensions {
     ApplicationName = "Cota-Streaming-Consumer"
@@ -151,12 +66,11 @@ resource "aws_cloudwatch_metric_alarm" "watchintor_cota_streaming_consumer_open_
 //-----------------------//
 
 variable "alarms_slack_path" {
-  description = "Path to the Slack channel"
-  default     = "/services/T7LRETX4G/BA0EW8W6R/vRbX198LKBkhAEK64OnHCUXH"
+  description = "Path to the Slack channel for monitoring alarms"
 }
 
 variable "alarms_slack_channel_name" {
-  description = "Name of the Slack channel"
+  description = "Name of the Slack channel for monitoring alarms"
 }
 
 variable "joomla_alarms_enabled" {
