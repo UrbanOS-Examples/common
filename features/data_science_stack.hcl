@@ -64,6 +64,44 @@ resource "aws_s3_bucket_policy" "parking_prediction" {
 POLICY
 }
 
+resource "aws_s3_bucket" "parking_prediction_public" {
+  bucket        = "${terraform.workspace}-parking-prediction-public"
+  acl           = "public-read"
+  force_destroy = "${var.force_destroy_s3_bucket}"
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "parking_prediction_public_ssl_policy" {
+  bucket = "${aws_s3_bucket.parking_prediction_public.id}"
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowSSLRequestsOnly",
+      "Action": "s3:*",
+      "Effect": "Deny",
+      "Resource": "${aws_s3_bucket.parking_prediction_public.arn}",
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      },
+      "Principal": "*"
+    }
+  ]
+}
+POLICY
+}
+
 resource "aws_iam_user" "parking_prediction_api" {
   name = "${terraform.workspace}-parking-prediction-api"
 }
@@ -125,7 +163,7 @@ resource "aws_iam_user_policy" "parking_prediction_train" {
         "s3:DeleteObject"
       ],
       "Effect": "Allow",
-      "Resource": ["${aws_s3_bucket.parking_prediction.arn}/*"]
+      "Resource": ["${aws_s3_bucket.parking_prediction.arn}/*", "${aws_s3_bucket.parking_prediction_public.arn}/*"]
     }
   ]
 }
