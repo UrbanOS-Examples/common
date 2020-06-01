@@ -65,6 +65,51 @@ resource "aws_cloudwatch_metric_alarm" "watchintor_cota_streaming_consumer_open_
 
 //-----------------------//
 
+//---------USERS---------//
+
+resource "aws_iam_user" "auth_zero_logger" {
+  name = "${terraform.workspace}-auth0-logger"
+}
+
+resource "aws_cloudwatch_log_group" "auth_zero" {
+  name              = "${terraform.workspace}-auth0"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_stream" "auth_zero" {
+  name = "${terraform.workspace}-auth0"
+  log_group_name = "${aws_cloudwatch_log_group.auth_zero.name}"
+}
+
+resource "aws_iam_user_policy" "auth_zero_logger" {
+  name = "put-and-describe-logs"
+  user = "${aws_iam_user.auth_zero_logger.name}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:PutLogEvents"
+      ],
+      "Resource": "${aws_cloudwatch_log_stream.auth_zero.arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": "${aws_cloudwatch_log_group.auth_zero.arn}"
+    }
+  ]
+}
+EOF
+}
+
+//-----------------------//
+
 variable "alarms_slack_path" {
   description = "Path to the Slack channel for monitoring alarms"
 }
