@@ -153,14 +153,15 @@ resource "aws_iam_user_policy" "parking_prediction_train" {
         "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.parking_prediction.arn}"
+      "Resource": ["${aws_s3_bucket.parking_prediction.arn}", "${aws_s3_bucket.parking_prediction_public.arn}"]
     },
     {
       "Sid": "Stmt2",
       "Action": [
         "s3:PutObject",
         "s3:GetObject",
-        "s3:DeleteObject"
+        "s3:DeleteObject",
+        "s3:PutObjectAcl"
       ],
       "Effect": "Allow",
       "Resource": ["${aws_s3_bucket.parking_prediction.arn}/*", "${aws_s3_bucket.parking_prediction_public.arn}/*"]
