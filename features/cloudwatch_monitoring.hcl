@@ -73,7 +73,7 @@ resource "aws_iam_user" "auth_zero_logger" {
 
 resource "aws_cloudwatch_log_group" "auth_zero" {
   name              = "${terraform.workspace}-auth0"
-  retention_in_days = 30
+  retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_stream" "auth_zero" {
