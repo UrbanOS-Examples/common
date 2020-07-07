@@ -226,6 +226,16 @@ resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
 }
 
+data "aws_eks_cluster" "eks_cluster" {
+  name = "${module.eks-cluster.cluster_id}"
+}
+
+resource "aws_iam_openid_connect_provider" "eks_cluster" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = []
+  url             = "${data.aws_eks_cluster.eks_cluster.identity.0.oidc.0.issuer}"
+}
+
 variable "cluster_version" {
   description = "The version of k8s at which to install the cluster"
   default     = "1.15"
@@ -290,4 +300,19 @@ output "eks_cluster_name" {
 output "eks_worker_role_arn" {
   description = "EKS Worker Role ARN"
   value       = "${module.eks-cluster.worker_iam_role_arn}"
+}
+
+output "eks_cluster_oidc_provider_url" {
+  description = "The OpendId Connect provider URL for the cluster"
+  value       = "${aws_iam_openid_connect_provider.eks_cluster.url}"
+}
+
+output "eks_cluster_oidc_provider_host" {
+  description = "The OpendId Connect provider host for the cluster"
+  value       = "${replace(aws_iam_openid_connect_provider.eks_cluster.url, "https://", "")}"
+}
+
+output "eks_cluster_oidc_provider_arn" {
+  description = "The OpendId Connect provider ARN for the cluster"
+  value       = "${aws_iam_openid_connect_provider.eks_cluster.arn}"
 }
