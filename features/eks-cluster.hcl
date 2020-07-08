@@ -230,9 +230,13 @@ data "aws_eks_cluster" "eks_cluster" {
   name = "${module.eks-cluster.cluster_id}"
 }
 
+data "external" "oidc_thumbprint" {
+  program = ["${path.module}/files/scripts/oidc_thumbprint.sh", "${var.region}"]
+}
+
 resource "aws_iam_openid_connect_provider" "eks_cluster" {
   client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = []
+  thumbprint_list = ["${data.external.oidc_thumbprint.result.thumbprint}"]
   url             = "${data.aws_eks_cluster.eks_cluster.identity.0.oidc.0.issuer}"
 }
 
