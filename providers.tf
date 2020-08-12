@@ -27,7 +27,7 @@ provider "external" {
 }
 
 provider "aws" {
-  version = "2.54"
+  version = "2.70.0"
   region  = "${var.region}"
 
   assume_role {
@@ -36,7 +36,7 @@ provider "aws" {
 }
 
 provider "aws" {
-  version = "2.54"
+  version = "2.70.0"
   alias   = "alm"
   region  = "${var.alm_region}"
 
