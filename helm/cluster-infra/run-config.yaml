@@ -6,7 +6,6 @@ albIngress:
     type: RollingUpdate
   args:
     ingress-class: alb
-    feature-gates: "wafv2=false"
   # extraEnv:
   #   AWS_REGION: ${AWS_REGION}
   #   CLUSTER_NAME: ${EKS_CLUSTER_NAME}

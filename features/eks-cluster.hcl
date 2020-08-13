@@ -140,6 +140,16 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
             "Resource": [
               "arn:aws:route53:::hostedzone/*"
             ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+              "wafv2:GetWebACL",
+              "wafv2:GetWebACLForResource",
+              "wafv2:AssociateWebACL",
+              "wafv2:DisassociateWebACL"
+            ],
+            "Resource": "*"
         }
     ]
 }
@@ -224,6 +234,154 @@ data "external" "helm_file_change_check" {
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   role       = "${module.eks-cluster.worker_iam_role_name}"
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
+}
+
+resource "aws_wafv2_web_acl" "eks_cluster" {
+  name        = "eks-cluster-web-acl-${terraform.workspace}"
+  description = "WAFv2 Web ACL available to all EKS based ALBs"
+  scope       = "REGIONAL"
+
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesAdminProtectionRuleSet"
+    priority = 0
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesAdminProtectionRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesAdminProtectionRuleSet"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesAmazonIpReputationList"
+    priority = 1
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesAmazonIpReputationList"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesAmazonIpReputationList"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesCommonRuleSet"
+    priority = 2
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesCommonRuleSet"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 3
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesLinuxRuleSet"
+    priority = 4
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesLinuxRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesLinuxRuleSet"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesPHPRuleSet"
+    priority = 5
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesPHPRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesPHPRuleSet"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "AWS-AWSWebACLEKSCluster"
+    sampled_requests_enabled   = false
+  }
 }
 
 data "aws_eks_cluster" "eks_cluster" {
@@ -319,4 +477,9 @@ output "eks_cluster_oidc_provider_host" {
 output "eks_cluster_oidc_provider_arn" {
   description = "The OpendId Connect provider ARN for the cluster"
   value       = "${aws_iam_openid_connect_provider.eks_cluster.arn}"
+}
+
+output "eks_cluster_waf_acl_arn" {
+  description = "The ARN for the EKS cluster's WAFv2 ACL ARN"
+  value       = "${aws_wafv2_web_acl.eks_cluster.arn}"
 }
