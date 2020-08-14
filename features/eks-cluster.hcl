@@ -249,10 +249,6 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
     name     = "AWS-AWSManagedRulesAdminProtectionRuleSet"
     priority = 0
 
-    override_action {
-      count {}
-    }
-
     statement {
       managed_rule_group_statement {
         name        = "AWSManagedRulesAdminProtectionRuleSet"
@@ -270,10 +266,6 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
   rule {
     name     = "AWS-AWSManagedRulesAmazonIpReputationList"
     priority = 1
-
-    override_action {
-      count {}
-    }
 
     statement {
       managed_rule_group_statement {
@@ -293,10 +285,6 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
     priority = 2
 
-    override_action {
-      count {}
-    }
-
     statement {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
@@ -314,10 +302,6 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
   rule {
     name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
     priority = 3
-
-    override_action {
-      count {}
-    }
 
     statement {
       managed_rule_group_statement {
@@ -337,10 +321,6 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
     name     = "AWS-AWSManagedRulesLinuxRuleSet"
     priority = 4
 
-    override_action {
-      count {}
-    }
-
     statement {
       managed_rule_group_statement {
         name        = "AWSManagedRulesLinuxRuleSet"
@@ -358,10 +338,6 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
   rule {
     name     = "AWS-AWSManagedRulesPHPRuleSet"
     priority = 5
-
-    override_action {
-      count {}
-    }
 
     statement {
       managed_rule_group_statement {
