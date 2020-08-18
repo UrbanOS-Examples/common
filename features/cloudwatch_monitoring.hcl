@@ -63,6 +63,28 @@ resource "aws_cloudwatch_metric_alarm" "watchintor_cota_streaming_consumer_open_
   treat_missing_data = "breaching"
 }
 
+resource "aws_cloudwatch_event_rule" "kms_cmk_rotation" {
+  name        = "${terraform.workspace}-kms-cmk-rotation"
+  description = "Capture whenever a KMS Customer Managed Key is rotated"
+
+  event_pattern = <<PATTERN
+{
+  "source": [
+    "aws.kms"
+  ],
+  "detail-type": [
+    "KMS CMK Rotation"
+  ]
+}
+PATTERN
+}
+
+resource "aws_cloudwatch_event_target" "kms_cmk_rotation_to_sns" {
+  rule      = "${aws_cloudwatch_event_rule.kms_cmk_rotation.name}"
+  target_id = "KmsCmkRotationToSNS"
+  arn       = "${module.monitoring.alert_handler_sns_topic_arn}"
+}
+
 //-----------------------//
 
 //---------USERS---------//

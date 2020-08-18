@@ -1,13 +1,15 @@
 module "lime_db" {
-  source = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.0.0"
+  source = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.4.0"
 
-  prefix = "${terraform.workspace}-lime"
-  name = "lime_survey"
-  type = "postgres"
-  attached_vpc_id = "${module.vpc.vpc_id}"
-  attached_subnet_ids = "${local.private_subnets}"
+  prefix        = "${terraform.workspace}-lime"
+  identifier    = "${terraform.workspace}-lime"
+  database_name = "lime_survey"
+  type          = "postgres"
+
+  attached_vpc_id          = "${module.vpc.vpc_id}"
+  attached_subnet_ids      = "${local.private_subnets}"
   attached_security_groups = ["${aws_security_group.chatter.id}"]
-  instance_class = "db.t2.small"
+  instance_class           = "db.t2.small"
 }
 
 output "lime_db_address" {
