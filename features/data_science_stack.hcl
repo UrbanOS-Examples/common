@@ -1,5 +1,5 @@
 module "parking_prediction_database" {
-  source = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.3.0"
+  source = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.4.0"
 
   identifier = "${terraform.workspace}-data-science-parking-prediction"
   prefix     = "${terraform.workspace}-data-science-parking-prediction"
