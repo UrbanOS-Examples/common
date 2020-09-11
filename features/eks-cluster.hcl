@@ -175,7 +175,7 @@ resource "null_resource" "eks_infrastructure" {
 set -e
 export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
 kubectl apply -f ${path.module}/k8s/tiller-role/
-kubectl apply -f ${path.module}/k8s/storage-class/
+kubectl patch sc gp2 --patch "$(cat ${path.module}/k8s/storage-class/patch-not-default.yaml)"
 helm init --service-account tiller
 
 LOOP_COUNT=10
