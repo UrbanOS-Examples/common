@@ -6,8 +6,9 @@ locals {
     "resource.instanceDetails.tags.value" = {"Eq" = ["${local.kubernetes_cluster_name}-Workers"]}
   }
 }
+
 module "security" {
-  source = "git@github.com:SmartColumbusOS/scos-tf-security.git?ref=1.3.1"
+  source = "git@github.com:SmartColumbusOS/scos-tf-security.git?ref=1.4.0"
 
   force_destroy_s3_bucket     = "${var.force_destroy_s3_bucket}"
   alert_handler_sns_topic_arn = "${module.monitoring.alert_handler_sns_topic_arn}"
@@ -20,4 +21,6 @@ module "security" {
       criterion = "${jsonencode(local.exclude_ingest_ports_for_eks_workers)}"
     }
   ]
+
+  vpc_id = "${module.vpc.vpc_id}"
 }
