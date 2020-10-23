@@ -1,5 +1,5 @@
 module "joomla_db" {
-  source                   = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.4.0"
+  source                   = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.4.2"
   identifier               = "${terraform.workspace}-joomla"
   prefix                   = "${terraform.workspace}-joomla"
   database_name            = "joomla"

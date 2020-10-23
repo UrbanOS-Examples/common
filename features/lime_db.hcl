@@ -1,5 +1,5 @@
 module "lime_db" {
-  source = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.4.0"
+  source = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.4.2"
 
   prefix        = "${terraform.workspace}-lime"
   identifier    = "${terraform.workspace}-lime"
