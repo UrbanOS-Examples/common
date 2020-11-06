@@ -1,10 +1,11 @@
-resource "aws_elasticache_cluster" "redis" {
-  cluster_id               = "redis-${terraform.workspace}"
+resource "aws_elasticache_replication_group" "redis" {
+  replication_group_id     = "redis-${terraform.workspace}"
+  replication_group_description = "Redis"
   engine                   = "redis"
   node_type                = "${var.redis_node_type}"
-  num_cache_nodes          = 1
+  number_cache_clusters       = 2
   parameter_group_name     = "default.redis5.0"
-  engine_version           = "5.0.0"
+  engine_version           = "5.0.6"
   port                     = 6379
   subnet_group_name        = "${aws_elasticache_subnet_group.redis_cache_subnet.name}"
   security_group_ids       = ["${aws_security_group.redis.id}"]
@@ -49,14 +50,14 @@ export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace
 
 helm upgrade --install common-external-services ${path.module}/helm/external-services \
     --namespace=external-services \
-    --set redis.host="${lookup(aws_elasticache_cluster.redis.cache_nodes[0], "address")}"
+    --set redis.host="${aws_elasticache_replication_group.redis.primary_endpoint_address}"
 
 EOF
   }
 
   triggers {
     helm_file_change_check = "${data.external.helm_file_change_check_redis.result.md5_result}"
-    redis_host             = "${lookup(aws_elasticache_cluster.redis.cache_nodes[0], "address")}"
+    redis_host             = "${aws_elasticache_replication_group.redis.primary_endpoint_address}"
   }
 }
 
