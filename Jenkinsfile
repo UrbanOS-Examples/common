@@ -7,7 +7,6 @@ library(
 
 properties(
     [
-        pipelineTriggers([scos.dailyBuildTrigger()]),
         disableConcurrentBuilds(),
         parameters([
             booleanParam(
