@@ -101,6 +101,36 @@ resource "aws_security_group_rule" "workers_ingress_cluster_https" {
   type                     = "ingress"
 }
 
+resource "aws_security_group_rule" "workers_ingress_cluster_dns_tcp" {
+  description              = "Allow pods to talk to the cluster dns via tcp."
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.workers.id}"
+  source_security_group_id = "${aws_security_group.workers.id}"
+  from_port                = 53
+  to_port                  = 53
+  type                     = "ingress"
+}
+
+resource "aws_security_group_rule" "workers_ingress_cluster_dns_udp" {
+  description              = "Allow pods to talk to the cluster dns via udp."
+  protocol                 = "udp"
+  security_group_id        = "${aws_security_group.workers.id}"
+  source_security_group_id = "${aws_security_group.workers.id}"
+  from_port                = 53
+  to_port                  = 53
+  type                     = "ingress"
+}
+
+resource "aws_security_group_rule" "workers_ingress_cluster_vault" {
+  description              = "Allow pods to store and retrieve credentials from vault, limited by their own security roles"
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.workers.id}"
+  source_security_group_id = "${aws_security_group.workers.id}"
+  from_port                = 8200
+  to_port                  = 8201
+  type                     = "ingress"
+}
+
 resource "aws_security_group" "private_workers" {
   name_prefix = "${terraform.workspace}"
   description = "Security group for private nodes in the cluster."

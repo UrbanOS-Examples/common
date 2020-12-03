@@ -64,7 +64,7 @@ module "eks-cluster" {
       name                          = "CPU-Optimized-Workers"
       asg_min_size                  = "0"
       asg_max_size                  = "0"
-      instance_type                 = "t2.nano"
+      instance_type                 = "t3.2xlarge"
       key_name                      = "${aws_key_pair.cloud_key.key_name}"
       kubelet_extra_args            = "--node-labels=scos.run.cpu-optimized=true ${var.kubelet_security_args}"
       additional_security_group_ids = "${aws_security_group.private_workers.id}"
@@ -418,7 +418,7 @@ variable "eks_ami_version" {
 variable "k8s_instance_size" {
   # See Note below on changing instance type
   description = "EC2 instance type"
-  default     = "t2.xlarge"
+  default     = "t3.xlarge"
 }
 
 variable "kafka_worker_instance_size" {
