@@ -1,15 +1,17 @@
 module "eks-cluster" {
   source = "github.com/SmartColumbusOS/terraform-aws-eks?ref=1.6.0"
 
-  cluster_name    = "${local.kubernetes_cluster_name}"
-  cluster_version = "${var.cluster_version}"
-  ami_version     = "${var.eks_ami_version}"
-  subnets         = "${local.private_subnets}"
-  vpc_id          = "${module.vpc.vpc_id}"
+  cluster_name                 = "${local.kubernetes_cluster_name}"
+  cluster_version              = "${var.cluster_version}"
+  ami_version                  = "${var.eks_ami_version}"
+  subnets                      = "${local.private_subnets}"
+  vpc_id                       = "${module.vpc.vpc_id}"
+  worker_create_security_group = "false"
 
   kubeconfig_aws_authenticator_command         = "aws-iam-authenticator"
   kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
 
+  worker_security_group_id             = "${aws_security_group.workers.id}"
   worker_additional_security_group_ids = ["${aws_security_group.chatter.id}", "${aws_security_group.allow_ssh_from_alm.id}"]
 
   # THIS COUNT NEEDS TO MATCH THE LENGTH OF THE PROVIDED LIST OR IT WILL NOT WORK
@@ -18,50 +20,55 @@ module "eks-cluster" {
 
   worker_groups = [
     {
-      name               = "Workers"
-      asg_min_size       = "${var.min_num_of_workers}"
-      asg_max_size       = "${var.max_num_of_workers}"
-      instance_type      = "${var.k8s_instance_size}"
-      key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "${var.kubelet_security_args}"
-      pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      name                          = "Workers"
+      asg_min_size                  = "${var.min_num_of_workers}"
+      asg_max_size                  = "${var.max_num_of_workers}"
+      instance_type                 = "${var.k8s_instance_size}"
+      key_name                      = "${aws_key_pair.cloud_key.key_name}"
+      kubelet_extra_args            = "${var.kubelet_security_args}"
+      additional_security_group_ids = "${aws_security_group.private_workers.id}"
+      pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
-      name               = "Worker-Group-Two-Workers"
-      asg_min_size       = "0"
-      asg_max_size       = "0"
-      instance_type      = "t2.medium"
-      key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "--register-with-taints=scos.run.group-two=true:NoExecute --node-labels=scos.run.group-two=true ${var.kubelet_security_args}"
-      pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      name                          = "Public-Workers"
+      asg_min_size                  = "2"
+      asg_max_size                  = "2"
+      instance_type                 = "${var.k8s_instance_size}"
+      key_name                      = "${aws_key_pair.cloud_key.key_name}"
+      kubelet_extra_args            = "--register-with-taints=scos.run.public-worker=true:NoExecute --node-labels=scos.run.public-worker=true ${var.kubelet_security_args}"
+      additional_security_group_ids = "${aws_security_group.public_workers.id}"
+      pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
-      name               = "Kafka-Workers"
-      asg_min_size       = "${var.min_num_of_kafka_workers}"
-      asg_max_size       = "${var.max_num_of_kafka_workers}"
-      instance_type      = "${var.kafka_worker_instance_size}"
-      key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true ${var.kubelet_security_args}"
-      pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      name                          = "Kafka-Workers"
+      asg_min_size                  = "${var.min_num_of_kafka_workers}"
+      asg_max_size                  = "${var.max_num_of_kafka_workers}"
+      instance_type                 = "${var.kafka_worker_instance_size}"
+      key_name                      = "${aws_key_pair.cloud_key.key_name}"
+      kubelet_extra_args            = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true ${var.kubelet_security_args}"
+      additional_security_group_ids = "${aws_security_group.private_workers.id}"
+      pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
       # so we don't have to go through a roll in the future - set to zeros and something inconsequential until we figure out what we need
-      name               = "Memory-Optimized-Workers"
-      asg_min_size       = "0"
-      asg_max_size       = "0"
-      instance_type      = "r5a.large"
-      key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "--node-labels=scos.run.memory-optimized=true ${var.kubelet_security_args}"
-      pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      name                          = "Memory-Optimized-Workers"
+      asg_min_size                  = "0"
+      asg_max_size                  = "0"
+      instance_type                 = "r5a.large"
+      key_name                      = "${aws_key_pair.cloud_key.key_name}"
+      kubelet_extra_args            = "--node-labels=scos.run.memory-optimized=true ${var.kubelet_security_args}"
+      additional_security_group_ids = "${aws_security_group.private_workers.id}"
+      pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
-      name               = "CPU-Optimized-Workers"
-      asg_min_size       = "0"
-      asg_max_size       = "0"
-      instance_type      = "t2.nano"
-      key_name           = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args = "--node-labels=scos.run.cpu-optimized=true ${var.kubelet_security_args}"
-      pre_userdata       = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      name                          = "CPU-Optimized-Workers"
+      asg_min_size                  = "0"
+      asg_max_size                  = "0"
+      instance_type                 = "t3.2xlarge"
+      key_name                      = "${aws_key_pair.cloud_key.key_name}"
+      kubelet_extra_args            = "--node-labels=scos.run.cpu-optimized=true ${var.kubelet_security_args}"
+      additional_security_group_ids = "${aws_security_group.private_workers.id}"
+      pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
   ]
 
@@ -411,7 +418,7 @@ variable "eks_ami_version" {
 variable "k8s_instance_size" {
   # See Note below on changing instance type
   description = "EC2 instance type"
-  default     = "t2.xlarge"
+  default     = "t3.xlarge"
 }
 
 variable "kafka_worker_instance_size" {
