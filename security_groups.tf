@@ -91,19 +91,19 @@ resource "aws_security_group" "allow_private" {
   }
 
   ingress {
-    description              = "Allow private nodes access to inbound traffic."
-    from_port                = 80
-    to_port                  = 80
-    protocol                 = "tcp"
-    source_security_group_id = "${aws_security_group.private_workers.id}"
+    description     = "Allow private nodes access to inbound traffic."
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.private_workers.id}"]
   }
 
   ingress {
-    description              = "Allow private nodes access to inbound traffic."
-    from_port                = 443
-    to_port                  = 443
-    protocol                 = "tcp"
-    source_security_group_id = "${aws_security_group.private_workers.id}"
+    description     = "Allow private nodes access to inbound traffic."
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.private_workers.id}"]
   }
 
   egress {
