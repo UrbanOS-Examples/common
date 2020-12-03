@@ -64,6 +64,57 @@ resource "aws_security_group" "allow_all" {
   }
 }
 
+resource "aws_security_group" "allow_private" {
+  name        = "allow_private"
+  description = "Allow inbound traffic from private nodes"
+  vpc_id      = "${module.vpc.vpc_id}"
+
+  tags = {
+    Name        = "Ingress and egress for load balancers."
+    Description = "Security group for allowing external and internal networks to talk to load balancers."
+  }
+
+  ingress {
+    description = "Allow any network to talk to load balancer via HTTP."
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  ingress {
+    description = "Allow any network to talk to load balancer via HTTPS."
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  ingress {
+    description              = "Allow private nodes access to inbound traffic."
+    from_port                = 80
+    to_port                  = 80
+    protocol                 = "tcp"
+    source_security_group_id = "${aws_security_group.private_workers.id}"
+  }
+
+  ingress {
+    description              = "Allow private nodes access to inbound traffic."
+    from_port                = 443
+    to_port                  = 443
+    protocol                 = "tcp"
+    source_security_group_id = "${aws_security_group.private_workers.id}"
+  }
+
+  egress {
+    description = "Allow nodes to egress to anywhere."
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "workers" {
   name_prefix = "${terraform.workspace}"
   description = "Security group for all nodes in the cluster."
@@ -168,6 +219,11 @@ resource "aws_security_group_rule" "public_workers_ingress_self" {
 output "allow_all_security_group" {
   description = "Security group id to allow all traffic to access albs"
   value       = "${aws_security_group.allow_all.id}"
+}
+
+output "allow_private_security_group" {
+  description = "Security group id to allow all traffic to access albs"
+  value       = "${aws_security_group.allow_private.id}"
 }
 
 output "chatter_sg_id" {
