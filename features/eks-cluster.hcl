@@ -37,6 +37,7 @@ module "eks-cluster" {
       key_name                      = "${aws_key_pair.cloud_key.key_name}"
       kubelet_extra_args            = "--register-with-taints=scos.run.public-worker=true:NoExecute --node-labels=scos.run.public-worker=true ${var.kubelet_security_args}"
       additional_security_group_ids = "${aws_security_group.public_workers.id}"
+      iam_role_id                   = "${aws_iam_role.eks_public_worker_role.id}"
       pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
     },
     {
@@ -163,6 +164,75 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
 EOF
 }
 
+resource "aws_iam_policy" "eks_public_work_alb_permissions" {
+  name        = "eks_public_work_alb_permissions-${terraform.workspace}"
+  description = "This policy allows a Public EKS Worker node to do everything it needs to do with an ALB"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "123",
+            "Effect": "Allow",
+            "Action": [
+                "tag:GetResources",
+
+                "ec2:Describe*",
+                "ec2:GetLaunchTemplateData",
+                "ec2:GetConsoleOutput",
+                "ec2:GetPasswordData",
+                "ec2:GetReservedInstancesExchangeQuote",
+                "ec2:GetConsoleScreenshot",
+                "ec2:GetHostReservationPurchasePreview",
+
+                "waf-regional:Get*",
+                "waf-regional:List*",
+
+                "acm:ListCertificates",
+                "iam:ListServerCertificates",
+
+                "ce:GetReservationUtilization",
+                "ce:GetDimensionValues",
+                "ce:GetCostAndUsage",
+                "ce:GetTags",
+
+                "elasticloadbalancing:*",
+
+                "route53:ListHostedZones",
+                "route53:ListResourceRecordSets",
+
+                "cloudwatch:PutMetricData",
+                "cloudwatch:ListMetrics",
+                "cloudwatch:GetMetricStatistics",
+                "cloudwatch:GetMetricData"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+              "route53:ChangeResourceRecordSets"
+            ],
+            "Resource": [
+              "arn:aws:route53:::hostedzone/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+              "wafv2:GetWebACL",
+              "wafv2:GetWebACLForResource",
+              "wafv2:AssociateWebACL",
+              "wafv2:DisassociateWebACL"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
 resource "local_file" "aws_props" {
   content = <<EOF
 aws:
@@ -241,6 +311,46 @@ data "external" "helm_file_change_check" {
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
   role       = "${module.eks-cluster.worker_iam_role_name}"
   policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
+}
+
+resource "aws_iam_role" "eks_public_worker_role" {
+  name = "${terraform.workspace}-eks-public-worker-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "eks_public_work_alb_permissions" {
+  role       = "${aws_iam_role.eks_public_worker_role.name}"
+  policy_arn = "${aws_iam_policy.eks_public_work_alb_permissions.arn}"
+}
+
+resource "aws_iam_role_policy_attachment" "workers_AmazonEKSWorkerNodePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = "${aws_iam_role.eks_public_worker_role.name}"
+}
+
+resource "aws_iam_role_policy_attachment" "workers_AmazonEKS_CNI_Policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = "${aws_iam_role.eks_public_worker_role.name}"
+}
+
+resource "aws_iam_role_policy_attachment" "workers_AmazonEC2ContainerRegistryReadOnly" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = "${aws_iam_role.eks_public_worker_role.name}"
 }
 
 resource "aws_wafv2_web_acl" "eks_cluster" {
