@@ -29,6 +29,16 @@ resource "aws_security_group_rule" "allow_all_sg_to_eks_worker_sg_node_ports" {
   source_security_group_id = "${aws_security_group.allow_all.id}"
 }
 
+resource "aws_security_group_rule" "allow_private_sg_to_eks_worker_sg_node_ports" {
+  description              = "Allow load balancer resources to talk to services in the NodePort range."
+  type                     = "ingress"
+  from_port                = 30000
+  to_port                  = 32767
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.chatter.id}"
+  source_security_group_id = "${aws_security_group.allow_private.id}"
+}
+
 resource "aws_security_group" "allow_all" {
   name        = "allow_all"
   description = "Allow all inbound traffic"
