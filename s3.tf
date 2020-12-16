@@ -155,3 +155,27 @@ resource "aws_s3_bucket" "andi_public_sample_datasets" {
     }
   }
 }
+
+resource "aws_s3_bucket_policy" "andi_ssl_policy" {
+  bucket = "${aws_s3_bucket.andi_public_sample_datasets.id}"
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowSSLRequestsOnly",
+      "Action": "s3:*",
+      "Effect": "Deny",
+      "Resource": "${aws_s3_bucket.andi_public_sample_datasets.arn}",
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      },
+      "Principal": "*"
+    }
+  ]
+}
+POLICY
+}
