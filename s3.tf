@@ -130,3 +130,28 @@ resource "aws_s3_bucket_policy" "ckan_ssl_policy" {
 }
 POLICY
 }
+
+resource "aws_s3_bucket" "andi_public_sample_datasets" {
+  bucket        = "${terraform.workspace}-andi-public-sample-datasets"
+  acl           = "public-read"
+  force_destroy = "${var.force_destroy_s3_bucket}"
+
+  versioning {
+    enabled = false
+  }
+
+  lifecycle_rule {
+    enabled = true
+    expiration {
+      days = 30
+    }
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
