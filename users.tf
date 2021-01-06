@@ -70,6 +70,45 @@ resource "aws_iam_user_policy" "reaper_user_ro" {
 EOF
 }
 
+resource "aws_iam_user" "andi_user" {
+  name = "${terraform.workspace}-andi"
+}
+
+resource "aws_iam_user_policy" "andi_user_ro" {
+  name = "write"
+  user = "${aws_iam_user.andi_user.name}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt2",
+      "Action": [
+        "s3:Get*",
+        "s3:List*",
+        "s3:putObject"
+      ],
+      "Effect": "Allow",
+      "Resource": ["${aws_s3_bucket.andi_public_sample_datasets.arn}/*"]
+    },
+    {
+      "Sid": "Stmt3",
+      "Action": [
+        "s3:Get*",
+        "s3:List*"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:s3:::*/*",
+        "arn:aws:s3:::*"
+        ]
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_user" "odo_user" {
   name = "${terraform.workspace}-odo"
 }
