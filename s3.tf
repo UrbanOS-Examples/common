@@ -133,7 +133,7 @@ POLICY
 
 resource "aws_s3_bucket" "andi_public_sample_datasets" {
   bucket        = "${terraform.workspace}-andi-public-sample-datasets"
-  acl           = "public-read"
+  acl           = "private"
   force_destroy = "${var.force_destroy_s3_bucket}"
 
   versioning {
