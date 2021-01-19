@@ -37,3 +37,5 @@ key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEwoOFbcKsWLdJHQQq1
 key_pair_name = "eks_key_dev_2020_03_23"
 
 force_destroy_s3_bucket = false
+
+andi_public_sample_datasets = "andi-public-sample-datasets"

@@ -130,3 +130,57 @@ resource "aws_s3_bucket_policy" "ckan_ssl_policy" {
 }
 POLICY
 }
+
+resource "aws_s3_bucket" "andi_public_sample_datasets" {
+  bucket        = "${terraform.workspace}-${var.andi_public_sample_datasets}"
+  acl           = "log-delivery-write"
+  force_destroy = "${var.force_destroy_s3_bucket}"
+
+  logging {
+    target_bucket = "${terraform.workspace}-${var.andi_public_sample_datasets}"
+    target_prefix = "log/"
+  }
+
+  versioning {
+    enabled = false
+  }
+
+  lifecycle_rule {
+    enabled = true
+    expiration {
+      days = 30
+    }
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "andi_ssl_policy" {
+  bucket = "${aws_s3_bucket.andi_public_sample_datasets.id}"
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowSSLRequestsOnly",
+      "Action": "s3:*",
+      "Effect": "Deny",
+      "Resource": "${aws_s3_bucket.andi_public_sample_datasets.arn}",
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      },
+      "Principal": "*"
+    }
+  ]
+}
+POLICY
+}
