@@ -83,9 +83,8 @@ resource "aws_iam_user_policy" "andi_user_ro" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "Stmt2",
+      "Sid": "Stmt1",
       "Action": [
-        "s3:Get*",
         "s3:List*",
         "s3:putObject"
       ],

@@ -79,3 +79,8 @@ output "aws_region" {
   description = "Name of aws region"
   value       = "${var.region}"
 }
+
+variable "andi_public_sample_datasets" {
+  description = "Bucket for public sample datasets in andi"
+  default     = "andi-public-sample-datasets"
+}

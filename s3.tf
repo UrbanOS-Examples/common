@@ -132,12 +132,12 @@ POLICY
 }
 
 resource "aws_s3_bucket" "andi_public_sample_datasets" {
-  bucket        = "${terraform.workspace}-andi-public-sample-datasets"
-  acl           = "private"
+  bucket        = "${terraform.workspace}-${var.andi_public_sample_datasets}"
+  acl           = "log-delivery-write"
   force_destroy = "${var.force_destroy_s3_bucket}"
 
   logging {
-    target_bucket = "${aws_s3_bucket.andi_public_sample_datasets.id}"
+    target_bucket = "${terraform.workspace}-${var.andi_public_sample_datasets}"
     target_prefix = "log/"
   }
 
