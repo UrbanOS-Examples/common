@@ -161,6 +161,15 @@ resource "aws_s3_bucket" "andi_public_sample_datasets" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "andi_public_sample_datasets_access" {
+  bucket = "${aws_s3_bucket.andi_public_sample_datasets.id}"
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket_policy" "andi_ssl_policy" {
   bucket = "${aws_s3_bucket.andi_public_sample_datasets.id}"
 
