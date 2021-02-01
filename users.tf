@@ -86,7 +86,8 @@ resource "aws_iam_user_policy" "andi_user_ro" {
       "Sid": "Stmt1",
       "Action": [
         "s3:List*",
-        "s3:putObject"
+        "s3:putObject",
+        "s3:GetObject"
       ],
       "Effect": "Allow",
       "Resource": ["${aws_s3_bucket.andi_public_sample_datasets.arn}/*"]
