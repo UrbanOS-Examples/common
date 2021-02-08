@@ -28,19 +28,19 @@ provider "external" {
 
 provider "aws" {
   version = "2.70.0"
-  region  = "${var.region}"
+  region  = var.region
 
   assume_role {
-    role_arn = "${var.role_arn}"
+    role_arn = var.role_arn
   }
 }
 
 provider "aws" {
   version = "2.70.0"
   alias   = "alm"
-  region  = "${var.alm_region}"
+  region  = var.alm_region
 
   assume_role {
-    role_arn = "${var.alm_role_arn}"
+    role_arn = var.alm_role_arn
   }
 }

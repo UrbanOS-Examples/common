@@ -80,7 +80,7 @@ module "eks-cluster" {
 
 resource "aws_security_group" "allow_ssh_from_alm" {
   name_prefix = "allow_ssh_from_alm_"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port = 22
@@ -245,7 +245,7 @@ EOF
 }
 
 resource "null_resource" "eks_infrastructure" {
-  depends_on = ["data.external.helm_file_change_check", "local_file.aws_props"]
+  depends_on = [data.external.helm_file_change_check, local_file.aws_props]
 
   provisioner "local-exec" {
     command = <<EOF
@@ -284,20 +284,8 @@ EOF
   }
 
   triggers {
-    helm_file_change_check = "${data.external.helm_file_change_check.result.md5_result}"
-    aws_props              = "${local_file.aws_props.content}"
-  }
-}
-
-resource "null_resource" "tear_down_load_balancers" {
-  provisioner "local-exec" {
-    when = "destroy"
-
-    command = <<EOF
-    set -e
-    echo "Destroying load balancers..."
-    ${path.module}/files/scripts/destroy_albs_created_via_kubernetes.sh ${module.vpc.vpc_id} ${var.region} ${var.role_arn}
-  EOF
+    helm_file_change_check = data.external.helm_file_change_check.result.md5_result
+    aws_props              = local_file.aws_props.content
   }
 }
 
@@ -309,8 +297,8 @@ data "external" "helm_file_change_check" {
 }
 
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
-  role       = "${module.eks-cluster.worker_iam_role_name}"
-  policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
+  role       = module.eks-cluster.worker_iam_role_name
+  policy_arn = aws_iam_policy.eks_work_alb_permissions.arn
 }
 
 resource "aws_iam_role" "eks_public_worker_role" {
@@ -334,23 +322,23 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "eks_public_work_alb_permissions" {
-  role       = "${aws_iam_role.eks_public_worker_role.name}"
-  policy_arn = "${aws_iam_policy.eks_public_work_alb_permissions.arn}"
+  role       = aws_iam_role.eks_public_worker_role.name
+  policy_arn = aws_iam_policy.eks_public_work_alb_permissions.arn
 }
 
 resource "aws_iam_role_policy_attachment" "workers_AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = "${aws_iam_role.eks_public_worker_role.name}"
+  role       = aws_iam_role.eks_public_worker_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "workers_AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = "${aws_iam_role.eks_public_worker_role.name}"
+  role       = aws_iam_role.eks_public_worker_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "workers_AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = "${aws_iam_role.eks_public_worker_role.name}"
+  role       = aws_iam_role.eks_public_worker_role.name
 }
 
 resource "aws_wafv2_web_acl" "eks_cluster" {
@@ -512,7 +500,7 @@ data "external" "oidc_thumbprint" {
 resource "aws_iam_openid_connect_provider" "eks_cluster" {
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = ["${data.external.oidc_thumbprint.result.thumbprint}"]
-  url             = "${data.aws_eks_cluster.eks_cluster.identity.0.oidc.0.issuer}"
+  url             = data.aws_eks_cluster.eks_cluster.identity.0.oidc.0.issuer
 }
 
 variable "cluster_version" {

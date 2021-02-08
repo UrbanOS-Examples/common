@@ -4,7 +4,7 @@ module "parking_prediction_database" {
   identifier = "${terraform.workspace}-data-science-parking-prediction"
   prefix     = "${terraform.workspace}-data-science-parking-prediction"
   type       = "sqlserver-web"
-  version    = "14.00.3223.3.v1"
+  vers       = "14.00.3223.3.v1"
   port       = "1433"
   username   = "padmin"
 
@@ -20,7 +20,7 @@ module "parking_prediction_database" {
 resource "aws_s3_bucket" "parking_prediction" {
   bucket        = "${terraform.workspace}-parking-prediction"
   acl           = "private"
-  force_destroy = "${var.force_destroy_s3_bucket}"
+  force_destroy = var.force_destroy_s3_bucket
 
   server_side_encryption_configuration {
     rule {
@@ -32,7 +32,7 @@ resource "aws_s3_bucket" "parking_prediction" {
 }
 
 resource "aws_s3_bucket_public_access_block" "parking_prediction" {
-  bucket = "${aws_s3_bucket.parking_prediction.id}"
+  bucket = aws_s3_bucket.parking_prediction.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -41,7 +41,7 @@ resource "aws_s3_bucket_public_access_block" "parking_prediction" {
 }
 
 resource "aws_s3_bucket_policy" "parking_prediction" {
-  bucket = "${aws_s3_bucket.parking_prediction.id}"
+  bucket = aws_s3_bucket.parking_prediction.id
 
   policy = <<POLICY
 {
@@ -67,7 +67,7 @@ POLICY
 resource "aws_s3_bucket" "parking_prediction_public" {
   bucket        = "${terraform.workspace}-parking-prediction-public"
   acl           = "public-read"
-  force_destroy = "${var.force_destroy_s3_bucket}"
+  force_destroy = var.force_destroy_s3_bucket
 
   server_side_encryption_configuration {
     rule {
@@ -79,7 +79,7 @@ resource "aws_s3_bucket" "parking_prediction_public" {
 }
 
 resource "aws_s3_bucket_policy" "parking_prediction_public_ssl_policy" {
-  bucket = "${aws_s3_bucket.parking_prediction_public.id}"
+  bucket = aws_s3_bucket.parking_prediction_public.id
 
   policy = <<POLICY
 {
@@ -112,7 +112,7 @@ resource "aws_iam_user" "parking_prediction_train" {
 
 resource "aws_iam_user_policy" "parking_prediction_api_ro" {
   name = "read"
-  user = "${aws_iam_user.parking_prediction_api.name}"
+  user = aws_iam_user.parking_prediction_api.name
 
   policy = <<EOF
 {
@@ -141,7 +141,7 @@ EOF
 
 resource "aws_iam_user_policy" "parking_prediction_train" {
   name = "read"
-  user = "${aws_iam_user.parking_prediction_train.name}"
+  user = aws_iam_user.parking_prediction_train.name
 
   policy = <<EOF
 {

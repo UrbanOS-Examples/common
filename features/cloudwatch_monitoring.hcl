@@ -8,7 +8,7 @@ module "monitoring" {
 //---------ALARMS---------//
 
 resource "aws_cloudwatch_metric_alarm" "joomla_rds_free_storage_space_low" {
-  count               = "${var.joomla_alarms_enabled}"
+  count               = var.joomla_alarms_enabled
   alarm_name          = "${terraform.workspace} Joomla - RDS Free Storage Space Low"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "2"
@@ -20,14 +20,14 @@ resource "aws_cloudwatch_metric_alarm" "joomla_rds_free_storage_space_low" {
   alarm_actions       = ["${module.monitoring.alert_handler_sns_topic_arn}"]
 
   dimensions {
-    DBInstanceIdentifier = "${module.joomla_db.id}"
+    DBInstanceIdentifier = module.joomla_db.id
   }
 
   treat_missing_data = "breaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "joomla_rds_high_cpu_util" {
-  count               = "${var.joomla_alarms_enabled}"
+  count               = var.joomla_alarms_enabled
   alarm_name          = "${terraform.workspace} Joomla - RDS High CPU Utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
@@ -39,7 +39,7 @@ resource "aws_cloudwatch_metric_alarm" "joomla_rds_high_cpu_util" {
   alarm_actions       = ["${module.monitoring.alert_handler_sns_topic_arn}"]
 
   dimensions {
-    DBInstanceIdentifier = "${module.joomla_db.id}"
+    DBInstanceIdentifier = module.joomla_db.id
   }
 
   treat_missing_data = "breaching"
@@ -80,9 +80,9 @@ PATTERN
 }
 
 resource "aws_cloudwatch_event_target" "kms_cmk_rotation_to_sns" {
-  rule      = "${aws_cloudwatch_event_rule.kms_cmk_rotation.name}"
+  rule      = aws_cloudwatch_event_rule.kms_cmk_rotation.name
   target_id = "KmsCmkRotationToSNS"
-  arn       = "${module.monitoring.alert_handler_sns_topic_arn}"
+  arn       = module.monitoring.alert_handler_sns_topic_arn
 }
 
 //-----------------------//
@@ -100,12 +100,12 @@ resource "aws_cloudwatch_log_group" "auth_zero" {
 
 resource "aws_cloudwatch_log_stream" "auth_zero" {
   name = "${terraform.workspace}-auth0"
-  log_group_name = "${aws_cloudwatch_log_group.auth_zero.name}"
+  log_group_name = aws_cloudwatch_log_group.auth_zero.name
 }
 
 resource "aws_iam_user_policy" "auth_zero_logger" {
   name = "put-and-describe-logs"
-  user = "${aws_iam_user.auth_zero_logger.name}"
+  user = aws_iam_user.auth_zero_logger.name
 
   policy = <<EOF
 {

@@ -4,10 +4,10 @@ resource "aws_inspector_assessment_target" "inspector_target" {
 
 resource "aws_inspector_assessment_template" "inspector_template" {
   name       = "${terraform.workspace}-inspector-template"
-  target_arn = "${aws_inspector_assessment_target.inspector_target.arn}"
-  duration   = "${var.inspector_assessment_duration}"
+  target_arn = aws_inspector_assessment_target.inspector_target.arn
+  duration   = var.inspector_assessment_duration
 
-  rules_package_arns = "${var.inspector_assessment_rules_package_arns}"
+  rules_package_arns = var.inspector_assessment_rules_package_arns
 }
 
 data "aws_iam_policy_document" "inspector_event_policy_document" {
@@ -43,20 +43,20 @@ EOF
 
 resource "aws_iam_role_policy" "inspector_event_policy" {
   name   = "${terraform.workspace}-inspector-event-policy"
-  role   = "${aws_iam_role.inspector_event_role.id}"
-  policy = "${data.aws_iam_policy_document.inspector_event_policy_document.json}"
+  role   = aws_iam_role.inspector_event_role.id
+  policy = data.aws_iam_policy_document.inspector_event_policy_document.json
 }
 
 resource "aws_cloudwatch_event_rule" "inspector_event_schedule" {
   name                = "${terraform.workspace}-inspector-schedule"
   description         = "Trigger an Inspector Assessment"
-  schedule_expression = "${var.inspector_assessment_schedule_expression}"
+  schedule_expression = var.inspector_assessment_schedule_expression
 }
 
 resource "aws_cloudwatch_event_target" "inspector_event_target" {
-  rule     = "${aws_cloudwatch_event_rule.inspector_event_schedule.name}"
-  arn      = "${aws_inspector_assessment_template.inspector_template.arn}"
-  role_arn = "${aws_iam_role.inspector_event_role.arn}"
+  rule     = aws_cloudwatch_event_rule.inspector_event_schedule.name
+  arn      = aws_inspector_assessment_template.inspector_template.arn
+  role_arn = aws_iam_role.inspector_event_role.arn
 }
 
 variable "inspector_assessment_rules_package_arns" {

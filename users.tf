@@ -4,7 +4,7 @@ resource "aws_iam_user" "discovery_api_user" {
 
 resource "aws_iam_user_policy" "discovery_api_user_ro" {
   name = "read"
-  user = "${aws_iam_user.discovery_api_user.name}"
+  user = aws_iam_user.discovery_api_user.name
 
   policy = <<EOF
 {
@@ -37,7 +37,7 @@ resource "aws_iam_user" "reaper_user" {
 
 resource "aws_iam_user_policy" "reaper_user_ro" {
   name = "write"
-  user = "${aws_iam_user.reaper_user.name}"
+  user = aws_iam_user.reaper_user.name
 
   policy = <<EOF
 {
@@ -76,7 +76,7 @@ resource "aws_iam_user" "andi_user" {
 
 resource "aws_iam_user_policy" "andi_user_ro" {
   name = "write"
-  user = "${aws_iam_user.andi_user.name}"
+  user = aws_iam_user.andi_user.name
 
   policy = <<EOF
 {
@@ -103,7 +103,7 @@ resource "aws_iam_user" "odo_user" {
 
 resource "aws_iam_user_policy" "odo_user_rw" {
   name = "read-write"
-  user = "${aws_iam_user.odo_user.name}"
+  user = aws_iam_user.odo_user.name
 
   policy = <<EOF
 {

@@ -2,8 +2,8 @@ module "tls_certificate" {
   source = "github.com/azavea/terraform-aws-acm-certificate?ref=1.1.0"
 
   providers = {
-    aws.acm_account     = "aws"
-    aws.route53_account = "aws"
+    aws.acm_account     = aws
+    aws.route53_account = aws
   }
 
   domain_name               = "${coalesce(var.tls_certificate_dns_name_override, local.internal_public_hosted_zone_name)}"
@@ -23,8 +23,8 @@ module "root_tls_certificate" {
   source = "github.com/azavea/terraform-aws-acm-certificate?ref=1.1.0"
 
   providers = {
-    aws.acm_account     = "aws"
-    aws.route53_account = "aws"
+    aws.acm_account     = aws
+    aws.route53_account = aws
   }
 
   domain_name               = "${local.root_tls_cert_domain_name}"

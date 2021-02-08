@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_route53_zone" "internal_public_hosted_zone" {
-  name          = "${local.internal_public_hosted_zone_name}"
+  name          = local.internal_public_hosted_zone_name
   force_destroy = true
 
   tags = {
@@ -12,10 +12,10 @@ resource "aws_route53_zone" "internal_public_hosted_zone" {
 }
 
 resource "aws_route53_record" "alm_ns_record" {
-  provider = "aws.alm"
+  provider = aws.alm
 
-  name    = "${terraform.workspace}"
-  zone_id = "${data.terraform_remote_state.durable.hosted_zone_id}"
+  name    = terraform.workspace
+  zone_id = data.terraform_remote_state.durable.hosted_zone_id
   type    = "NS"
   ttl     = 300
   records = ["${aws_route53_zone.internal_public_hosted_zone.name_servers}"]
