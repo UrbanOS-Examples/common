@@ -1,5 +1,5 @@
 module "eks-cluster" {
-  source = "github.com/SmartColumbusOS/terraform-aws-eks?ref=1.6.0"
+  source = "github.com/SmartColumbusOS/terraform-aws-eks?ref=common-512"
 
   cluster_name                 = "${local.kubernetes_cluster_name}"
   cluster_version              = "${var.cluster_version}"
