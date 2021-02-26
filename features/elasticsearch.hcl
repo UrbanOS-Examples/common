@@ -50,38 +50,38 @@ variable "elasticsearch_ebs_volume_size" {
 
 resource "aws_elasticsearch_domain" "elasticsearch" {
   domain_name           = "elasticsearch-${terraform.workspace}"
-  elasticsearch_version = "${var.elasticsearch_version}"
+  elasticsearch_version = var.elasticsearch_version
 
   cluster_config {
-    instance_type            = "${var.elasticsearch_instance_type}"
-    instance_count           = "${var.elasticsearch_instance_count}"
-    dedicated_master_enabled = "${var.elasticsearch_dedicated_master_enabled}"
-    dedicated_master_type    = "${var.elasticsearch_dedicated_master_type}"
-    dedicated_master_count   = "${var.elasticsearch_dedicated_master_count}"
+    instance_type            = var.elasticsearch_instance_type
+    instance_count           = var.elasticsearch_instance_count
+    dedicated_master_enabled = var.elasticsearch_dedicated_master_enabled
+    dedicated_master_type    = var.elasticsearch_dedicated_master_type
+    dedicated_master_count   = var.elasticsearch_dedicated_master_count
 
-    zone_awareness_enabled = "${var.elasticsearch_zone_awareness_enabled}"
+    zone_awareness_enabled = var.elasticsearch_zone_awareness_enabled
 
     zone_awareness_config {
-      availability_zone_count = "${var.elasticsearch_instance_count}"
+      availability_zone_count = var.elasticsearch_instance_count
     }
   }
 
   encrypt_at_rest {
-    enabled = "${var.elasticsearch_at_rest_encryption_enabled}"
+    enabled = var.elasticsearch_at_rest_encryption_enabled
   }
 
   node_to_node_encryption {
-    enabled = "${var.elasticsearch_node_to_node_encryption_enabled}"
+    enabled = var.elasticsearch_node_to_node_encryption_enabled
   }
 
   domain_endpoint_options {
-    enforce_https = true
+    enforce_https       = true
     tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
   }
 
   ebs_options {
     ebs_enabled = true
-    volume_size = "${var.elasticsearch_ebs_volume_size}"
+    volume_size = var.elasticsearch_ebs_volume_size
   }
 
   snapshot_options {
@@ -90,9 +90,17 @@ resource "aws_elasticsearch_domain" "elasticsearch" {
 
   vpc_options {
     # there are 6 total private subnets and this one includes only the main 3
-    subnet_ids = ["${slice(local.private_subnets, 0, var.elasticsearch_instance_count)}"]
+    # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
+    # force an interpolation expression to be interpreted as a list by wrapping it
+    # in an extra set of list brackets. That form was supported for compatibility in
+    # v0.11, but is no longer supported in Terraform v0.12.
+    #
+    # If the expression in the following list itself returns a list, remove the
+    # brackets to avoid interpretation as a list of lists. If the expression
+    # returns a single list item then leave it as-is and remove this TODO comment.
+    subnet_ids = slice(local.private_subnets, 0, var.elasticsearch_instance_count)
 
-    security_group_ids = ["${aws_security_group.elasticsearch.id}"]
+    security_group_ids = [aws_security_group.elasticsearch.id]
   }
 
   advanced_options = {
@@ -113,15 +121,15 @@ resource "aws_elasticsearch_domain" "elasticsearch" {
       }
     ]
   }
-  POLICY
+  
+POLICY
+
 
   tags = {
     Domain = "elasticsearch-${terraform.workspace}"
   }
 
-  depends_on = [
-    "aws_iam_service_linked_role.elasticsearch"
-  ]
+  depends_on = [aws_iam_service_linked_role.elasticsearch]
 }
 
 resource "aws_iam_service_linked_role" "elasticsearch" {
@@ -131,7 +139,7 @@ resource "aws_iam_service_linked_role" "elasticsearch" {
 resource "aws_security_group" "elasticsearch" {
   name        = "elasticsearch-${terraform.workspace}"
   description = "Security group for all instances in the ElasticSearch cluster."
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 
   tags = {
     Name = "elasticsearch"
@@ -141,8 +149,8 @@ resource "aws_security_group" "elasticsearch" {
 resource "aws_security_group_rule" "eks_workers_to_elasticsearch" {
   description              = "Allow EKS worker nodes to communicate with ElasticSearch instances."
   protocol                 = "tcp"
-  security_group_id        = "${aws_security_group.elasticsearch.id}"
-  source_security_group_id = "${aws_security_group.chatter.id}"
+  security_group_id        = aws_security_group.elasticsearch.id
+  source_security_group_id = aws_security_group.chatter.id
   from_port                = 443
   to_port                  = 443
   type                     = "ingress"
@@ -151,18 +159,18 @@ resource "aws_security_group_rule" "eks_workers_to_elasticsearch" {
 resource "aws_security_group_rule" "vpn_to_elasticsearch" {
   description       = "Allow VPN hosts to communicate with ElasticSearch instances."
   protocol          = "tcp"
-  security_group_id = "${aws_security_group.elasticsearch.id}"
-  cidr_blocks       = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
-  from_port         = 443
-  to_port           = 443
-  type              = "ingress"
+  security_group_id = aws_security_group.elasticsearch.id
+  cidr_blocks = [data.terraform_remote_state.alm_remote_state.outputs.vpc_cidr_block]
+  from_port   = 443
+  to_port     = 443
+  type        = "ingress"
 }
 
 resource "aws_security_group_rule" "elasticsearch_intra_cluster" {
   description              = "Allow ElasticSearch cluster instances to talk to each other."
   protocol                 = "-1"
-  security_group_id        = "${aws_security_group.elasticsearch.id}"
-  source_security_group_id = "${aws_security_group.elasticsearch.id}"
+  security_group_id        = aws_security_group.elasticsearch.id
+  source_security_group_id = aws_security_group.elasticsearch.id
   from_port                = 0
   to_port                  = 0
   type                     = "ingress"
@@ -171,7 +179,7 @@ resource "aws_security_group_rule" "elasticsearch_intra_cluster" {
 resource "aws_security_group_rule" "elasticsearch_egress" {
   description       = "Allow ElasticSearch cluster to egress to anywhere."
   protocol          = "-1"
-  security_group_id = "${aws_security_group.elasticsearch.id}"
+  security_group_id = aws_security_group.elasticsearch.id
   cidr_blocks       = ["0.0.0.0/0"]
   from_port         = 0
   to_port           = 0
@@ -179,6 +187,7 @@ resource "aws_security_group_rule" "elasticsearch_egress" {
 }
 
 output "elasticsearch_endpoint" {
-  value       = "${aws_elasticsearch_domain.elasticsearch.endpoint}"
+  value       = aws_elasticsearch_domain.elasticsearch.endpoint
   description = "The ElasticSearch endpoint as a hostname"
 }
+

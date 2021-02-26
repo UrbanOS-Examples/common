@@ -7,41 +7,41 @@ data "external" "seeded_random" {
 }
 
 locals {
-  vpc_cidr = "${length(var.vpc_cidr) > 0 ? var.vpc_cidr : data.external.seeded_random.result.cidr_block}"
+  vpc_cidr = length(var.vpc_cidr) > 0 ? var.vpc_cidr : data.external.seeded_random.result.cidr_block
 }
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "1.32.0"
 
-  name = "${local.vpc_name}"
-  cidr = "${local.vpc_cidr}"
-  azs  = "${var.vpc_azs}"
+  name = local.vpc_name
+  cidr = local.vpc_cidr
+  azs  = var.vpc_azs
 
   private_subnets = [
-    "${cidrsubnet(local.vpc_cidr, 3, 0)}",
-    "${cidrsubnet(local.vpc_cidr, 3, 2)}",
-    "${cidrsubnet(local.vpc_cidr, 3, 4)}",
-    "${cidrsubnet(local.vpc_cidr, 10, 192)}",
-    "${cidrsubnet(local.vpc_cidr, 10, 448)}",
-    "${cidrsubnet(local.vpc_cidr, 10, 704)}",
+    cidrsubnet(local.vpc_cidr, 3, 0),
+    cidrsubnet(local.vpc_cidr, 3, 2),
+    cidrsubnet(local.vpc_cidr, 3, 4),
+    cidrsubnet(local.vpc_cidr, 10, 192),
+    cidrsubnet(local.vpc_cidr, 10, 448),
+    cidrsubnet(local.vpc_cidr, 10, 704),
   ]
 
   public_subnets = [
-    "${cidrsubnet(local.vpc_cidr, 4, 2)}",
-    "${cidrsubnet(local.vpc_cidr, 4, 6)}",
-    "${cidrsubnet(local.vpc_cidr, 4, 10)}",
+    cidrsubnet(local.vpc_cidr, 4, 2),
+    cidrsubnet(local.vpc_cidr, 4, 6),
+    cidrsubnet(local.vpc_cidr, 4, 10),
   ]
 
-  enable_nat_gateway = "${var.vpc_enable_nat_gateway}"
-  single_nat_gateway = "${var.vpc_single_nat_gateway}"
+  enable_nat_gateway = var.vpc_enable_nat_gateway
+  single_nat_gateway = var.vpc_single_nat_gateway
 
-  enable_vpn_gateway       = "${var.vpc_enable_vpn_gateway}"
-  enable_s3_endpoint       = "${var.vpc_enable_s3_endpoint}"
-  enable_dynamodb_endpoint = "${var.vpc_enable_dynamodb_endpoint}"
-  enable_dns_hostnames     = "${var.vpc_enable_dns_hostnames}"
+  enable_vpn_gateway       = var.vpc_enable_vpn_gateway
+  enable_s3_endpoint       = var.vpc_enable_s3_endpoint
+  enable_dynamodb_endpoint = var.vpc_enable_dynamodb_endpoint
+  enable_dns_hostnames     = var.vpc_enable_dns_hostnames
 
-  enable_dhcp_options      = "${var.vpc_enable_dhcp_options}"
+  enable_dhcp_options      = var.vpc_enable_dhcp_options
   dhcp_options_domain_name = "${terraform.workspace}.${var.vpc_domain_name}"
 
   private_subnet_tags = {
@@ -50,9 +50,9 @@ module "vpc" {
   }
 
   tags = {
-    Owner                                                    = "${var.owner}"
-    Environment                                              = "${terraform.workspace}"
-    Name                                                     = "${local.vpc_name}"
+    Owner                                                    = var.owner
+    Environment                                              = terraform.workspace
+    Name                                                     = local.vpc_name
     "kubernetes.io/cluster/${local.kubernetes_cluster_name}" = "shared"
   }
 }
@@ -60,9 +60,9 @@ module "vpc" {
 resource "aws_db_subnet_group" "default" {
   name        = "environment db ${terraform.workspace} subnet group"
   description = "DB Subnet Group"
-  subnet_ids  = ["${module.vpc.private_subnets}"]
+  subnet_ids = [module.vpc.private_subnets]
 
-  tags {
+  tags = {
     Name = "Subnet Group for Environment ${terraform.workspace} VPC"
   }
 }
@@ -123,39 +123,40 @@ variable "owner" {
 }
 
 locals {
-  hdp_subnets = "${slice(module.vpc.private_subnets,3,6)}"
+  hdp_subnets = slice(module.vpc.private_subnets, 3, 6)
 }
 
 locals {
-  private_subnets = "${slice(module.vpc.private_subnets,0,3)}"
+  private_subnets = slice(module.vpc.private_subnets, 0, 3)
 }
 
 output "vpc_id" {
   description = "The ID of the VPC"
-  value       = "${module.vpc.vpc_id}"
+  value       = module.vpc.vpc_id
 }
 
 output "private_subnets" {
   description = "List of IDs of private subnets"
-  value       = ["${module.vpc.private_subnets}"]
+  value       = [module.vpc.private_subnets]
 }
 
 output "public_subnets" {
   description = "List of IDs of public subnets"
-  value       = ["${module.vpc.public_subnets}"]
+  value       = [module.vpc.public_subnets]
 }
 
 output "nat_public_ips" {
   description = "List of public Elastic IPs created for AWS NAT Gateway"
-  value       = ["${module.vpc.nat_public_ips}"]
+  value       = [module.vpc.nat_public_ips]
 }
 
 variable "key_pair_public_key" {
   description = "The public key used to create a key pair"
-  default = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZUiqcbO+5rkKXuYxBcUGtyLWtNainCjKaKaV4ZBEDhUZIxSJXLNq0SH7NxcODYDNNREqUdy6okJMP16NLuMHngmZYGW7FWaB5AVeKpYOdUHL2ik+RH0pY6PquGNWXMqUP+uVB8Kn5SgqsYT/u84Re6m0FztqVf7N8L5SuDbdnkvfLUc+R3JiMArvVGGKj5GkcUAqMFuzEuBQ2e7ID/bSevtMKfrPlOCLVSUzbMIVPCrxE7YyhTDgZjN7kMNZePWQhdyq86QzHJr50qa0fMnp2oUP1qwzbFjymYbG+oXPcj9dSiB7q2anf2imBnWP8JlhSinzJZrR2wa7Vn535MBhD"
+  default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZUiqcbO+5rkKXuYxBcUGtyLWtNainCjKaKaV4ZBEDhUZIxSJXLNq0SH7NxcODYDNNREqUdy6okJMP16NLuMHngmZYGW7FWaB5AVeKpYOdUHL2ik+RH0pY6PquGNWXMqUP+uVB8Kn5SgqsYT/u84Re6m0FztqVf7N8L5SuDbdnkvfLUc+R3JiMArvVGGKj5GkcUAqMFuzEuBQ2e7ID/bSevtMKfrPlOCLVSUzbMIVPCrxE7YyhTDgZjN7kMNZePWQhdyq86QzHJr50qa0fMnp2oUP1qwzbFjymYbG+oXPcj9dSiB7q2anf2imBnWP8JlhSinzJZrR2wa7Vn535MBhD"
 }
 
 variable "key_pair_name" {
   description = "The name of the keypair.  This must be changed to roll the keys"
-  default = "invalid_key_pair"
+  default     = "invalid_key_pair"
 }
+

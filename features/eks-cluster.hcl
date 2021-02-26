@@ -1,18 +1,18 @@
 module "eks-cluster" {
   source = "github.com/SmartColumbusOS/terraform-aws-eks?ref=common-512"
 
-  cluster_name                 = "${local.kubernetes_cluster_name}"
-  cluster_version              = "${var.cluster_version}"
-  ami_version                  = "${var.eks_ami_version}"
-  subnets                      = "${local.private_subnets}"
-  vpc_id                       = "${module.vpc.vpc_id}"
+  cluster_name                 = local.kubernetes_cluster_name
+  cluster_version              = var.cluster_version
+  ami_version                  = var.eks_ami_version
+  subnets                      = local.private_subnets
+  vpc_id                       = module.vpc.vpc_id
   worker_create_security_group = "false"
 
   kubeconfig_aws_authenticator_command         = "aws-iam-authenticator"
-  kubeconfig_aws_authenticator_additional_args = ["-r", "${var.role_arn}"]
+  kubeconfig_aws_authenticator_additional_args = ["-r", var.role_arn]
 
-  worker_security_group_id             = "${aws_security_group.workers.id}"
-  worker_additional_security_group_ids = ["${aws_security_group.chatter.id}", "${aws_security_group.allow_ssh_from_alm.id}"]
+  worker_security_group_id             = aws_security_group.workers.id
+  worker_additional_security_group_ids = [aws_security_group.chatter.id, aws_security_group.allow_ssh_from_alm.id]
 
   # THIS COUNT NEEDS TO MATCH THE LENGTH OF THE PROVIDED LIST OR IT WILL NOT WORK
   # as of Terraform v0.11.7, computing this value is not seemingly supported
@@ -21,34 +21,34 @@ module "eks-cluster" {
   worker_groups = [
     {
       name                          = "Workers"
-      asg_min_size                  = "${var.min_num_of_workers}"
-      asg_max_size                  = "${var.max_num_of_workers}"
-      instance_type                 = "${var.k8s_instance_size}"
-      key_name                      = "${aws_key_pair.cloud_key.key_name}"
-      kubelet_extra_args            = "${var.kubelet_security_args}"
-      additional_security_group_ids = "${aws_security_group.private_workers.id}"
-      pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      asg_min_size                  = var.min_num_of_workers
+      asg_max_size                  = var.max_num_of_workers
+      instance_type                 = var.k8s_instance_size
+      key_name                      = aws_key_pair.cloud_key.key_name
+      kubelet_extra_args            = var.kubelet_security_args
+      additional_security_group_ids = aws_security_group.private_workers.id
+      pre_userdata                  = file("${path.module}/files/eks/workers_pre_userdata")
     },
     {
       name                          = "Public-Workers"
       asg_min_size                  = "2"
       asg_max_size                  = "2"
-      instance_type                 = "${var.k8s_instance_size}"
-      key_name                      = "${aws_key_pair.cloud_key.key_name}"
+      instance_type                 = var.k8s_instance_size
+      key_name                      = aws_key_pair.cloud_key.key_name
       kubelet_extra_args            = "--register-with-taints=scos.run.public-worker=true:NoExecute --node-labels=scos.run.public-worker=true ${var.kubelet_security_args}"
-      additional_security_group_ids = "${aws_security_group.public_workers.id}"
-      iam_role_id                   = "${aws_iam_role.eks_public_worker_role.id}"
-      pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      additional_security_group_ids = aws_security_group.public_workers.id
+      iam_role_id                   = aws_iam_role.eks_public_worker_role.id
+      pre_userdata                  = file("${path.module}/files/eks/workers_pre_userdata")
     },
     {
       name                          = "Kafka-Workers"
-      asg_min_size                  = "${var.min_num_of_kafka_workers}"
-      asg_max_size                  = "${var.max_num_of_kafka_workers}"
-      instance_type                 = "${var.kafka_worker_instance_size}"
-      key_name                      = "${aws_key_pair.cloud_key.key_name}"
+      asg_min_size                  = var.min_num_of_kafka_workers
+      asg_max_size                  = var.max_num_of_kafka_workers
+      instance_type                 = var.kafka_worker_instance_size
+      key_name                      = aws_key_pair.cloud_key.key_name
       kubelet_extra_args            = "--register-with-taints=scos.run.kafka=true:NoExecute --node-labels=scos.run.kafka=true ${var.kubelet_security_args}"
-      additional_security_group_ids = "${aws_security_group.private_workers.id}"
-      pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      additional_security_group_ids = aws_security_group.private_workers.id
+      pre_userdata                  = file("${path.module}/files/eks/workers_pre_userdata")
     },
     {
       # so we don't have to go through a roll in the future - set to zeros and something inconsequential until we figure out what we need
@@ -56,39 +56,38 @@ module "eks-cluster" {
       asg_min_size                  = "0"
       asg_max_size                  = "0"
       instance_type                 = "r5a.large"
-      key_name                      = "${aws_key_pair.cloud_key.key_name}"
+      key_name                      = aws_key_pair.cloud_key.key_name
       kubelet_extra_args            = "--node-labels=scos.run.memory-optimized=true ${var.kubelet_security_args}"
-      additional_security_group_ids = "${aws_security_group.private_workers.id}"
-      pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      additional_security_group_ids = aws_security_group.private_workers.id
+      pre_userdata                  = file("${path.module}/files/eks/workers_pre_userdata")
     },
     {
       name                          = "CPU-Optimized-Workers"
       asg_min_size                  = "0"
       asg_max_size                  = "0"
       instance_type                 = "t3.2xlarge"
-      key_name                      = "${aws_key_pair.cloud_key.key_name}"
+      key_name                      = aws_key_pair.cloud_key.key_name
       kubelet_extra_args            = "--node-labels=scos.run.cpu-optimized=true ${var.kubelet_security_args}"
-      additional_security_group_ids = "${aws_security_group.private_workers.id}"
-      pre_userdata                  = "${file("${path.module}/files/eks/workers_pre_userdata")}"
+      additional_security_group_ids = aws_security_group.private_workers.id
+      pre_userdata                  = file("${path.module}/files/eks/workers_pre_userdata")
     },
   ]
 
   tags = {
-    Environment = "${terraform.workspace}"
+    Environment = terraform.workspace
   }
 }
 
 resource "aws_security_group" "allow_ssh_from_alm" {
   name_prefix = "allow_ssh_from_alm_"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port = 22
     to_port   = 22
     protocol  = "tcp"
 
-    # datablock from vpc_peer.tf
-    cidr_blocks = ["${data.terraform_remote_state.alm_remote_state.vpc_cidr_block}"]
+    cidr_blocks = [data.terraform_remote_state.alm_remote_state.outputs.vpc_cidr_block]
   }
 }
 
@@ -162,6 +161,7 @@ resource "aws_iam_policy" "eks_work_alb_permissions" {
     ]
 }
 EOF
+
 }
 
 resource "aws_iam_policy" "eks_public_work_alb_permissions" {
@@ -231,6 +231,7 @@ resource "aws_iam_policy" "eks_public_work_alb_permissions" {
     ]
 }
 EOF
+
 }
 
 resource "local_file" "aws_props" {
@@ -241,11 +242,15 @@ aws:
   certificateArn: "${module.tls_certificate.arn}"
 EOF
 
+
   filename = "${path.module}/aws.yaml"
 }
 
 resource "null_resource" "eks_infrastructure" {
-  depends_on = ["data.external.helm_file_change_check", "local_file.aws_props"]
+  depends_on = [
+    data.external.helm_file_change_check,
+    local_file.aws_props,
+  ]
 
   provisioner "local-exec" {
     command = <<EOF
@@ -281,23 +286,26 @@ helm upgrade --install cluster-infra ${path.module}/helm/cluster-infra \
     --values ${local_file.aws_props.filename}
 
 EOF
+
   }
 
-  triggers {
-    helm_file_change_check = "${data.external.helm_file_change_check.result.md5_result}"
-    aws_props              = "${local_file.aws_props.content}"
+  triggers = {
+    helm_file_change_check = data.external.helm_file_change_check.result.md5_result
+    aws_props              = local_file.aws_props.content
   }
 }
 
 resource "null_resource" "tear_down_load_balancers" {
   provisioner "local-exec" {
-    when = "destroy"
+    when = destroy
 
     command = <<EOF
     set -e
     echo "Destroying load balancers..."
     ${path.module}/files/scripts/destroy_albs_created_via_kubernetes.sh ${module.vpc.vpc_id} ${var.region} ${var.role_arn}
-  EOF
+  
+EOF
+
   }
 }
 
@@ -309,8 +317,8 @@ data "external" "helm_file_change_check" {
 }
 
 resource "aws_iam_role_policy_attachment" "eks_work_alb_permissions" {
-  role       = "${module.eks-cluster.worker_iam_role_name}"
-  policy_arn = "${aws_iam_policy.eks_work_alb_permissions.arn}"
+  role       = module.eks-cluster.worker_iam_role_name
+  policy_arn = aws_iam_policy.eks_work_alb_permissions.arn
 }
 
 resource "aws_iam_role" "eks_public_worker_role" {
@@ -331,26 +339,27 @@ resource "aws_iam_role" "eks_public_worker_role" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy_attachment" "eks_public_work_alb_permissions" {
-  role       = "${aws_iam_role.eks_public_worker_role.name}"
-  policy_arn = "${aws_iam_policy.eks_public_work_alb_permissions.arn}"
+  role       = aws_iam_role.eks_public_worker_role.name
+  policy_arn = aws_iam_policy.eks_public_work_alb_permissions.arn
 }
 
 resource "aws_iam_role_policy_attachment" "workers_AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = "${aws_iam_role.eks_public_worker_role.name}"
+  role       = aws_iam_role.eks_public_worker_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "workers_AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = "${aws_iam_role.eks_public_worker_role.name}"
+  role       = aws_iam_role.eks_public_worker_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "workers_AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = "${aws_iam_role.eks_public_worker_role.name}"
+  role       = aws_iam_role.eks_public_worker_role.name
 }
 
 resource "aws_wafv2_web_acl" "eks_cluster" {
@@ -359,7 +368,8 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
   scope       = "REGIONAL"
 
   default_action {
-    allow {}
+    allow {
+    }
   }
 
   rule {
@@ -367,7 +377,8 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
     priority = 0
 
     override_action {
-      none {}
+      none {
+      }
     }
 
     statement {
@@ -389,7 +400,8 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
     priority = 1
 
     override_action {
-      none {}
+      none {
+      }
     }
 
     statement {
@@ -411,7 +423,8 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
     priority = 2
 
     override_action {
-      none {}
+      none {
+      }
     }
 
     statement {
@@ -433,7 +446,8 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
     priority = 3
 
     override_action {
-      none {}
+      none {
+      }
     }
 
     statement {
@@ -455,7 +469,8 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
     priority = 4
 
     override_action {
-      none {}
+      none {
+      }
     }
 
     statement {
@@ -477,7 +492,8 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
     priority = 5
 
     override_action {
-      none {}
+      none {
+      }
     }
 
     statement {
@@ -502,17 +518,17 @@ resource "aws_wafv2_web_acl" "eks_cluster" {
 }
 
 data "aws_eks_cluster" "eks_cluster" {
-  name = "${module.eks-cluster.cluster_id}"
+  name = module.eks-cluster.cluster_id
 }
 
 data "external" "oidc_thumbprint" {
-  program = ["${path.module}/files/scripts/oidc_thumbprint.sh", "${var.region}"]
+  program = ["${path.module}/files/scripts/oidc_thumbprint.sh", var.region]
 }
 
 resource "aws_iam_openid_connect_provider" "eks_cluster" {
   client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["${data.external.oidc_thumbprint.result.thumbprint}"]
-  url             = "${data.aws_eks_cluster.eks_cluster.identity.0.oidc.0.issuer}"
+  thumbprint_list = [data.external.oidc_thumbprint.result.thumbprint]
+  url             = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
 }
 
 variable "cluster_version" {
@@ -568,35 +584,40 @@ variable "kubelet_security_args" {
 
 output "eks_cluster_kubeconfig" {
   description = "Working kubeconfig to talk to the eks cluster."
-  value       = "${module.eks-cluster.kubeconfig}"
+  value       = module.eks-cluster.kubeconfig
 }
 
 output "eks_cluster_name" {
   description = "Name of the EKS cluster"
-  value       = "${local.kubernetes_cluster_name}"
+  value       = local.kubernetes_cluster_name
 }
 
 output "eks_worker_role_arn" {
   description = "EKS Worker Role ARN"
-  value       = "${module.eks-cluster.worker_iam_role_arn}"
+  value       = module.eks-cluster.worker_iam_role_arn
 }
 
 output "eks_cluster_oidc_provider_url" {
   description = "The OpendId Connect provider URL for the cluster"
-  value       = "${aws_iam_openid_connect_provider.eks_cluster.url}"
+  value       = aws_iam_openid_connect_provider.eks_cluster.url
 }
 
 output "eks_cluster_oidc_provider_host" {
   description = "The OpendId Connect provider host for the cluster"
-  value       = "${replace(aws_iam_openid_connect_provider.eks_cluster.url, "https://", "")}"
+  value = replace(
+    aws_iam_openid_connect_provider.eks_cluster.url,
+    "https://",
+    "",
+  )
 }
 
 output "eks_cluster_oidc_provider_arn" {
   description = "The OpendId Connect provider ARN for the cluster"
-  value       = "${aws_iam_openid_connect_provider.eks_cluster.arn}"
+  value       = aws_iam_openid_connect_provider.eks_cluster.arn
 }
 
 output "eks_cluster_waf_acl_arn" {
   description = "The ARN for the EKS cluster's WAFv2 ACL ARN"
-  value       = "${aws_wafv2_web_acl.eks_cluster.arn}"
+  value       = aws_wafv2_web_acl.eks_cluster.arn
 }
+
