@@ -8,7 +8,7 @@ module "monitoring" {
 //---------ALARMS---------//
 
 resource "aws_cloudwatch_metric_alarm" "joomla_rds_free_storage_space_low" {
-  count               = var.joomla_alarms_enabled
+  count               = var.joomla_alarms_enabled ? 1 : 0
   alarm_name          = "${terraform.workspace} Joomla - RDS Free Storage Space Low"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "2"
@@ -27,7 +27,7 @@ resource "aws_cloudwatch_metric_alarm" "joomla_rds_free_storage_space_low" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "joomla_rds_high_cpu_util" {
-  count               = var.joomla_alarms_enabled
+  count               = var.joomla_alarms_enabled ? 1 : 0
   alarm_name          = "${terraform.workspace} Joomla - RDS High CPU Utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"

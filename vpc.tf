@@ -12,7 +12,7 @@ locals {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "1.32.0"
+  version = "2.70.0"
 
   name = local.vpc_name
   cidr = local.vpc_cidr
@@ -60,7 +60,7 @@ module "vpc" {
 resource "aws_db_subnet_group" "default" {
   name        = "environment db ${terraform.workspace} subnet group"
   description = "DB Subnet Group"
-  subnet_ids = [module.vpc.private_subnets]
+  subnet_ids = module.vpc.private_subnets
 
   tags = {
     Name = "Subnet Group for Environment ${terraform.workspace} VPC"
@@ -137,7 +137,7 @@ output "vpc_id" {
 
 output "private_subnets" {
   description = "List of IDs of private subnets"
-  value       = [module.vpc.private_subnets]
+  value       = module.vpc.private_subnets
 }
 
 output "public_subnets" {

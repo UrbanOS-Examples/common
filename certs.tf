@@ -1,5 +1,5 @@
 module "tls_certificate" {
-  source = "github.com/azavea/terraform-aws-acm-certificate?ref=1.1.0"
+  source = "github.com/azavea/terraform-aws-acm-certificate?ref=3.0.0"
 
   providers = {
     aws.acm_account     = aws
@@ -29,7 +29,7 @@ locals {
 }
 
 module "root_tls_certificate" {
-  source = "github.com/azavea/terraform-aws-acm-certificate?ref=1.1.0"
+  source = "github.com/azavea/terraform-aws-acm-certificate?ref=3.0.0"
 
   providers = {
     aws.acm_account     = aws

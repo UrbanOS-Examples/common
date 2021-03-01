@@ -28,6 +28,6 @@ module "security" {
     },
   ]
 
-  vpc_id = module.vpc.vpc_id
+  default_network_acl_id = module.vpc.default_network_acl_id
 }
 
