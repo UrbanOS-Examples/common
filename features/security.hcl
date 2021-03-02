@@ -2,7 +2,7 @@
 locals {
   exclude_ingest_ports_for_eks_workers = {
     "service.action.networkConnectionAction.remotePortDetails.port" = {
-      "Eq" = [255, 8443]
+      "Eq" = ["255", "8443"]
     }
     "resource.instanceDetails.tags.key" = {
       "Eq" = ["aws:autoscaling:groupName"]
@@ -14,7 +14,7 @@ locals {
 }
 
 module "security" {
-  source = "git@github.com:SmartColumbusOS/scos-tf-security.git?ref=2.0.0"
+  source = "git@github.com:SmartColumbusOS/scos-tf-security.git?ref=common-512"
 
   force_destroy_s3_bucket     = var.force_destroy_s3_bucket
   alert_handler_sns_topic_arn = module.monitoring.alert_handler_sns_topic_arn
