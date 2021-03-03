@@ -142,12 +142,12 @@ output "private_subnets" {
 
 output "public_subnets" {
   description = "List of IDs of public subnets"
-  value       = [module.vpc.public_subnets]
+  value       = module.vpc.public_subnets
 }
 
 output "nat_public_ips" {
   description = "List of public Elastic IPs created for AWS NAT Gateway"
-  value       = [module.vpc.nat_public_ips]
+  value       = module.vpc.nat_public_ips
 }
 
 variable "key_pair_public_key" {
