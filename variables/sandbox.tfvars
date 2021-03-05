@@ -5,6 +5,15 @@
 enabled_features = [
   "eks-cluster",
   "redis"
+  # "joomla",
+  # "lime_db",
+  # "cloudwatch_monitoring",
+  # "ses",
+  # "inspector_assessment",
+  # "data_science_stack",
+  # "elasticsearch"
+  # "security" cannot be deployed to sandbox.  scos-tf-security deploys
+  #     AWS Config which can only be effectively deployed once per account
 ]
 
 sandbox = true

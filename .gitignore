@@ -1,17 +1,23 @@
-**/terraform.*
-**/.terraform
-**/*.zip
-*.swp
-**/*.plan
-plan.txt
-plan.bin
-.DS_Store
+# Terraform outputs
+.terraform/
+_feature_*.tf
+aws.yaml
+config-map-aws-auth_streaming-*.yaml
+kubeconfig_streaming-*
+helm/
+
+# Developer specified ignores
 sandbox_dev.tfvars
 sandbox_prod.tfvars
 sandbox_staging.tfvars
+plan.txt
+plan.bin
+plans/
+**/*.zip
+**/*.plan
 **/*.out
-**/_feature_*.tf
+**/terraform.*
 
-aws.yaml
-config-map-aws-auth_streaming-kube-smrt-*.yaml
-kubeconfig_streaming-kube-smrt-*
+# Filesystem and editor ignores
+*.swp
+.DS_Store
