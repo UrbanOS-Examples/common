@@ -7,6 +7,8 @@ enabled_features = [
   "redis"
 ]
 
+sandbox = true
+
 alm_account_id = "068920858268"
 
 alm_state_bucket_name = "scos-sandbox-terraform-state"
@@ -42,3 +44,11 @@ key_pair_name = "eks_key_sandbox_2021_03_02"
 force_destroy_s3_bucket = true
 
 andi_public_sample_datasets = "andi-public-sample-datasets"
+
+#Alarms
+alarms_slack_path = "/services/T7LRETX4G/BDE8Y9SQ3/Amboqt9U8R3IYQgxUlBPkSUY"
+
+alarms_slack_channel_name = "#pre_prod_alerts"
+
+#Elastic Search
+elasticsearch_dedicated_master_count = 3

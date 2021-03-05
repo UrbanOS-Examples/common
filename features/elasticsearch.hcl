@@ -133,6 +133,7 @@ POLICY
 }
 
 resource "aws_iam_service_linked_role" "elasticsearch" {
+  count = var.sandbox ? 0 : 1
   aws_service_name = "es.amazonaws.com"
 }
 
