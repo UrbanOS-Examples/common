@@ -127,7 +127,7 @@ locals {
 }
 
 locals {
-  private_subnets = slice(module.vpc.private_subnets, 0, 3)
+  private_subnets = length(module.vpc.private_subnets) > 2 ? slice(module.vpc.private_subnets, 0, 3) : module.vpc.private_subnets
 }
 
 output "vpc_id" {
