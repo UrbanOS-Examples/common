@@ -14,7 +14,7 @@ locals {
 }
 
 module "security" {
-  source = "git@github.com:SmartColumbusOS/scos-tf-security.git?ref=common-512"
+  source = "git@github.com:SmartColumbusOS/scos-tf-security.git?ref=2.0.1"
 
   force_destroy_s3_bucket     = var.force_destroy_s3_bucket
   alert_handler_sns_topic_arn = module.monitoring.alert_handler_sns_topic_arn
