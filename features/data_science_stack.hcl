@@ -4,7 +4,7 @@ module "parking_prediction_database" {
   identifier = "${terraform.workspace}-data-science-parking-prediction"
   prefix     = "${terraform.workspace}-data-science-parking-prediction"
   type       = "sqlserver-web"
-  vers       = "14.00.3223.3.v1"
+  vers       = "14.00.3281.6.v1"
   port       = "1433"
   username   = "padmin"
 
