@@ -1,17 +1,17 @@
 module "parking_prediction_database" {
-  source = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=1.4.2"
+  source = "git@github.com:SmartColumbusOS/scos-tf-rds?ref=2.1.0"
 
   identifier = "${terraform.workspace}-data-science-parking-prediction"
   prefix     = "${terraform.workspace}-data-science-parking-prediction"
   type       = "sqlserver-web"
-  version    = "14.00.3223.3.v1"
+  vers       = "14.00.3281.6.v1"
   port       = "1433"
   username   = "padmin"
 
   multi_az                            = false
-  attached_vpc_id                     = "${module.vpc.vpc_id}"
-  attached_subnet_ids                 = "${local.private_subnets}"
-  attached_security_groups            = ["${aws_security_group.chatter.id}"]
+  attached_vpc_id                     = module.vpc.vpc_id
+  attached_subnet_ids                 = local.private_subnets
+  attached_security_groups            = [aws_security_group.chatter.id]
   attached_security_group_cidr_blocks = ["10.0.0.0/16"]
   instance_class                      = "db.m5.xlarge"
   allocated_storage                   = 1000
@@ -20,7 +20,7 @@ module "parking_prediction_database" {
 resource "aws_s3_bucket" "parking_prediction" {
   bucket        = "${terraform.workspace}-parking-prediction"
   acl           = "private"
-  force_destroy = "${var.force_destroy_s3_bucket}"
+  force_destroy = var.force_destroy_s3_bucket
 
   server_side_encryption_configuration {
     rule {
@@ -32,7 +32,7 @@ resource "aws_s3_bucket" "parking_prediction" {
 }
 
 resource "aws_s3_bucket_public_access_block" "parking_prediction" {
-  bucket = "${aws_s3_bucket.parking_prediction.id}"
+  bucket = aws_s3_bucket.parking_prediction.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -41,7 +41,7 @@ resource "aws_s3_bucket_public_access_block" "parking_prediction" {
 }
 
 resource "aws_s3_bucket_policy" "parking_prediction" {
-  bucket = "${aws_s3_bucket.parking_prediction.id}"
+  bucket = aws_s3_bucket.parking_prediction.id
 
   policy = <<POLICY
 {
@@ -62,12 +62,13 @@ resource "aws_s3_bucket_policy" "parking_prediction" {
   ]
 }
 POLICY
+
 }
 
 resource "aws_s3_bucket" "parking_prediction_public" {
   bucket        = "${terraform.workspace}-parking-prediction-public"
   acl           = "public-read"
-  force_destroy = "${var.force_destroy_s3_bucket}"
+  force_destroy = var.force_destroy_s3_bucket
 
   server_side_encryption_configuration {
     rule {
@@ -79,7 +80,7 @@ resource "aws_s3_bucket" "parking_prediction_public" {
 }
 
 resource "aws_s3_bucket_policy" "parking_prediction_public_ssl_policy" {
-  bucket = "${aws_s3_bucket.parking_prediction_public.id}"
+  bucket = aws_s3_bucket.parking_prediction_public.id
 
   policy = <<POLICY
 {
@@ -100,6 +101,7 @@ resource "aws_s3_bucket_policy" "parking_prediction_public_ssl_policy" {
   ]
 }
 POLICY
+
 }
 
 resource "aws_iam_user" "parking_prediction_api" {
@@ -112,7 +114,7 @@ resource "aws_iam_user" "parking_prediction_train" {
 
 resource "aws_iam_user_policy" "parking_prediction_api_ro" {
   name = "read"
-  user = "${aws_iam_user.parking_prediction_api.name}"
+  user = aws_iam_user.parking_prediction_api.name
 
   policy = <<EOF
 {
@@ -137,11 +139,12 @@ resource "aws_iam_user_policy" "parking_prediction_api_ro" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_user_policy" "parking_prediction_train" {
   name = "read"
-  user = "${aws_iam_user.parking_prediction_train.name}"
+  user = aws_iam_user.parking_prediction_train.name
 
   policy = <<EOF
 {
@@ -169,19 +172,21 @@ resource "aws_iam_user_policy" "parking_prediction_train" {
   ]
 }
 EOF
+
 }
 
 output "data_science_db_server" {
   description = "Data Science MSSQL server url"
-  value       = "${module.parking_prediction_database.address}"
+  value       = module.parking_prediction_database.address
 }
 
 output "data_science_db_secret_id" {
   description = "Data Science MSSQL server secret"
-  value = "${module.parking_prediction_database.password_secret_id}"
+  value       = module.parking_prediction_database.password_secret_id
 }
 
 output "data_science_db_username" {
   description = "Data Science MSSQL username"
-  value = "${module.parking_prediction_database.username}"
+  value       = module.parking_prediction_database.username
 }
+
