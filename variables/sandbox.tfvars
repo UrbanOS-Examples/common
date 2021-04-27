@@ -5,13 +5,13 @@
 enabled_features = [
   "eks-cluster",
   "redis",
+  "elasticsearch"
   # "joomla",
   # "lime_db",
   # "cloudwatch_monitoring",
   # "ses",
   # "inspector_assessment",
   # "data_science_stack",
-   "elasticsearch"
   # "security" cannot be deployed to sandbox.  scos-tf-security deploys
   #     AWS Config which can only be effectively deployed once per account
 ]
@@ -56,13 +56,3 @@ elasticsearch_dedicated_master_count = 3
 cluster_version = "1.16"
 
 eks_ami_version = "20210329"
-
-#EKS Workers
-#min_num_of_workers = 3
-
-#k8s_instance_size = "t3.medium"
-
-#Kafka EKS Workers
-#min_num_of_kafka_workers = 3
-
-#max_num_of_kafka_workers = 3
