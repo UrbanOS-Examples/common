@@ -4,14 +4,14 @@
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = [
   "eks-cluster",
-  "redis"
+  "redis",
   # "joomla",
   # "lime_db",
   # "cloudwatch_monitoring",
   # "ses",
   # "inspector_assessment",
   # "data_science_stack",
-  # "elasticsearch"
+   "elasticsearch"
   # "security" cannot be deployed to sandbox.  scos-tf-security deploys
   #     AWS Config which can only be effectively deployed once per account
 ]
@@ -25,16 +25,6 @@ alm_state_bucket_name = "scos-sandbox-terraform-state"
 role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
 alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
-
-#EKS Workers  
-min_num_of_workers = 3
-
-k8s_instance_size = "t3.medium"
-
-#Kafka EKS Workers
-min_num_of_kafka_workers = 3
-
-max_num_of_kafka_workers = 3
 
 # Redis Elasticache settings
 redis_node_type = "cache.t2.medium"
@@ -66,3 +56,13 @@ elasticsearch_dedicated_master_count = 3
 cluster_version = "1.16"
 
 eks_ami_version = "20210329"
+
+#EKS Workers
+#min_num_of_workers = 3
+
+#k8s_instance_size = "t3.medium"
+
+#Kafka EKS Workers
+#min_num_of_kafka_workers = 3
+
+#max_num_of_kafka_workers = 3
