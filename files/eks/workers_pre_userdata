@@ -1,20 +1,5 @@
 #!/bin/bash
 
-# Prevent containers from exhausting the process table, killing the node. (Fork bomb.)
-mkdir --parents /etc/systemd/system/docker.service.d
-cat <<MARK > /etc/systemd/system/docker.service.d/override.conf
-[Service]
-ExecStart=
-ExecStart=/usr/bin/dockerd --default-ulimit nproc=5000:10000 --default-ulimit nofile=65600:65600
-MARK
-
-# Make sure kubelet gets restarted on exit.
-mkdir --parents /etc/systemd/system/kubelet.service.d
-cat <<MARK > /etc/systemd/system/kubelet.service.d/override.conf
-[Service]
-Restart=always
-MARK
-
 # Security Setting to enforce standard kernel tuning. ref: CIS 2.1.6
 mkdir --parents /etc/systemd/system/kubelet.service.d
 cat <<MARK > /etc/sysctl.d/90-scos-kubelet.conf

@@ -4,14 +4,14 @@
 # whose list of enabled_features is different, you must re-run `tf-init` before any other terraform commands.
 enabled_features = [
   "eks-cluster",
-  "redis"
+  "redis",
+  "elasticsearch"
   # "joomla",
   # "lime_db",
   # "cloudwatch_monitoring",
   # "ses",
   # "inspector_assessment",
   # "data_science_stack",
-  # "elasticsearch"
   # "security" cannot be deployed to sandbox.  scos-tf-security deploys
   #     AWS Config which can only be effectively deployed once per account
 ]
@@ -26,16 +26,6 @@ role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
 alm_role_arn = "arn:aws:iam::068920858268:role/admin_role"
 
-#EKS Workers  
-min_num_of_workers = 3
-
-k8s_instance_size = "t3.medium"
-
-#Kafka EKS Workers
-min_num_of_kafka_workers = 3
-
-max_num_of_kafka_workers = 3
-
 # Redis Elasticache settings
 redis_node_type = "cache.t2.medium"
 
@@ -46,7 +36,7 @@ root_dns_zone = "sandbox-smartos.com"
 
 is_sandbox = true # Leave this true
 
-key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCrnk5HU0rn3fe5MksDs+cz7zxl9+xbzOVNz+Rl1AjTRC58xm1zatkrUjtraQY2A/0zRvfTalSdheAhxXgf8IcKMsbytrInyqkIz1kOnciAuF/RanHyoYxaQE/N/klbjcJPLeglm+s8pXIVBwsTIe4B+sjwkkLEoiVhrVllj7z4XsptE8ko1+nGJFVY0GM27AKtt+TZvRTcj3/2d6BiUs0QLD4No11VsAP41l4FxE7ywtZWDY3S3H/Ii+/d7Z9Z8abmwwLEPeNnDQ1BP7a1RCCfKGR5Crlbo6n6oIREyT8cHGvfsZVkgjjIF43Zj5L6mQBra20vVWt1Wf9a3AQZVWxLkRmicuqakodKdp8Liuj569u6MH//vnXQ0XXDfyyKgsigIw6NHBJkY0jRZakE9/fM+a4BOLxx5IK9q+CaIlPIaNno6DEHi+k8vG69nDI39n1UJfcjfiZdeZ7PX/McgxxNR7yZuiUqtflaWx9S8rxcz04eJbkDQFuabGTZsCmgtcauENEFBtISiYVEUaBbS7uywLdt6FlASHoYyFvO/xIpPdB2VUZo6ARA0P5I5K96k4UrkT02L09/I3hD/LbC+T73RMCLmPptiumxrkuL91ZmWhkZseguybfZJJe3ZrdpGnt94/fB+odbrkEt2UsATBEHB1dBdwQy5UT1/QL3ho48LQ== jarred.olson@AMAC02XR4Z3JG5M"
+key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRAvH6k7iEeRDz9SQtkH1o8KiUaed/e2hmzTUjA8bhmeWVLPsgCMKIUKR0jdPlvdZ0AmMLXswobsXj08dPgWxUZxoAWIqKCjd969KckydUpBtcb+X2Q+tpOcugBOQSY1H8hgNrdcRKEaUllTfvseJ9pBOYU7j9VuZ608HQhfZw7+aS8wi9o/BJwejtpWdlo6gkxXoIRqDX/ioYg+W6Tc7yoUzAEANwZAy3/3GKWDrh+9jnzR6mEEN48Nuee49wWfP5G0T/v4+Gvux5zioHb3rcmmR9YTkFOiv1poInhXlPdc7Q38yj+z6E+hACNN3rK80YjU0ByaSPltPjqm9ZYmPX"
 
 key_pair_name = "eks_key_sandbox_2021_03_02"
 
