@@ -39,3 +39,8 @@ key_pair_name = "eks_key_dev_2020_03_23"
 force_destroy_s3_bucket = false
 
 andi_public_sample_datasets = "andi-public-sample-datasets"
+
+# EKS
+cluster_version = "1.16"
+
+eks_ami_version = "20210329"
