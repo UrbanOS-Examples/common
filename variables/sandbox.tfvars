@@ -51,8 +51,3 @@ alarms_slack_channel_name = "#pre_prod_alerts"
 
 #Elastic Search
 elasticsearch_dedicated_master_count = 3
-
-# EKS
-cluster_version = "1.16"
-
-eks_ami_version = "20210329"
