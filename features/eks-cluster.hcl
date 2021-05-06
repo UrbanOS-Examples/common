@@ -264,6 +264,7 @@ resource "null_resource" "kubernetes_certs" {
         openssl genrsa -out ca.key 2048
         openssl req -x509 -new -key ca.key -out ca.crt -config v3_ca.cnf -extensions v3_ca -batch -subj "/C=US/ST=Ohio/L=Columbus"
 
+        kubectl get namespaces | egrep '^cert-manager ' || kubectl create namespace cert-manager
         kubectl create secret tls ca-key-pair \
           --cert=ca.crt \
           --key=ca.key \
@@ -302,7 +303,6 @@ kubectl get namespaces | egrep '^cluster-infra ' || kubectl create namespace clu
 kubectl label namespace cluster-infra name=cluster-infra --overwrite
 
 helm repo add jetstack https://charts.jetstack.io
-kubectl get namespaces | egrep '^cert-manager ' || kubectl create namespace cert-manager
 
 cd ${path.module}/helm/cluster-infra
 helm dependency update
