@@ -246,10 +246,38 @@ EOF
   filename = "${path.module}/aws.yaml"
 }
 
+resource "null_resource" "kubernetes_certs" {
+  depends_on = [
+    data.external.helm_file_change_check
+  ]
+
+  provisioner "local-exec" {
+    command = <<EOF
+      if ! kubectl get secret -n cert-manager | grep -E '^ca-key-pair'; then
+        cp /etc/ssl/openssl.cnf v3_ca.cnf
+        echo "
+          [ v3_ca ]
+          basicConstraints = critical,CA:TRUE
+          subjectKeyIdentifier = hash
+          authorityKeyIdentifier = keyid:always,issuer:always
+        " >> v3_ca.cnf
+        openssl genrsa -out ca.key 2048
+        openssl req -x509 -new -key ca.key -out ca.crt -config v3_ca.cnf -extensions v3_ca -batch -subj "/C=US/ST=Ohio/L=Columbus"
+
+        kubectl create secret tls ca-key-pair \
+          --cert=ca.crt \
+          --key=ca.key \
+          --namespace=cert-manager
+      fi
+    EOF
+  }
+}
+
 resource "null_resource" "eks_infrastructure" {
   depends_on = [
     data.external.helm_file_change_check,
     local_file.aws_props,
+    null_resource.kubernetes_certs
   ]
 
   provisioner "local-exec" {
@@ -267,15 +295,25 @@ for i in $(seq 1 $LOOP_COUNT); do
     echo "Running Tiller Pod not found"
     [ $i -eq $LOOP_COUNT ] && exit 1
 done
-echo "Identified Running Tiller Pod..."
+echo "Identified Running Tiller Pod...."
 
 # label the dns namespace to later select for network policy rules; overwrite = no-op
 kubectl get namespaces | egrep '^cluster-infra ' || kubectl create namespace cluster-infra
 kubectl label namespace cluster-infra name=cluster-infra --overwrite
 
+helm repo add jetstack https://charts.jetstack.io
+kubectl get namespaces | egrep '^cert-manager ' || kubectl create namespace cert-manager
+
 cd ${path.module}/helm/cluster-infra
 helm dependency update
 cd -
+
+helm upgrade --install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --version v1.0.3 \
+  --set installCRDs=true
+
+kubectl -n cert-manager rollout status deployment cert-manager-webhook
 
 helm upgrade --install cluster-infra ${path.module}/helm/cluster-infra \
     --namespace=cluster-infra \

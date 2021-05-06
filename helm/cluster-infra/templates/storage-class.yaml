@@ -15,6 +15,9 @@ metadata:
 provisioner: {{ .provisioner }}
 parameters:
   type: {{ .type }}
+{{- if .parameters }}
+{{ toYaml .parameters | trim | indent 2 }}
+{{- end }}
 reclaimPolicy: {{ .reclaimPolicy }}
 {{- if .mountOptions }}
 mountOptions:
