@@ -39,3 +39,5 @@ key_pair_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC5yJ//U9QiuN3T7C2Zo
 key_pair_name = "eks_key_prod_2020_03_23"
 
 max_num_of_workers = 25
+
+min_num_of_workers = 25
