@@ -258,7 +258,7 @@ set -e
 export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
 kubectl apply -f ${path.module}/k8s/tiller-role/
 kubectl patch sc gp2 --patch "$(cat ${path.module}/k8s/storage-class/patch-not-default.yaml)"
-helm init --service-account tiller --stable-repo-url https://charts.helm.sh/stable
+helm repo add stable https://charts.helm.sh/stable
 
 LOOP_COUNT=10
 for i in $(seq 1 $LOOP_COUNT); do
