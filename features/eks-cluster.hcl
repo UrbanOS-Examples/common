@@ -260,17 +260,9 @@ kubectl apply -f ${path.module}/k8s/tiller-role/
 kubectl patch sc gp2 --patch "$(cat ${path.module}/k8s/storage-class/patch-not-default.yaml)"
 helm repo add stable https://charts.helm.sh/stable
 
-LOOP_COUNT=10
-for i in $(seq 1 $LOOP_COUNT); do
-    [ $i -gt 1 ] && sleep 15
-    [ $(kubectl get pods --namespace kube-system -l name='tiller' | grep -i Running | grep -ic '1/1') -gt 0 ] && break
-    echo "Running Tiller Pod not found"
-    [ $i -eq $LOOP_COUNT ] && exit 1
-done
-echo "Identified Running Tiller Pod..."
+kubectl get namespaces | egrep '^cluster-infra ' || kubectl create namespace cluster-infra
 
 # label the dns namespace to later select for network policy rules; overwrite = no-op
-kubectl get namespaces | egrep '^cluster-infra ' || kubectl create namespace cluster-infra
 kubectl label namespace cluster-infra name=cluster-infra --overwrite
 
 cd ${path.module}/helm/cluster-infra
