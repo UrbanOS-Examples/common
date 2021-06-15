@@ -36,7 +36,7 @@ resource "random_pet" "this_exists_to_download_random_plugin_if_terraform_cache_
 }
 
 resource "aws_key_pair" "cloud_key" {
-  key_name   = var.key_pair_name
+  key_name   = "${terraform.workspace}-${var.key_pair_name}"
   public_key = var.key_pair_public_key
 }
 
