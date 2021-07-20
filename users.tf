@@ -127,3 +127,18 @@ EOF
 
 }
 
+output "andi_aws_user_name" {
+  value = aws_iam_user.andi_user.name
+}
+
+output "odo_aws_user_name" {
+  value = aws_iam_user.odo_user.name
+}
+
+output "reaper_aws_user_name" {
+  value = aws_iam_user.reaper_user.name
+}
+
+output "discovery_api_aws_user_name" {
+  value = aws_iam_user.discovery_api_user.name
+}
