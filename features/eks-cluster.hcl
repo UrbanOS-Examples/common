@@ -579,6 +579,16 @@ output "eks_cluster_kubeconfig" {
   value       = module.eks-cluster.kubeconfig
 }
 
+output "eks_cluster_certificate_authority_data" {
+  description = "Nested attribute containing certificate-authority-data for your cluster. This is the base64 encoded certificate data required to communicate with your cluster."
+  value       = module.eks-cluster.cluster_certificate_authority_data
+}
+
+output "eks_cluster_endpoint" {
+  description = "The endpoint for your EKS Kubernetes API."
+  value       = module.eks-cluster.cluster_endpoint
+}
+
 output "eks_cluster_name" {
   description = "Name of the EKS cluster"
   value       = local.kubernetes_cluster_name
