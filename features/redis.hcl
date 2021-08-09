@@ -50,6 +50,7 @@ resource "null_resource" "redis_external_service" {
     command = <<EOF
 set -e
 export KUBECONFIG=${path.module}/kubeconfig_streaming-kube-${terraform.workspace}
+kubectl get namespaces | egrep '^external-services ' || kubectl create namespace external-services
 
 helm upgrade --install common-external-services ${path.module}/helm/external-services \
     --namespace=external-services \
