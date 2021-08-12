@@ -65,7 +65,7 @@ module "vpc" {
 resource "aws_db_subnet_group" "default" {
   name        = "environment db ${terraform.workspace} subnet group"
   description = "DB Subnet Group"
-  subnet_ids = module.vpc.private_subnets
+  subnet_ids  = module.vpc.private_subnets
 
   tags = {
     Name = "Subnet Group for Environment ${terraform.workspace} VPC"

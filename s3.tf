@@ -61,7 +61,7 @@ resource "aws_s3_bucket_public_access_block" "os_hosted_datasets_s3_access" {
 }
 
 resource "aws_s3_bucket_policy" "os_hosted_datasets_ssl_policy" {
-  depends_on = [ aws_s3_bucket_public_access_block.os_hosted_datasets_s3_access ]
+  depends_on = [aws_s3_bucket_public_access_block.os_hosted_datasets_s3_access]
 
   bucket = aws_s3_bucket.os_hosted_datasets.id
 
@@ -112,7 +112,7 @@ resource "aws_s3_bucket_public_access_block" "ckan_s3_access" {
 }
 
 resource "aws_s3_bucket_policy" "ckan_ssl_policy" {
-  depends_on = [ aws_s3_bucket_public_access_block.ckan_s3_access ]
+  depends_on = [aws_s3_bucket_public_access_block.ckan_s3_access]
 
   bucket = aws_s3_bucket.ckan.id
 
@@ -178,7 +178,7 @@ resource "aws_s3_bucket_public_access_block" "andi_public_sample_datasets_access
 }
 
 resource "aws_s3_bucket_policy" "andi_ssl_policy" {
-  depends_on = [ aws_s3_bucket_public_access_block.andi_public_sample_datasets_access ]
+  depends_on = [aws_s3_bucket_public_access_block.andi_public_sample_datasets_access]
 
   bucket = aws_s3_bucket.andi_public_sample_datasets.id
 
