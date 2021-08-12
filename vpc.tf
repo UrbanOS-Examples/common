@@ -47,6 +47,11 @@ module "vpc" {
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = ""
     "kubernetes.io/role/alb-ingress"  = ""
+    "Visibility"                      = "private"
+  }
+
+  public_subnet_tags = {
+    "Visibility" = "public"
   }
 
   tags = {
