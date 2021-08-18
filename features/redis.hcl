@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "eks_workers_to_redis" {
 }
 
 resource "aws_elasticache_subnet_group" "redis_cache_subnet" {
-  name = "redis-cache-subnet-${terraform.workspace}"
+  name       = "redis-cache-subnet-${terraform.workspace}"
   subnet_ids = module.vpc.private_subnets
 }
 

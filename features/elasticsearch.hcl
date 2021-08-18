@@ -133,7 +133,7 @@ POLICY
 }
 
 resource "aws_iam_service_linked_role" "elasticsearch" {
-  count = var.sandbox ? 0 : 1
+  count            = var.sandbox ? 0 : 1
   aws_service_name = "es.amazonaws.com"
 }
 
@@ -161,10 +161,10 @@ resource "aws_security_group_rule" "vpn_to_elasticsearch" {
   description       = "Allow VPN hosts to communicate with ElasticSearch instances."
   protocol          = "tcp"
   security_group_id = aws_security_group.elasticsearch.id
-  cidr_blocks = [data.terraform_remote_state.alm_remote_state.outputs.vpc_cidr_block]
-  from_port   = 443
-  to_port     = 443
-  type        = "ingress"
+  cidr_blocks       = [data.terraform_remote_state.alm_remote_state.outputs.vpc_cidr_block]
+  from_port         = 443
+  to_port           = 443
+  type              = "ingress"
 }
 
 resource "aws_security_group_rule" "elasticsearch_intra_cluster" {
