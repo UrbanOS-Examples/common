@@ -51,3 +51,11 @@ alarms_slack_channel_name = "#pre_prod_alerts"
 
 #Elastic Search
 elasticsearch_dedicated_master_count = 3
+
+#min_num_of_workers = 10
+
+#max_num_of_workers = 10
+
+#min_num_of_kafka_workers = 3
+
+#max_num_of_kafka_workers = 3
