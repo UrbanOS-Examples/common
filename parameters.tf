@@ -34,12 +34,26 @@ resource "aws_ssm_parameter" "eks_cluster_endpoint" {
   name        = "${terraform.workspace}_eks_cluster_endpoint"
   description = "AWS EKS Cluster Endpoint URL"
   type        = "String"
-  value       =  
+  value       = module.eks-cluster.cluster_endpoint
 }
 
 resource "aws_ssm_parameter" "eks_cluster_cert_auth_data" {
   name        = "${terraform.workspace}_eks_cluster_cert_auth_data"
   description = "AWS EKS Certificate Authority Data"
   type        = "String"
-  value       = 
+  value       = module.eks-cluster.cluster_certificate_authority_data
+}
+
+resource "aws_ssm_parameter" "dns_zone" {
+  name        = "${terraform.workspace}_dns_zone"
+  description = "Internal DNS Zone for Ingress"
+  type        = "String"
+  value       = local.internal_public_hosted_zone_name
+}
+
+resource "aws_ssm_parameter" "root_dns_zone" {
+  name        = "${terraform.workspace}_root_dns_zone"
+  description = "Root DNS Zone for Ingress"
+  type        = "String"
+  value       = local.root_public_hosted_zone_name
 }
