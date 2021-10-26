@@ -53,9 +53,9 @@ module "eks-cluster" {
     {
       # so we don't have to go through a roll in the future - set to zeros and something inconsequential until we figure out what we need
       name                          = "Memory-Optimized-Workers"
-      asg_min_size                  = "0"
-      asg_max_size                  = "0"
-      instance_type                 = "r5a.large"
+      asg_min_size                  = var.min_num_of_memory_workers
+      asg_max_size                  = var.max_num_of_memory_workers
+      instance_type                 = "m5.4xlarge"
       key_name                      = aws_key_pair.cloud_key.key_name
       kubelet_extra_args            = "--node-labels=scos.run.memory-optimized=true ${var.kubelet_security_args}"
       additional_security_group_ids = aws_security_group.private_workers.id
@@ -567,6 +567,16 @@ variable "min_num_of_kafka_workers" {
 variable "max_num_of_kafka_workers" {
   description = "Maximum number of kafka workers to be created on eks cluster"
   default     = 5
+}
+
+variable "min_num_of_memory_workers" {
+  description = "Minimum number of kafka workers to be created on eks cluster"
+  default     = 0
+}
+
+variable "max_num_of_memory_workers" {
+  description = "Maximum number of kafka workers to be created on eks cluster"
+  default     = 0
 }
 
 variable "kubelet_security_args" {

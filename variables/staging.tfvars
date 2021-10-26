@@ -37,3 +37,9 @@ key_pair_name = "eks_key_staging_2020_03_23"
 force_destroy_s3_bucket = false
 
 andi_public_sample_datasets = "andi-public-sample-datasets"
+
+max_num_of_workers = 8
+min_num_of_workers = 6
+
+max_num_of_memory_workers = 1
+min_num_of_memory_workers = 1
