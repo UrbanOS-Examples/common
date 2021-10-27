@@ -570,12 +570,12 @@ variable "max_num_of_kafka_workers" {
 }
 
 variable "min_num_of_memory_workers" {
-  description = "Minimum number of kafka workers to be created on eks cluster"
+  description = "Minimum number of high memory workers to be created on eks cluster"
   default     = 0
 }
 
 variable "max_num_of_memory_workers" {
-  description = "Maximum number of kafka workers to be created on eks cluster"
+  description = "Maximum number of high memory workers to be created on eks cluster"
   default     = 0
 }
 
