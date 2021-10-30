@@ -5,7 +5,7 @@ variable "elasticsearch_instance_type" {
 
 variable "elasticsearch_instance_count" {
   description = "The number of the ElasticSearch instances in the cluster"
-  default     = 2
+  default     = 3
 }
 
 variable "elasticsearch_dedicated_master_enabled" {
@@ -20,7 +20,7 @@ variable "elasticsearch_dedicated_master_type" {
 
 variable "elasticsearch_dedicated_master_count" {
   description = "The number of the ElasticSearch master instances (if enabled) in the cluster"
-  default     = 2
+  default     = 3
 }
 
 variable "elasticsearch_zone_awareness_enabled" {
