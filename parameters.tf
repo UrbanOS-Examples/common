@@ -10,7 +10,7 @@ resource "aws_ssm_parameter" "certificate" {
 }
 
 resource "aws_ssm_parameter" "root_certificate" {
-  name        = "${terraform.workspace}_certificate_arn"
+  name        = "${terraform.workspace}_root_certificate_arn"
   description = "Certificate ARN for Ingress"
   type        = "String"
   value       = module.root_tls_certificate.arn
