@@ -9,6 +9,13 @@ resource "aws_ssm_parameter" "certificate" {
   value       = module.tls_certificate.arn
 }
 
+resource "aws_ssm_parameter" "root_certificate" {
+  name        = "${terraform.workspace}_certificate_arn"
+  description = "Certificate ARN for Ingress"
+  type        = "String"
+  value       = module.root_tls_certificate.arn
+}
+
 resource "aws_ssm_parameter" "public_subnets" {
   name        = "${terraform.workspace}_public_subnets"
   description = "Public subnets for Ingress ALB"
