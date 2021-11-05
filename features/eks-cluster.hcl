@@ -530,7 +530,7 @@ variable "cluster_version" {
 
 variable "eks_ami_version" {
   description = "the version of the EKS AMI to use to deploy workers"
-  default     = "20210826"
+  default     = "20211013"
 }
 
 variable "k8s_instance_size" {
