@@ -525,7 +525,7 @@ resource "aws_iam_openid_connect_provider" "eks_cluster" {
 
 variable "cluster_version" {
   description = "The version of k8s at which to install the cluster"
-  default     = "1.18"
+  default     = "1.19"
 }
 
 variable "eks_ami_version" {
